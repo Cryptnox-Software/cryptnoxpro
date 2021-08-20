@@ -1,0 +1,16 @@
+__pycache__
+*.pem
+build
+dist
+
+.idea
+
+signature.sig
+cardpub.pub
+
+_build
+_static
+_templates
+/cryptnoxcard.ini
+
+cryptnoxcard.egg-info

@@ -1,0 +1,32 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+mypy = "*"
+pyinstaller = "*"
+pylint = "*"
+pytest-pylint = "*"
+pytest = "*"
+
+[packages]
+aiohttp = "*"
+argparse = "*"
+appdirs = "*"
+base58 = "*"
+ecdsa = "*"
+colander = "*"
+cryptnoxpy = "*"
+cryptography = "*"
+lazy-import = "*"
+pytz = "*"
+pyscard = "==2.0.1"
+requests = "*"
+tabulate = "*"
+stdiomask = "*"
+web3 = "*"
+winrt = "*"
+
+[requires]
+python_version = "3.9"
