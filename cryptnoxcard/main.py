@@ -11,13 +11,13 @@ import argparse
 try:
     from command import options
     from command import factory
+    from __init__ import __version__
     import interactive_cli
-    from version import __version__
 except ImportError:
     from .command import options
     from .command import factory
     from . import interactive_cli
-    from .version import __version__
+    from . import __version__
 
 cryptnoxpy = lazy_import.lazy_module("cryptnoxpy")
 json = lazy_import.lazy_module("json")
@@ -39,7 +39,7 @@ def get_parser() -> argparse.ArgumentParser:
     parser = interactive_cli.ErrorParser(description="Cryptnox command line interface.")
 
     parser.add_argument("-v", "--version", action="version",
-                        version=f"Cryptnox Client {__version__}")
+                        version=f"Cryptnox Card {__version__}")
     parser.add_argument("--verbose", action="store_true",
                         help="Turn on logging")
     serial_index_parser = parser.add_mutually_exclusive_group()

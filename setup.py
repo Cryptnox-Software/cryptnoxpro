@@ -1,42 +1,15 @@
 """
 Configuration for setting up CryptnoxCard CLI application
 """
-import sys
+import pathlib
+
 from setuptools import setup
 
-from cryptnoxcard.version import __version__
 
-PYSCARD = "pyscard"
-if sys.platform.startswith("win"):
-    PYSCARD += "==2.0.1"
+def read(file):
+    return (pathlib.Path(__file__).parent / file).read_text("utf-8").strip()
 
-dependencies = [
-    "aiohttp",
-    "argparse",
-    "appdirs",
-    "base58",
-    "ecdsa",
-    "colander",
-    "cryptnoxpy",
-    "cryptography",
-    "lazy-import",
-    "pytz",
-    PYSCARD,
-    "requests",
-    "tabulate",
-    "stdiomask",
-    "web3"
-]
 
-if sys.platform.startswith("win"):
-    dependencies.append("winrt")
-
-setup(name='cryptnoxcard',
-      version=__version__,
-      platforms=['any'],
-      python_requires=">=3.6,<3.10",
-      install_requires=dependencies,
-      entry_points={
-          'console_scripts': ['cryptnoxcard=cryptnoxcard.main:main'],
-      }
-      )
+setup(
+    long_description="\n\n".join((read("README.rst"), read("CHANGELOG.rst"))),
+)

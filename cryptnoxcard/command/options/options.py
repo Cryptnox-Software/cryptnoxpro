@@ -11,10 +11,8 @@ from ..helper.helper_methods import IntRange
 
 try:
     import enums
-    import version
 except ImportError:
     from ... import enums
-    from ... import version
 
 
 def add(parser, interactive: bool = False):

@@ -15,7 +15,6 @@ import cryptnoxpy
 
 try:
     import enums
-    import version
     from command import options
     from command.helper import security
     from command.helper.cards import (
@@ -25,7 +24,6 @@ try:
     )
 except ImportError:
     from . import enums
-    from . import version
     from .command import options
     from .command.helper import security
     from .command.helper.cards import (
@@ -416,6 +414,6 @@ class InteractiveCli:
     def _prepare_parser(self) -> None:
         self.parser = UsageParser(description="Cryptnox command line interface")
         self.parser.add_argument(" version", action="version",
-                                 version=f"Cryptnox Client {self.version}",
+                                 version=f"Cryptnox Card {self.version}",
                                  help="Show program's version number")
         options.add(self.parser, True)

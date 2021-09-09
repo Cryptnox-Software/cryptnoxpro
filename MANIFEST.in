@@ -1,0 +1,5 @@
+include LICENSE
+include CHANGELOG.rst
+include README.rst
+include cryptnoxcard/contract_abi/*.json
+include cryptnoxcard/lib/cryptos/english.txt

@@ -11,22 +11,19 @@ pytest-pylint = "*"
 pytest = "*"
 
 [packages]
-aiohttp = "*"
 argparse = "*"
 appdirs = "*"
 base58 = "*"
 ecdsa = "*"
 colander = "*"
 cryptnoxpy = "*"
-cryptography = "*"
 lazy-import = "*"
 pytz = "*"
-pyscard = "==2.0.1"
 requests = "*"
 tabulate = "*"
 stdiomask = "*"
 web3 = "*"
-winrt = "*"
+winrt = {version = "*", sys_platform = "== 'win32'"}
 
 [requires]
 python_version = "3.9"
