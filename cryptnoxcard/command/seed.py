@@ -2,12 +2,15 @@
 """
 Module containing command for generating keys on the card
 """
+from pathlib import Path
+from typing import Union
 
 import cryptnoxpy
+from tabulate import tabulate
 
 from . import user_keys
 from .command import Command
-from .helper import security
+from .helper import backup, helper_methods, security
 from .helper.cards import ExitException, TimeoutException
 
 try:
@@ -34,14 +37,18 @@ class Seed(Command):
                   "\nReset the card before generating another one")
             return 0
 
-        if self.data.method == "upload":
-            Seed._upload(card)
-        elif self.data.method == "chip":
+        if self.data.action == "backup":
+            Seed._backup(card)
+        elif self.data.action == "chip":
             Seed._chip(card)
-        elif self.data.method == "recover":
-            Seed._recover(card)
-        elif self.data.method == "dual":
+        elif self.data.action == "dual":
             result = self._dual_seed(card)
+        elif self.data.action == "recover":
+            Seed._recover(card)
+        elif self.data.action == "restore":
+            Seed._restore(card)
+        elif self.data.action == "upload":
+            Seed._upload(card)
         else:
             print("Method not valid.")
             result = 1
@@ -49,13 +56,87 @@ class Seed(Command):
         return result
 
     @staticmethod
-    def _chip(card) -> None:
+    def _backup(card: cryptnoxpy.Card) -> int:
+        pin_code = Seed._get_pin_code(card)
+
+        service = Seed._backup_service()
+        if not service:
+            return False
+
+        name = helper_methods.input_with_exit("Name of the seed on the KMS in HSM: ")
+
+        seed = card.generate_random_number(32)
+        print("Backing up seed...")
+        try:
+            service.backup(name, seed)
+        except backup.ExistsException:
+            print(f"The backup operation failed because seed under the name {name} already exists.")
+            return -1
+        except backup.BackupException as error:
+            print(error)
+            return -1
+
+        print("Retrieving seed from service for check...")
+        try:
+            decoded = service.retrieve(name)
+        except backup.BackupException as error:
+            print(error)
+            return -1
+
+        if decoded != seed:
+            print("Retrieved and backed up data is not the same.")
+            return -1
+
+        print("Seed successfully saved. Writing card.")
+        mnemonic = cryptos.entropy_to_words(seed)
+        Seed._load_mnemonic(card, mnemonic, pin_code)
+
+        data = list(service.region.items())
+        data.append(("name", name))
+        print("\nBackup data:\n" + tabulate(data))
+
+        backup_file = Path.home().joinpath(f"{name}.txt")
+        backup_file.write_text(tabulate(data))
+        print(f"\nBackup data also saved to: {backup_file}")
+
+        helper_methods.print_warning("It is advised to delete your AWS access keys if you "
+                                     "don't plan to use them.")
+
+        return 0
+
+    @staticmethod
+    def _backup_service() -> Union[None, backup.AWS]:
+        access_key_id = helper_methods.input_with_exit("Access Key ID: ")
+        secret_access_key = helper_methods.secret_with_exit("Secret Access Key: ")
+
+        try:
+            service = backup.AWS(access_key_id, secret_access_key)
+        except backup.ConnectionException as error:
+            print(f"Error in connecting to service: {error}")
+            return None
+
+        regions = {}
+        for client, options in service.regions.items():
+            for option in regions.values():
+                options.remove(option)
+            regions[client] = helper_methods.option_input(options)
+
+        try:
+            service.region = regions
+        except ValueError:
+            print("Issue with setting regions")
+            return None
+
+        return service
+
+    @staticmethod
+    def _chip(card: cryptnoxpy.Card) -> None:
         pin_code = Seed._get_pin_code(card)
 
         card.generate_seed(pin_code)
         print("New key generated in card.")
 
-    def _dual_seed(self, card) -> int:
+    def _dual_seed(self, card: cryptnoxpy.Card) -> int:
         try:
             card.dual_seed_public_key()
         except NotImplementedError as error:
@@ -101,29 +182,6 @@ class Seed(Command):
         return 0
 
     @staticmethod
-    def _load_mnemonic(card: cryptnoxpy.Card, mnemonic: str, pin_code: str) -> None:
-        bip32_master_seed = cryptos.cryptnox_mnemonic_to_seed(mnemonic)
-        card.load_seed(bip32_master_seed, pin_code)
-
-    @staticmethod
-    def _recover(card: cryptnoxpy.Card) -> None:
-        pin_code = Seed._get_pin_code(card)
-
-        print("\nEnter the mnemonic root to recover :")
-        mnemonic = input("> ")
-        Seed._load_mnemonic(card, mnemonic, pin_code)
-        print("Mnemonic loaded, please keep it safe for backup.")
-
-    @staticmethod
-    def _upload(card: cryptnoxpy.Card) -> None:
-        pin_code = Seed._get_pin_code(card)
-        mnemonic = cryptos.entropy_to_words(card.generate_random_number(32))
-        print("\nMnemonic root :")
-        print(mnemonic)
-        Seed._load_mnemonic(card, mnemonic, pin_code)
-        print("\nMnemonic loaded, please save this root mnemonic for backup.")
-
-    @staticmethod
     def _get_pin_code(card: cryptnoxpy.Card) -> str:
         card.check_init()
 
@@ -157,8 +215,8 @@ class Seed(Command):
                 try:
                     card.dual_seed_public_key()
                 except NotImplementedError:
-                    print(f"Second card, {card.serial_number} doesn't have this functionality. Insert "
-                          f"another card")
+                    print(f"Second card, {card.serial_number} doesn't have this functionality. "
+                          f"Insert another card")
                     input("Press ENTER to continue.")
                 except cryptnoxpy.DataValidationException:
                     break
@@ -166,3 +224,61 @@ class Seed(Command):
                     break
 
         return card
+
+    @staticmethod
+    def _load_mnemonic(card: cryptnoxpy.Card, mnemonic: str, pin_code: str) -> None:
+        seed = cryptos.cryptnox_mnemonic_to_seed(mnemonic)
+        card.load_seed(seed, pin_code)
+
+    @staticmethod
+    def _recover(card: cryptnoxpy.Card) -> None:
+        pin_code = Seed._get_pin_code(card)
+
+        print("\nEnter the mnemonic root to recover :")
+        mnemonic = input("> ")
+        Seed._load_mnemonic(card, mnemonic, pin_code)
+        print("Mnemonic loaded, please keep it safe for backup.")
+
+    @staticmethod
+    def _restore(card: cryptnoxpy.Card) -> int:
+        pin_code = Seed._get_pin_code(card)
+        service = Seed._backup_service()
+        if not service:
+            return -1
+        name = helper_methods.input_with_exit("Name of the seed on the KMS in HSM: ")
+
+        print("Retrieving seed from service...")
+        try:
+            seed = service.retrieve(name)
+        except backup.NotFoundException:
+            print(f"Backup with name {name} not found.")
+            return -1
+        except backup.BackupException as error:
+            print(error)
+            return -1
+
+        try:
+            mnemonic = cryptos.entropy_to_words(seed)
+        except ValueError:
+            print("There was an issue with the retrieved backup in converting it to a mnemonic.")
+            return -1
+
+        print("Seed successfully retrieved. Writing card.")
+        Seed._load_mnemonic(card, mnemonic, pin_code)
+        print("\nMnemonic loaded from backup service.")
+
+        helper_methods.print_warning("It is advised to delete your AWS access keys if you "
+                                     "don't plan to use them.")
+
+        return 0
+
+    @staticmethod
+    def _upload(card: cryptnoxpy.Card) -> None:
+        pin_code = Seed._get_pin_code(card)
+        seed = card.generate_random_number(32)
+        mnemonic = cryptos.entropy_to_words(seed)
+        Seed._load_mnemonic(card, mnemonic, pin_code)
+        print("\nMnemonic root :")
+        print(mnemonic)
+
+        print("\nMnemonic loaded, please save this root mnemonic for backup.")

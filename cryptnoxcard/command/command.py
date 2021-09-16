@@ -9,7 +9,7 @@ from argparse import Namespace
 from tabulate import tabulate
 
 from . import user_keys
-from .helper import security
+from .helper import helper_methods, security
 from .helper.cards import (
     Cards,
     ExitException,
@@ -105,6 +105,9 @@ class Command(metaclass=abc.ABCMeta):
             result = -1
         except (cryptnoxpy.CryptnoxException, NotImplementedError) as error:
             print(error)
+            result = -1
+        except helper_methods.ExitException:
+            print("Exited by user.")
             result = -1
 
         return result

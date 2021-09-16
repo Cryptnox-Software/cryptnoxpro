@@ -13,6 +13,8 @@ async-timeout==3.0.1; python_full_version >= '3.5.3'
 attrs==21.2.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
 base58==2.1.0
 bitarray==1.2.2
+boto3==1.18.39
+botocore==1.21.39; python_version >= '3.6'
 certifi==2021.5.30
 cffi==1.14.6
 chardet==4.0.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
@@ -29,11 +31,12 @@ eth-keyfile==0.5.1
 eth-keys==0.3.3
 eth-rlp==0.2.1; python_version >= '3.6' and python_version < '4'
 eth-typing==2.2.2; python_version >= '3.5' and python_version < '4'
-eth-utils==1.10.0; python_version >= '3.5' and python_full_version != '3.5.2' and python_version < '4'
+eth-utils==1.10.0; python_version >= '3.5' and python_version < '4' and python_full_version != '3.5.2'
 hexbytes==0.2.2; python_version >= '3.6' and python_version < '4'
 idna==3.2; python_version >= '3'
 ipfshttpclient==0.8.0a2; python_full_version >= '3.6.2' and python_full_version not in '3.7.0, 3.7.1'
 iso8601==0.1.16
+jmespath==0.10.0; python_version >= '2.6' and python_version not in '3.0, 3.1, 3.2, 3.3'
 jsonschema==3.2.0
 lazy-import==0.2.2
 lru-dict==1.1.7
@@ -46,11 +49,13 @@ pycparser==2.20; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.
 pycryptodome==3.10.1
 pyrsistent==0.18.0; python_version >= '3.6'
 pyscard==2.0.1
+python-dateutil==2.8.2; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
 pytz==2021.1
 pywin32==301; platform_system == 'Windows'
 requests==2.26.0
 rlp==2.0.1
-six==1.16.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2'
+s3transfer==0.5.0; python_version >= '3.6'
+six==1.16.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
 stdiomask==0.0.6
 tabulate==0.8.9
 toolz==0.11.1; python_version >= '3.5'

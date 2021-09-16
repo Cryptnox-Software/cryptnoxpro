@@ -95,7 +95,7 @@ class Initialize(Command):
             print("Card is in demo mode."
                   "\n\nPress enter for all pin and puk prompts.\n")
 
-        print(tabulate([["RUN KEY COMMAND TO GENERATE A SEED."]],
+        print(tabulate([["RUN SEED COMMAND TO GENERATE A SEED."]],
                        tablefmt="rst"))
 
         del self._cards[card.serial_number]

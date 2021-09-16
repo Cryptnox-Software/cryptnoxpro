@@ -1,3 +1,5 @@
+import re
+
 import argparse
 
 from . import eosio
@@ -45,13 +47,14 @@ def add(parser, interactive: bool = False):
 
     return subparsers
 
+
 def _btc_options(subparsers, interactive_mode):
     def add_send(sub_parser):
         def _validate(address: str) -> str:
-            if len(address) < 25 or address[0] not in ("1", "2", "3", "n", "m"):
-                raise argparse.ArgumentTypeError("Not a valid BTC address")
-
-            return address
+            if re.match('^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$', address) or \
+                    re.match('^[2nm][a-km-zA-HJ-NP-Z1-9]{25,34}$', address):
+                return address
+            raise argparse.ArgumentTypeError("Not a valid BTC address")
 
         send_sub_parser = sub_parser.add_parser("send", help="Simple command to send Bitcoin "
                                                              "system token")
@@ -79,6 +82,7 @@ def _card_configuration(subparsers, interactive_mode):
 
     if interactive_mode:
         add_pin_option(sub_parser)
+
 
 def _change_pin_options(subparsers, interactive_mode):
     sub_parser = subparsers.add_parser(enums.Command.CHANGE_PIN.value,
@@ -146,15 +150,17 @@ def _seed_options(subparsers, interactive_mode):
     if interactive_mode:
         add_pin_option(sub_parser)
 
-    sub_parser.add_argument("method",
-                            choices=["upload", "chip", "recover", "dual"],
-                            help="Choose method for generation: "
-                                 "(upload) Generate a key word list in this host and upload it in "
-                                 "the cryptnox card. "
-                                 "(chip) Generate in the chip a new root key. "
-                                 "(recover) Recover a key from a BIP39 word list. "
-                                 "(dual) Generate same seed on two cards")
+    action_sub_parser = sub_parser.add_subparsers(dest="action", required=True)
 
+    action_sub_parser.add_parser("backup", help="Generate seed in host, backup to KMS in HSM and "
+                                                "upload to card.")
+    action_sub_parser.add_parser("chip", help="Generate new root key in the chip.")
+    action_sub_parser.add_parser("dual", help="Generate same seed on two cards. "
+                                              "(Requires two cards)")
+    action_sub_parser.add_parser("recover", help="Recover a key from a BIP39 word list.")
+    action_sub_parser.add_parser("restore", help="Restore from seed stored on KMS in HSM.")
+    action_sub_parser.add_parser("upload", help="Generate seed in host, upload to card and show "
+                                                "BIP39 word list for backup.")
 
 def _unlock_pin_options(subparsers, _: bool):
     subparsers.add_parser(enums.Command.UNLOCK_PIN.value,
