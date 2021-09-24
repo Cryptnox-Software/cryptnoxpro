@@ -91,6 +91,12 @@ class Command(metaclass=abc.ABCMeta):
 
     def run_execute(self, card) -> int:
         print(f"Using card with serial number {card.serial_number}")
+        if card.origin == cryptnoxpy.enums.Origin.UNKNOWN:
+            helper_methods.print_warning("Origin of card can't be checked. "
+                                         "Internet connection required.")
+        elif card.origin == cryptnoxpy.enums.Origin.FAKE:
+            helper_methods.print_warning(f"Card with serial number{card.serial_number} is not "
+                                         f"genuine.")
 
         try:
             result = self._execute(card)

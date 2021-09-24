@@ -15,19 +15,13 @@ from .helper.helper_methods import printable_flags
 try:
     import enums
     from config import get_configuration
-    from wallet.eth import (
-        checksum_address,
-        Web3Api
-    )
+    from wallet import eth
     from wallet.btc import BTCwallet, BlkHubApi
     from wallet.eos import EOSWallet
 except ImportError:
     from .. import enums
     from ..config import get_configuration
-    from ..wallet.eth import (
-        checksum_address,
-        Web3Api
-    )
+    from ..wallet import eth
     from ..wallet.btc import BTCwallet, BlkHubApi
     from ..wallet.eos import EOSWallet
 
@@ -55,7 +49,7 @@ class Info(Command):
         if not config["eth"]["api_key"]:
             print("\nTo use the Ethereum network. Go to https://infura.io. Register and get an "
                   "API key. Set the API key with: eth config api_key")
-        if is_demo(card.info):
+        if is_demo(card.info) and eth_info["balance"] == "0.0 ETH":
             print(f"\nTo get some Ethereum do: wget --no-check-certificate "
                   f"https://faucet.ropsten.be/donate/{eth_info['address']}")
 
@@ -95,12 +89,13 @@ class Info(Command):
             tabulate_data["account"] = []
             tabulate_data["balance"] = []
             accounts = wallet.get_account()
+            if not accounts:
+                raise IndexError
             for index in range(len(accounts)):
                 tabulate_data["account"].append(accounts[index])
                 tabulate_data["balance"].append(wallet.get_balance(index))
         except IndexError:
-            tabulate_data["account"].append(
-                "No EOS account registered for this public key.")
+            tabulate_data["account"].append("No EOS account registered for this public key.")
             tabulate_data["balance"].append("--")
         except Exception:
             tabulate_data["address"] = "Network issue"
@@ -140,26 +135,29 @@ class Info(Command):
     def _get_eth_info(card) -> dict:
         path = "m/44'/60'/0'/0"
         config = get_configuration(card.serial_number)["eth"]
-        network = config.get("network", "ropsten")
+        network = enums.EthNetwork[config.get("network", "ropsten").upper()]
         try:
             derivation = cryptnoxpy.Derivation[config["derivation"]].value
         except KeyError:
             return {"name": "Bad derivation type"}
-        api_key = config.get("api_key", "")
-        endpoint = Web3Api(card, network, api_key)
+
+        try:
+            api = eth.Api(card, config["endpoint"], network, config["api_key"])
+        except ValueError as error:
+            print(error)
+            return -1
 
         public_key = card.get_public_key(derivation, path=path, compressed=False)
-        address = checksum_address(public_key)
+        address = eth.checksum_address(public_key)
 
         tabulate_data = {
             "name": "ETH",
             "address": address,
-            "network": f"{network.lower()}"
-                       f"\n   -{endpoint.get_domain()}"
+            "network": f"{network.name.lower()}\n   -{api.endpoint.domain}"
         }
 
         try:
-            balance = endpoint.get_balance(address) / 10.0 ** 18
+            balance = api.get_balance(address) / 10.0 ** 18
         except Exception:
             tabulate_data["balance"] = "--"
         else:

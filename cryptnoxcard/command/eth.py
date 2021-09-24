@@ -85,24 +85,36 @@ class Event:
 
     def list(self) -> int:
         try:
-            config = get_configuration(self.card.serial_number)[
+            contract_config = get_configuration(self.card.serial_number)[
                 "hidden"]["eth"]["contract"][self.data.alias]
         except KeyError:
             print("There are no contracts with this name")
             return 1
 
-        network = config["network"].upper()
-
-        network = wallet.Web3Api(self.card, network, config.get("api_key"))
+        config = get_configuration(self.card.serial_number)
 
         try:
-            abi = _abi(config["abi"])
+            network = self.data.network.upper()
+        except AttributeError:
+            try:
+                network = contract_config["network"].upper()
+            except KeyError:
+                network = config["eth"]["network"].upper()
+
+        try:
+            endpoint = wallet.Api(self.card, config["eth"]["endpoint"], network,
+                                  config["eth"]["api_key"])
+        except ValueError as error:
+            print(error)
+            return -1
+
+        try:
+            abi = _abi(contract_config["abi"])
         except ValueError as error:
             print(error)
             return 3
 
-        w3 = network.get_web3()
-        contract = w3.eth.contract(address=config["address"], abi=abi)
+        contract = endpoint.contract(address=contract_config["address"], abi=abi)
 
         tabulate_table = []
         for event in contract.abi:
@@ -118,24 +130,35 @@ class Event:
 
     def logs(self):
         try:
-            config = get_configuration(self.card.serial_number)[
+            config_contract = get_configuration(self.card.serial_number)[
                 "hidden"]["eth"]["contract"][self.data.alias]
         except KeyError:
             print("There are no contracts with this name")
             return 1
 
-        network = config["network"].upper()
-
-        network = wallet.Web3Api(self.card, network, config.get("api_key", ""))
+        config_eth = get_configuration(self.card.serial_number)["eth"]
 
         try:
-            abi = _abi(config["abi"])
+            network = self.data.network.upper()
+        except AttributeError:
+            try:
+                network = config_contract["network"].upper()
+            except KeyError:
+                network = config_eth["network"].upper()
+
+        try:
+            endpoint = wallet.Api(self.card, config_eth["endpoint"], network, config_eth["api_key"])
+        except ValueError as error:
+            print(error)
+            return -1
+
+        try:
+            abi = _abi(config_contract["abi"])
         except ValueError as error:
             print(error)
             return 3
 
-        w3 = network.get_web3()
-        contract = w3.eth.contract(address=config["address"], abi=abi)
+        contract = endpoint.contract(address=config_contract["address"], abi=abi)
 
         try:
             event = getattr(contract.events, self.data.event)
@@ -155,7 +178,7 @@ class Event:
         else:
             print("No events have been found")
         self.config["hidden"]["eth"]["contract"][self.data.alias][self.data.event] \
-            = w3.eth.block_number
+            = endpoint.block_number
         save_to_config(self.card.serial_number, self.config)
 
     @staticmethod
@@ -172,8 +195,7 @@ class Event:
             except ValueError as error:
                 if error.args[0]["code"] != MORE_THAN_X_RESULTS:
                     raise
-                max_offset = offset = ((max_offset - min_offset) // 2) + \
-                                      min_offset
+                max_offset = offset = ((max_offset - min_offset) // 2) + min_offset
             else:
                 if len(entries) > 25 or offset >= MONTH_PERIOD_IN_BLOCKS:
                     break
@@ -186,7 +208,7 @@ class Event:
             event_filter = event.createFilter(fromBlock=current_block - offset,
                                               toBlock=current_block)
 
-        return list(map(dict, entries[-24::-1]))
+        return list(map(dict, entries[-25:][::-1]))
 
     @staticmethod
     def _logs_table(entries):
@@ -222,7 +244,7 @@ class Contract(Command):
                     event = Event(self.data, card)
                     return event.list()
                 else:
-                    return self._list(card)
+                    return Contract._list(card)
             if self.data.contract_action == "list_events":
                 event = Event(self.data, card)
                 return event.logs()
@@ -234,10 +256,6 @@ class Contract(Command):
 
     def _get_endpoint(self, card):
         config = get_configuration(card.serial_number)
-        if not config["eth"]["api_key"]:
-            raise ApiKeyException("\nTo use the Ethereum network. Go to https://infura.io. "
-                                  "Register and get an API key. Set the API key with: eth config "
-                                  "api_key")
 
         try:
             network = self.data.network.upper()
@@ -247,15 +265,10 @@ class Contract(Command):
                     "network"].upper()
             except KeyError:
                 network = config["eth"]["network"].upper()
-        try:
-            network = wallet.Network[network]
-        except KeyError:
-            raise LookupError("Network is invalid")
 
-        return wallet.Web3Api(card, network, config["eth"]["api_key"])
+        return wallet.Api(card, config["eth"]["endpoint"], network, config["eth"]["api_key"])
 
     def _add(self, card):
-        endpoint = self._get_endpoint(card)
         abi = _get_processed_json_argument(self.data.abi)
 
         try:
@@ -274,9 +287,14 @@ class Contract(Command):
                 print("ERC not recognized by the application.")
                 return -1
 
-        w3 = endpoint.get_web3()
         try:
-            w3.eth.contract(address=self.data.address, abi=abi)
+            endpoint = self._get_endpoint(card)
+        except ValueError as error:
+            print(error)
+            return -1
+
+        try:
+            endpoint.contract(address=self.data.address, abi=abi)
         except web3.exceptions.InvalidAddress as error:
             print(error.args[0])
             return -1
@@ -286,13 +304,14 @@ class Contract(Command):
             "address": self.data.address,
             "abi": abi_to_config,
             "network": endpoint.network.name,
-            "block": w3.eth.block_number
+            "block": endpoint.block_number
         }
         save_to_config(card.serial_number, config)
         print(f"Contract added to application. Use it with alias:"
               f" {self.data.alias}")
 
-    def _list(self, card) -> int:
+    @staticmethod
+    def _list(card) -> int:
         config = get_configuration(card.serial_number)
         print("\n")
 
@@ -311,11 +330,10 @@ class Contract(Command):
         return 0
 
     def _functions(self, card):
-        endpoint = self._get_endpoint(card)
         config = get_configuration(card.serial_number)
         try:
             config = config["hidden"]["eth"]["contract"][self.data.alias]
-        except KeyError as error:
+        except KeyError:
             print("Contract with alias not found")
             return 1
 
@@ -329,8 +347,12 @@ class Contract(Command):
             print(error)
             return 3
 
-        w3 = endpoint.get_web3()
-        contract = w3.eth.contract(address=config["address"], abi=abi)
+        try:
+            contract = self._get_endpoint(card).contract(address=config["address"], abi=abi)
+        except ValueError as error:
+            print(error)
+            return -1
+
         for event in contract.abi:
             if event["type"] == "function":
                 args = [[f"{arg['name'].strip('_')}:", arg["type"]] for arg
@@ -343,7 +365,6 @@ class Contract(Command):
                        tablefmt="grid"))
 
     def _call(self, card):
-        endpoint = self._get_endpoint(card)
         config = get_configuration(card.serial_number)
         try:
             config = config["hidden"]["eth"]["contract"][self.data.alias]
@@ -357,9 +378,12 @@ class Contract(Command):
             print(error)
             return 3
 
-        w3 = endpoint.get_web3()
+        try:
+            contract = self._get_endpoint(card).contract(address=config["address"], abi=abi)
+        except ValueError as error:
+            print(error)
+            return -1
 
-        contract = w3.eth.contract(address=config["address"], abi=abi)
         try:
             function = contract.get_function_by_name(self.data.function)
         except ValueError as error:
@@ -386,15 +410,9 @@ class Contract(Command):
         return 0
 
     def _transact(self, card):
-        endpoint = self._get_endpoint(card)
         self._check(card)
 
         config = get_configuration(card.serial_number)
-
-        if not config["eth"]["api_key"]:
-            print("\nTo use the Ethereum network. Go to https://infura.io. Register and get an "
-                  "API key. Set the API key with: eth config api_key")
-            return -1
 
         try:
             contract_config = config["hidden"]["eth"]["contract"][self.data.alias]
@@ -414,9 +432,13 @@ class Contract(Command):
             print(error)
             return 3
 
-        w3 = endpoint.get_web3()
-        public_key = card.get_public_key(derivation, path=Eth.PATH, compressed=False)
-        contract = w3.eth.contract(address=contract_config["address"], abi=abi)
+        try:
+            endpoint = self._get_endpoint(card)
+        except ValueError as error:
+            print(error)
+            return -1
+
+        contract = endpoint.contract(address=contract_config["address"], abi=abi)
         try:
             function = contract.get_function_by_name(self.data.function)
         except ValueError as error:
@@ -442,14 +464,14 @@ class Contract(Command):
         price = self.data.price or int(config["eth"]["price"])
         limit = self.data.limit or int(config["eth"]["limit"])
 
+        public_key = card.get_public_key(derivation, path=Eth.PATH, compressed=False)
         balance = endpoint.get_balance(wallet.address(public_key))
         if balance - (web3.Web3.fromWei(price, "gwei") * limit) < 0:
             print("Not enough fund for the transaction")
             return -2
 
         set_data.update({
-            "nonce": w3.eth.get_transaction_count(
-                wallet.checksum_address(public_key)),
+            "nonce": endpoint.get_transaction_count(wallet.checksum_address(public_key)),
             "gasPrice": price,
             "gas": limit
         })
@@ -541,16 +563,6 @@ class Eth(Command):
         self._check(card)
 
         config = get_configuration(card.serial_number)["eth"]
-        if not config["api_key"]:
-            print("\nTo use the Ethereum network. Go to https://infura.io. Register and get an "
-                  "API key. Set the API key with: eth config api_key")
-            return -1
-
-        try:
-            network = wallet.Network[(self.data.network or config["network"]).upper()]
-        except KeyError:
-            print("Network is invalid")
-            return 1
 
         try:
             derivation = cryptnoxpy.Derivation[config["derivation"]]
@@ -560,7 +572,11 @@ class Eth(Command):
 
         price = self.data.price or int(config.get("price", 8))
         limit = self.data.limit or int(config.get("limit", 21000))
-        endpoint = wallet.Web3Api(card, network, config.get("api_key", ""))
+        try:
+            endpoint = wallet.Api(card, config["endpoint"], config["network"], config["api_key"])
+        except ValueError as error:
+            print(error)
+            return -1
 
         print("Sending ETH")
         try:

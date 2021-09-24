@@ -10,7 +10,10 @@ from typing import (
 
 import cryptnoxpy
 from tabulate import tabulate
-from .helper_methods import printable_flags
+from .helper_methods import (
+    printable_flags,
+    print_warning
+)
 
 class ExitException(Exception):
     """
@@ -139,7 +142,7 @@ class Cards:
         if data or print_with_one_card:
             print(tabulate(data, headers=headers, colalign=alignment))
             if uninitialized and show_warnings:
-                print("\n" + tabulate([["UNINITIALIZED CARDS ARE FOUND"]], tablefmt="rst"))
+                print_warning("UNINITIALIZED CARDS ARE FOUND")
                 print("To initialize card run init\nTo initialize card in demo mode run init -d")
 
     def select_card(self) -> cryptnoxpy.Card:

@@ -11,7 +11,10 @@ from tabulate import tabulate
 
 from . import user_keys
 from .command import Command
-from .helper import security
+from .helper import (
+    helper_methods,
+    security
+)
 
 try:
     import enums
@@ -28,6 +31,13 @@ class UserKey(Command):
     def _execute(self, card: cryptnoxpy.Card) -> int:
         if self.data.subaction == "list":
             return self._list(card)
+
+        if not card.initialized:
+            helper_methods.print_warning("Card is not initialized")
+            print("To initialize card run init\nTo initialize card in demo mode run init -d")
+
+            return -1
+
         if self.data.subaction == "add":
             return UserKey._add(card, self.data.type, " ".join(self.data.description))
         if self.data.subaction == "delete":
@@ -52,7 +62,7 @@ class UserKey(Command):
     def _delete(card: cryptnoxpy.Card, auth_type: str) -> int:
         result = -1
         if not card.user_key_enabled(user_keys.get()[auth_type]):
-            print("Key not found exist.")
+            print("Target key not found.")
             return -1
 
         if security.process_command_with_puk(card, user_keys.delete, auth_type, card):

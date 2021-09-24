@@ -17,7 +17,7 @@ class CardConfiguration(Command):
     Command for printing card configuraton
     """
     _SEED_SOURCE_TO_STRING = {
-        cryptnoxpy.SeedSource.NO_SEED: "no seed",
+        cryptnoxpy.SeedSource.NO_SEED: "No seed",
         cryptnoxpy.SeedSource.SINGLE: "Single 256K1 EC pair",
         cryptnoxpy.SeedSource.EXTENDED: "Extended 256K1 EC pair BIP32 node",
         cryptnoxpy.SeedSource.EXTERNAL: "Externally generated",
@@ -32,7 +32,7 @@ class CardConfiguration(Command):
 
     def _execute(self, card) -> int:
         data = [
-            ["Card initialisation", CardConfiguration._bool_to_str(card.initialized)],
+            ["Card initialisation", CardConfiguration._bool_to_str(card.initialized)]
         ]
         try:
             data += [["Seed source", CardConfiguration._SEED_SOURCE_TO_STRING[card.seed_source]]]

@@ -42,7 +42,8 @@ def add(name: str, card: cryptnoxpy.Card, description: str, puk: str) -> bool:
         description = description or user_key.description
         try:
             public_key = user_key.public_key
-        except user_key_base.UserKeyException:
+        except user_key_base.UserKeyException as error:
+            print(error)
             return False
 
         card.user_key_add(user_key.slot_index, description, public_key, puk)

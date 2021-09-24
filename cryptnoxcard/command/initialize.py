@@ -67,8 +67,8 @@ class Initialize(Command):
             data = [
                 ["Owner's name", ":", owner_name],
                 ["Owner's email", ":", owner_email],
-                [f"Card PUK code ({card.puk_rule})", ":", puk_code],
-                [f"Card PIN code ({card.pin_rule})", ":", pin_code]
+                [f"Card PIN code ({card.pin_rule})", ":", pin_code],
+                [f"Card PUK code ({card.puk_rule})", ":", puk_code]
             ]
             print(tabulate(data, tablefmt="plain"))
         else:
@@ -77,8 +77,8 @@ class Initialize(Command):
                     Initialize._get_owner_name())
                 owner_email = Initialize._handle_exit(
                     Initialize._get_owner_email())
-                puk_code, puk_choice = self._get_puk_code(card)
                 pin_code = self._get_pin_code(card)
+                puk_code, puk_choice = self._get_puk_code(card)
             except KeyboardInterrupt:
                 return 0
 

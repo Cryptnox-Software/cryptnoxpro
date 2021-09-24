@@ -247,6 +247,22 @@ class BlkHubApi:
         return out
 
 
+def test_addr(btc_addr: str):
+    """
+
+    :param btc_addr: str
+    :return:
+    """
+    # Safe test of the address format
+    if btc_addr.startswith("1") or btc_addr.startswith("3"):
+        return re.match('^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$', btc_addr)
+    if btc_addr.startswith("n") or btc_addr.startswith(
+            "m") or btc_addr.startswith("2"):
+        return re.match('^[2nm][a-km-zA-HJ-NP-Z1-9]{25,34}$', btc_addr)
+
+    return False
+
+
 class BTCwallet:
     """
     BTCwallet

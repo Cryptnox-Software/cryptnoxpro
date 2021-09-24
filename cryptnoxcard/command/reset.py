@@ -22,8 +22,10 @@ class Reset(Command):
     """
     _name = enums.Command.RESET.value
 
-    def _execute(self, card) -> int:
-        card.check_init()
+    def _execute(self, card: cryptnoxpy.Card) -> int:
+        if not card.initialized:
+            print("Card is not initialized. Already cleared.")
+            return 0
 
         serial_number = card.serial_number
         security.process_command_with_puk(card, card.reset)

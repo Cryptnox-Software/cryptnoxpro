@@ -4,8 +4,11 @@ Module containing command for changing PIN code of the card
 """
 import cryptnoxpy
 
-from .helper import security
 from .command import Command
+from .helper import (
+    helper_methods,
+    security
+)
 
 try:
     import enums
@@ -20,6 +23,12 @@ class ChangePuk(Command):
     _name = enums.Command.CHANGE_PUK.value
 
     def _execute(self, card: cryptnoxpy.Card) -> int:
+        if not card.initialized:
+            helper_methods.print_warning("Card is not initialized")
+            print("To initialize card run init\nTo initialize card in demo mode run init -d")
+
+            return -1
+
         demo_mode = security.is_demo(card.info)
         if demo_mode:
             print("The card is in demo mode, just press ENTER. The PUK will be from DEMO mode "
@@ -27,6 +36,11 @@ class ChangePuk(Command):
 
         puk_code = security.get_puk_code(card, f"   Enter the PUK ({card.puk_rule}): ",
                                          [""] if demo_mode else [])
+
+        if demo_mode:
+            puk_code = security.demo_puk(card)
+
+        card.change_puk(puk_code, puk_code)
 
         if security.is_demo(card.info):
             print("Card is in demo mode. Setting same PUK code")

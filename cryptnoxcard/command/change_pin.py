@@ -4,8 +4,11 @@ Module containing command for changing PIN code of the card
 """
 import cryptnoxpy
 
-from .helper import security
 from .command import Command
+from .helper import (
+    helper_methods,
+    security
+)
 
 try:
     import enums
@@ -19,7 +22,13 @@ class ChangePin(Command):
     """
     _name = enums.Command.CHANGE_PIN.value
 
-    def _execute(self, card) -> int:
+    def _execute(self, card: cryptnoxpy.Card) -> int:
+        if not card.initialized:
+            helper_methods.print_warning("Card is not initialized")
+            print("To initialize card run init\nTo initialize card in demo mode run init -d")
+
+            return -1
+
         if card.auth_type != cryptnoxpy.AuthType.PIN:
             security.check_pin_code(card)
 

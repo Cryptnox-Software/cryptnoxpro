@@ -54,10 +54,9 @@ class Notification:
     @staticmethod
     def _check(data):
         try:
-            network_name = data["network"].upper()
-
-            network = wallet.Web3Api(None, network_name, data["api_key"])
-            w3 = network.get_web3()
+            w3 = wallet.Web3Api(None,
+                                wallet.endpoint_factory(data["endpoint"], data["network"],
+                                                        data["api_key"])).web3
             contract = w3.eth.contract(address=data["address"], abi=data["abi"])
             event = contract.events[data["event_name"]]
 
@@ -88,8 +87,11 @@ class Notification:
             for alias, contract_config in contract_config.items():
                 alias_config = contract_config[alias]
                 network_name = contract_config["network"].upper()
-                network = wallet.Web3Api(None, network_name, config.get("api_key", ""))
-                w3 = network.get_web3()
+
+                network = wallet.Web3Api(None, wallet.endpoint_factory(config["endpoint"],
+                                                                       network_name,
+                                                                       config["api_key"]))
+                w3 = network.web3
                 contract = w3.eth.contract(
                     address=contract_config["address"],
                     abi=_abi(contract_config["abi"]))
@@ -103,7 +105,8 @@ class Notification:
                         "address": contract_config["address"],
                         "abi": _abi(contract_config["abi"]),
                         "network": contract_config["network"],
-                        "api_key": config.get("api_key", ""),
+                        "endpoint": config["endpoint"],
+                        "api_key": config["api_key"],
                         "event_name": event.event_name,
                         "from_block": last_check,
                         "to_block": current_block,

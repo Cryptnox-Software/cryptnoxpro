@@ -1,16 +1,24 @@
 from typing import Union
 
 try:
-    from config import get_configuration, save_to_config
+    from config import (
+        get_configuration,
+        save_to_config
+    )
     from wallet.validators import ValidationError
     from wallet.btc import BlkHubApi, BtcValidator
-    from wallet.eth import EthValidator, Web3Api
+    from wallet import eth
+    from wallet.eth import EthValidator
     from wallet.eos import EosioValidator
 except ImportError:
-    from ...config import get_configuration, save_to_config
+    from ...config import (
+        get_configuration,
+        save_to_config
+    )
     from ...wallet.validators import ValidationError
     from ...wallet.btc import BlkHubApi, BtcValidator
-    from ...wallet.eth import EthValidator, Web3Api
+    from ...wallet import eth
+    from ...wallet.eth import EthValidator
     from ...wallet.eos import EosioValidator
 
 
@@ -34,7 +42,7 @@ def add_config_sub_parser(sub_parser, crypto_currency: str) -> None:
 
 def create_config_method(card_serial: Union[int, str], key: Union[str, None],
                          value: Union[str, None],
-                         currency_name: str)  -> int:
+                         currency_name: str) -> int:
     """
     Create config method for specific cryptocurrency
 
@@ -125,11 +133,8 @@ def print_key_config(card_serial: Union[int, str],
 
 def find_endpoint(section: str, key: str, value: str, append: str = "") \
         -> str:
-    if key == "network" and section in ["eth", "btc"]:
-        if section == "eth":
-            return f"\nendpoint: https://{Web3Api(None, value).get_domain()}{append}"
-        elif section == "btc":
-            return f"\nendpoint: {BlkHubApi.get_api(value)}{append}"
+    if key == "network" and section == "btc":
+        return f"\nendpoint: {BlkHubApi.get_api(value)}{append}"
 
     return ""
 
@@ -154,6 +159,7 @@ def write_config(card_serial: Union[int, str],
     try:
         getattr(instance, key)
         setattr(instance, key, value)
+        instance.validate()
     except ValidationError as error:
         valid = instance.__class__.__dict__[key]
         print(f"Invalid value for the {key.replace('_', ' ')}")

@@ -136,16 +136,11 @@ def get_puk_code(card: cryptnoxpy.Card, text: str = "", allowed_values: List = N
 
 
 def _get_code(validation_method: typing.Callable, text: str = "", allowed_values: List = None) -> str:
-    allowed = allowed_values[:] if allowed_values else []
+    allowed_values = allowed_values or []
     code = getpass(prompt=text)
 
-    if code in allowed:
+    if not {code, ""}.isdisjoint(allowed_values):
         return code
-
-    try:
-        allowed.remove("")
-    except ValueError:
-        pass
 
     while True:
         try:
@@ -154,7 +149,7 @@ def _get_code(validation_method: typing.Callable, text: str = "", allowed_values
             print(error, "\n")
             code = getpass(prompt=text)
 
-            if code in allowed:
+            if code in allowed_values:
                 break
         else:
             break

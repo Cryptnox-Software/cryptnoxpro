@@ -26,22 +26,23 @@ def get_default_configuration() -> Dict:
     """
     config = {
         "btc": {
-            "network": "testnet",
+            "derivation": "DERIVE",
             "fees": "2000",
-            "derivation": "DERIVE"
-        },
-        "eosio": {
-            "endpoint": "https://jungle3.cryptolions.io:443",
-            "coin_symbol": "EOS",
-            "key_type": "K1",
-            "derivation": "DERIVE"
+            "network": "testnet",
         },
         "eth": {
+            "api_key": "",
+            "derivation": "DERIVE",
+            "endpoint": "cryptnox",
+            "limit": "30000",
             "network": "ropsten",
             "price": "8",
-            "limit": "30000",
+        },
+        "eosio": {
+            "coin_symbol": "EOS",
             "derivation": "DERIVE",
-            "api_key": ""
+            "endpoint": "https://jungle3.cryptolions.io:443",
+            "key_type": "K1",
         },
         "hidden": {
             "eth": {
