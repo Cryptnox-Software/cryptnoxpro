@@ -57,7 +57,7 @@ class Api:
                  api_key: str):
         if isinstance(network, str):
             try:
-                network = enums.EthNetwork[network]
+                network = enums.EthNetwork[network.upper()]
             except KeyError:
                 raise LookupError("Network is invalid")
 

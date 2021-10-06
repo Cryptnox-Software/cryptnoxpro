@@ -45,7 +45,7 @@ class Info(Command):
 
         Info._print_info_table(info)
 
-        config = get_configuration(card.serial_number)
+        config = get_configuration(card)
         if not config["eth"]["api_key"]:
             print("\nTo use the Ethereum network. Go to https://infura.io. Register and get an "
                   "API key. Set the API key with: eth config api_key")
@@ -58,7 +58,7 @@ class Info(Command):
     @staticmethod
     def _get_eosio_info(card) -> dict:
         path = "m/44'/194'/0'/0"
-        config = get_configuration(card.serial_number)["eosio"]
+        config = get_configuration(card)["eosio"]
         tabulate_data = {
             "name": "EOS",
             "address": "Unknown address",
@@ -106,7 +106,7 @@ class Info(Command):
     @staticmethod
     def _get_btc_info(card) -> dict:
         path = "m/44'/0'/0'/0"
-        config = get_configuration(card.serial_number)["btc"]
+        config = get_configuration(card)["btc"]
         try:
             derivation = cryptnoxpy.Derivation[config["derivation"]].value
         except KeyError:
@@ -134,7 +134,7 @@ class Info(Command):
     @staticmethod
     def _get_eth_info(card) -> dict:
         path = "m/44'/60'/0'/0"
-        config = get_configuration(card.serial_number)["eth"]
+        config = get_configuration(card)["eth"]
         network = enums.EthNetwork[config.get("network", "ropsten").upper()]
         try:
             derivation = cryptnoxpy.Derivation[config["derivation"]].value
@@ -145,7 +145,7 @@ class Info(Command):
             api = eth.Api(card, config["endpoint"], network, config["api_key"])
         except ValueError as error:
             print(error)
-            return -1
+            return {}
 
         public_key = card.get_public_key(derivation, path=path, compressed=False)
         address = eth.checksum_address(public_key)

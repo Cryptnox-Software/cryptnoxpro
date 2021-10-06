@@ -22,6 +22,12 @@ except ImportError:
     from ..config import get_configuration, save_to_config
 
 
+class Unauthorized(Exception):
+    """
+    None of the authorization methods has validated the user.
+    """
+
+
 class Command(metaclass=abc.ABCMeta):
     """
     Base class for all commands
@@ -103,8 +109,7 @@ class Command(metaclass=abc.ABCMeta):
         except cryptnoxpy.InitializationException as error:
             print("\n" + tabulate([[str(error).upper()]],
                                   tablefmt="rst"))
-            print("To initialize card run init."
-                  "\nTo initialize in demo mode run init -d\n")
+            print("To initialize card run : init\nTo initialize card in demo mode run : init -d")
             result = -1
         except cryptnoxpy.SeedException:
             print("The seed is not generated\nRun seed command to generate seed")
@@ -115,6 +120,10 @@ class Command(metaclass=abc.ABCMeta):
         except helper_methods.ExitException:
             print("Exited by user.")
             result = -1
+        except Unauthorized as error:
+            print(error)
+            print("User not authorized")
+            result = -2
 
         return result
 
@@ -178,7 +187,10 @@ class Command(metaclass=abc.ABCMeta):
             pass
 
         if not result:
-            result = bool(security.check_pin_code(card))
+            if card.pin_authentication:
+                result = bool(security.check_pin_code(card))
+            else:
+                raise Unauthorized("PIN authentication is not allowed.")
 
         return result
 

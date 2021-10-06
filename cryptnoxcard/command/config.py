@@ -24,17 +24,15 @@ class Config(Command):
     _name = enums.Command.CONFIG.value
 
     def _execute(self, card) -> int:
-        if self.data.value:
-            return write_config(card.serial_number,
-                                self.data.section, self.data.key,
-                                self.data.value)
-        if self.data.key:
-            return print_key_config(card.serial_number,
-                                    self.data.section, self.data.key)
-        if self.data.section:
-            return print_section_config(card.serial_number,
-                                        self.data.section)
+        self._check(card)
 
-        read_config(card.serial_number)
+        if self.data.value:
+            return write_config(card, self.data.section, self.data.key, self.data.value)
+        if self.data.key:
+            return print_key_config(card, self.data.section, self.data.key)
+        if self.data.section:
+            return print_section_config(card, self.data.section)
+
+        read_config(card)
 
         return 0

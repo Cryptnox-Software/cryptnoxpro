@@ -190,7 +190,7 @@ class Eosio(Command):
     @staticmethod
     def _process(card, wallet, transaction, additional_info=""):
         key_type = cryptnoxpy.KeyType[wallet.key_type]
-        config = get_configuration(card.serial_number)["eosio"]
+        config = get_configuration(card)["eosio"]
         try:
             derivation = cryptnoxpy.Derivation[config["derivation"]]
         except KeyError as error:
@@ -239,7 +239,7 @@ class Eosio(Command):
         return result
 
     def _print_public_key(self, card: cryptnoxpy.Card):
-        config = get_configuration(card.serial_number)["eosio"]
+        config = get_configuration(card)["eosio"]
         endpoint = config["endpoint"]
 
         try:
@@ -264,7 +264,7 @@ class Eosio(Command):
         self._check(card)
 
         path = self.data.path
-        config = get_configuration(card.serial_number)["eosio"]
+        config = get_configuration(card)["eosio"]
         endpoint = self.data.url or config.get(
             "endpoint", "https://jungle3.eossweden.org")
         coin_symbol = self.data.symbol or config.get("coin_symbol", "EOS")

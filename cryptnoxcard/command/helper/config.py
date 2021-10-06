@@ -1,5 +1,6 @@
 from typing import Union
 
+import cryptnoxpy
 try:
     from config import (
         get_configuration,
@@ -40,8 +41,7 @@ def add_config_sub_parser(sub_parser, crypto_currency: str) -> None:
                              "and key")
 
 
-def create_config_method(card_serial: Union[int, str], key: Union[str, None],
-                         value: Union[str, None],
+def create_config_method(card: cryptnoxpy.Card, key: Union[str, None],  value: Union[str, None],
                          currency_name: str) -> int:
     """
     Create config method for specific cryptocurrency
@@ -54,15 +54,14 @@ def create_config_method(card_serial: Union[int, str], key: Union[str, None],
     :return: None
     """
     if value is not None:
-        return write_config(card_serial, currency_name, key, value)
+        return write_config(card, currency_name, key, value)
     if key is not None:
-        return print_key_config(
-            card_serial, currency_name, key)
+        return print_key_config(card, currency_name, key)
 
-    return print_section_config(card_serial, currency_name)
+    return print_section_config(card, currency_name)
 
 
-def read_config(card_serial: Union[int, str], exclude=None) -> None:
+def read_config(card: cryptnoxpy.Card, exclude=None) -> None:
     """
     Prints contents of config.
 
@@ -72,7 +71,7 @@ def read_config(card_serial: Union[int, str], exclude=None) -> None:
     :return: None
     """
     exclude = exclude or ["hidden"]
-    config = get_configuration(card_serial)
+    config = get_configuration(card)
 
     for section in config:
         if section in exclude:
@@ -82,7 +81,7 @@ def read_config(card_serial: Union[int, str], exclude=None) -> None:
             print(f"{key}: {value}" + find_endpoint(section, key, value, " - Read only"))
 
 
-def print_section_config(card_serial: Union[int, str], section: str) -> int:
+def print_section_config(card: cryptnoxpy.Card, section: str) -> int:
     """
     Prints contents of a section from configuration.
 
@@ -90,7 +89,7 @@ def print_section_config(card_serial: Union[int, str], section: str) -> int:
     :param section: Section of the configuration file wanted printed
     :return: Execution status
     """
-    config = get_configuration(card_serial)
+    config = get_configuration(card)
     if section not in config:
         print("No such section")
         return 1
@@ -103,8 +102,7 @@ def print_section_config(card_serial: Union[int, str], section: str) -> int:
     return 0
 
 
-def print_key_config(card_serial: Union[int, str],
-                     section: str, key: str) -> int:
+def print_key_config(card: cryptnoxpy.Card, section: str, key: str) -> int:
     """
     Prints key and value from section in config.
 
@@ -113,7 +111,7 @@ def print_key_config(card_serial: Union[int, str],
     :param key: Name of the parameter we want to change
     :return: Execution status
     """
-    config = get_configuration(card_serial)
+    config = get_configuration(card)
     try:
         old_key = key
         key = "network" if key == "endpoint" and section != "eosio" else key
@@ -139,8 +137,7 @@ def find_endpoint(section: str, key: str, value: str, append: str = "") \
     return ""
 
 
-def write_config(card_serial: Union[int, str],
-                 section: str, key: str, value: str) -> int:
+def write_config(card: cryptnoxpy.Card, section: str, key: str, value: str) -> int:
     """
     Writes new value at chosen section and key.
 
@@ -150,7 +147,7 @@ def write_config(card_serial: Union[int, str],
     :param value: Value we want to insert into the configuration file
     :return: Execution status
     """
-    config = get_configuration(card_serial)
+    config = get_configuration(card)
     try:
         instance = eval(f"{section.capitalize()}Validator")()
     except NameError:
@@ -182,7 +179,7 @@ def write_config(card_serial: Union[int, str],
             print("Invalid key")
             return 1
 
-    save_to_config(card_serial, config)
+    save_to_config(card, config)
     print("\nConfiguration is written into the config file")
 
     return 0

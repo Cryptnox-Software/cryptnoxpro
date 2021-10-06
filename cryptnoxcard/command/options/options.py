@@ -78,10 +78,16 @@ def _btc_options(subparsers, interactive_mode):
 
 def _card_configuration(subparsers, interactive_mode):
     sub_parser = subparsers.add_parser(enums.Command.CARD_CONFIGURATION.value,
-                                       help="Show card configuration")
+                                       help="Show card configuration and set PIN-less path, "
+                                            "PIN authentication ")
 
     if interactive_mode:
         add_pin_option(sub_parser)
+
+    sub_parser.add_argument("key", nargs="?", type=str, default=None, choices=["pinless", "pin"],
+                            help="Configuration to set")
+    sub_parser.add_argument("value", nargs="?", type=str, default=None, choices=["yes", "no"],
+                            help="Set/unset card configuration")
 
 
 def _change_pin_options(subparsers, interactive_mode):

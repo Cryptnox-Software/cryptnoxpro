@@ -81,17 +81,17 @@ class Event:
     def __init__(self, data: Namespace, card):
         self.data = data
         self.card = card
-        self.config = get_configuration(card.serial_number)
+        self.config = get_configuration(card)
 
     def list(self) -> int:
         try:
-            contract_config = get_configuration(self.card.serial_number)[
+            contract_config = get_configuration(self.card)[
                 "hidden"]["eth"]["contract"][self.data.alias]
         except KeyError:
             print("There are no contracts with this name")
             return 1
 
-        config = get_configuration(self.card.serial_number)
+        config = get_configuration(self.card)
 
         try:
             network = self.data.network.upper()
@@ -130,13 +130,13 @@ class Event:
 
     def logs(self):
         try:
-            config_contract = get_configuration(self.card.serial_number)[
+            config_contract = get_configuration(self.card)[
                 "hidden"]["eth"]["contract"][self.data.alias]
         except KeyError:
             print("There are no contracts with this name")
             return 1
 
-        config_eth = get_configuration(self.card.serial_number)["eth"]
+        config_eth = get_configuration(self.card)["eth"]
 
         try:
             network = self.data.network.upper()
@@ -255,7 +255,7 @@ class Contract(Command):
             return -1
 
     def _get_endpoint(self, card):
-        config = get_configuration(card.serial_number)
+        config = get_configuration(card)
 
         try:
             network = self.data.network.upper()
@@ -299,7 +299,7 @@ class Contract(Command):
             print(error.args[0])
             return -1
 
-        config = get_configuration(card.serial_number)
+        config = get_configuration(card)
         config["hidden"]["eth"]["contract"][self.data.alias] = {
             "address": self.data.address,
             "abi": abi_to_config,
@@ -312,7 +312,7 @@ class Contract(Command):
 
     @staticmethod
     def _list(card) -> int:
-        config = get_configuration(card.serial_number)
+        config = get_configuration(card)
         print("\n")
 
         table = []
@@ -330,7 +330,7 @@ class Contract(Command):
         return 0
 
     def _functions(self, card):
-        config = get_configuration(card.serial_number)
+        config = get_configuration(card)
         try:
             config = config["hidden"]["eth"]["contract"][self.data.alias]
         except KeyError:
@@ -365,7 +365,7 @@ class Contract(Command):
                        tablefmt="grid"))
 
     def _call(self, card):
-        config = get_configuration(card.serial_number)
+        config = get_configuration(card)
         try:
             config = config["hidden"]["eth"]["contract"][self.data.alias]
         except KeyError as error:
@@ -412,7 +412,7 @@ class Contract(Command):
     def _transact(self, card):
         self._check(card)
 
-        config = get_configuration(card.serial_number)
+        config = get_configuration(card)
 
         try:
             contract_config = config["hidden"]["eth"]["contract"][self.data.alias]
@@ -562,7 +562,7 @@ class Eth(Command):
     def _send(self, card) -> int:
         self._check(card)
 
-        config = get_configuration(card.serial_number)["eth"]
+        config = get_configuration(card)["eth"]
 
         try:
             derivation = cryptnoxpy.Derivation[config["derivation"]]

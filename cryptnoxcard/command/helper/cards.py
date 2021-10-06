@@ -64,7 +64,7 @@ class Cards:
             try:
                 card = self._cards[key]
             except KeyError:
-                self._wait_for_card(key)
+                card = self._wait_for_card(key)
 
         return card
 
@@ -143,7 +143,7 @@ class Cards:
             print(tabulate(data, headers=headers, colalign=alignment))
             if uninitialized and show_warnings:
                 print_warning("UNINITIALIZED CARDS ARE FOUND")
-                print("To initialize card run init\nTo initialize card in demo mode run init -d")
+                print("To initialize card run : init\nTo initialize card in demo mode run : init -d")
 
     def select_card(self) -> cryptnoxpy.Card:
         self.refresh()

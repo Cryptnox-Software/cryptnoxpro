@@ -4,10 +4,12 @@ Module for handling config file
 """
 import gzip
 import json
-from pathlib import Path
-from typing import Union, Dict
+from typing import (
+    Any,
+    Dict
+)
 
-from appdirs import user_data_dir
+import cryptnoxpy
 
 try:
     from command.helper import helper_methods
@@ -54,71 +56,52 @@ def get_default_configuration() -> Dict:
     return config
 
 
-def get_configuration(card_serial: Union[int, str]) -> Dict:
+def get_configuration(card: cryptnoxpy.Card) -> Dict:
     """
     Get the configuration.
 
-    :param card_serial: Serial number of the card used
+    :param cryptnoxpy.Card card: Serial number of the card used
+
     :return: Configuration from file or default configuration if not found
     :rtype: dict
     """
     try:
-        config = _CONFIGURATION[str(card_serial)]
+        config = _CONFIGURATION[card.serial_number]
     except LookupError:
-        config = read_card_config(card_serial)
+        config = read_card_config(card)
 
-        _CONFIGURATION[card_serial] = config
+        _CONFIGURATION[card.serial_number] = config
 
     return config
 
 
-def return_config_path(card_serial: Union[int, str]) -> Path:
-    """
-    Returns path of config file.
-
-    :param card_serial: Serial number of the card used
-    :return: Path of the configuration file
-    :rtype: Path
-    """
-    config_path = Path(user_data_dir("CryptnoxCard", False))
-    config_path = config_path.joinpath(str(card_serial))
-    config_path.mkdir(parents=True, exist_ok=True)
-    config_path = config_path.joinpath("cryptnoxcard.json.gz")
-
-    return config_path
-
-
-def save_to_config(card_serial: Union[int, str]
-                   ,
-                   config: Dict) -> None:
+def save_to_config(card: cryptnoxpy.Card, config: Dict[str, Any]) -> None:
     """
     Save given configuration to file.
 
-    :param card_serial: Serial number of the card used
-    :param Dict config: Configuration to save
+    :param cryptnoxpy.Card card: Serial number of the card used
+    :param Dict[str, Any] config: Configuration to save
     """
-    _CONFIGURATION[card_serial] = config
+    _CONFIGURATION[card.serial_number] = config
 
-    with gzip.open(return_config_path(card_serial), 'wb') as file:
-        file.write(bytes(json.dumps(config), "UTF-8"))
+    card.user_data = gzip.compress(bytes(json.dumps(config), "UTF-8"))
 
 
-def read_card_config(card_serial: Union[int, str]) -> Dict:
+def read_card_config(card: cryptnoxpy.Card) -> Dict:
     """
-    Reads configuration from config file.
+    Reads the configuration.
 
-    :param card_serial: Serial number of the card used
+    :param cryptnoxpy.Card card: Serial number of the card used
+
     :return: Configuration read from the file
     :rtype: dict
     """
 
-    path = return_config_path(card_serial)
     config = get_default_configuration()
     try:
-        with gzip.open(path, "rb") as file:
-            card_config = json.loads(file.read())
-    except FileNotFoundError:
-        save_to_config(card_serial, config)
+        card_config = json.loads(gzip.decompress(card.user_data))
+    except (json.decoder.JSONDecodeError, FileNotFoundError, gzip.BadGzipFile):
+        save_to_config(card, config)
     else:
         helper_methods.deep_update(config, card_config)
 

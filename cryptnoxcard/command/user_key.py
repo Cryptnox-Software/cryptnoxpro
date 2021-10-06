@@ -34,7 +34,7 @@ class UserKey(Command):
 
         if not card.initialized:
             helper_methods.print_warning("Card is not initialized")
-            print("To initialize card run init\nTo initialize card in demo mode run init -d")
+            print("To initialize card run : init\nTo initialize card in demo mode run : init -d")
 
             return -1
 

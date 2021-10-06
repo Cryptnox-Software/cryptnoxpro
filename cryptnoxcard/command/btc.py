@@ -40,7 +40,7 @@ class Btc(Command):
         return 0
 
     def _send(self, card: cryptnoxpy.Card) -> None:
-        config = get_configuration(card.serial_number)["btc"]
+        config = get_configuration(card)["btc"]
         network = self.data.network or config.get("network", "testnet")
         fees = self.data.fees or int(config.get("fees", 2000))
 

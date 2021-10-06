@@ -95,7 +95,7 @@ class Initialize(Command):
             print("Card is in demo mode."
                   "\n\nPress enter for all pin and puk prompts.\n")
 
-        print(tabulate([["RUN SEED COMMAND TO GENERATE A SEED."]],
+        print(tabulate([["RUN seed COMMAND TO GENERATE NEW OR LOAD AN EXISTING SEED."]],
                        tablefmt="rst"))
 
         del self._cards[card.serial_number]
@@ -152,7 +152,7 @@ class Initialize(Command):
     @staticmethod
     def _get_owner_name() -> str:
 
-        return Initialize._get_valid_input("Owner's name:",
+        return Initialize._get_valid_input("Owner's name: ",
                                            lambda text: text.isascii_() and len(text) <= 20,
                                            "ERROR when input owner name, should be ASCII string no "
                                            "longer than 20 chars.")
