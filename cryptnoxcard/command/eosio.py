@@ -53,9 +53,8 @@ class Eosio(Command):
             elif self.data.action == "get":
                 result = self._get(card)
             elif self.data.action == "config":
-                result = create_config_method(card.serial_number,
-                                              self.data.key, self.data.value,
-                                              "eosio")
+                self._check(card)
+                result = create_config_method(card, self.data.key, self.data.value, "eosio")
             else:
                 print("Action not found")
         except requests.exceptions.RequestException as error:

@@ -541,9 +541,8 @@ class Eth(Command):
             if self.data.eth_action == "send":
                 return self._send(card)
             if self.data.eth_action == "config":
-                return create_config_method(card.serial_number,
-                                            self.data.key, self.data.value,
-                                            "eth")
+                self._check(card)
+                return create_config_method(card, self.data.key, self.data.value, "eth")
             if self.data.eth_action == "contract":
                 contract = Contract(self.data)
                 return contract._execute(card)

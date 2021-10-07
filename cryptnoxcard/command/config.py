@@ -6,9 +6,9 @@ Module containing command for handling configuration file
 from .command import Command
 from .helper.config import (
     write_config,
+    print_config,
     print_key_config,
-    print_section_config,
-    read_config
+    print_section_config
 )
 
 try:
@@ -33,6 +33,6 @@ class Config(Command):
         if self.data.section:
             return print_section_config(card, self.data.section)
 
-        read_config(card)
+        print_config(card)
 
         return 0

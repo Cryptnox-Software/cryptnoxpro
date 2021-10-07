@@ -33,9 +33,7 @@ class Btc(Command):
         if self.data.action == "send":
             self._send(card)
         if self.data.action == "config":
-            return create_config_method(card.serial_number,
-                                        self.data.key, self.data.value,
-                                        "btc")
+            return create_config_method(card, self.data.key, self.data.value, "btc")
 
         return 0
 

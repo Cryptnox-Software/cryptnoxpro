@@ -46,12 +46,14 @@ def create_config_method(card: cryptnoxpy.Card, key: Union[str, None],  value: U
     """
     Create config method for specific cryptocurrency
 
-    :param card_serial: Serial number of the card used
+    :param cryptnoxpy.Card card: Card to use for the operation
     :param key: Key of the configuration dictionary to be edited
     :param value: Value to be inserted into configuration or None
     :param currency_name: Name of the crypto for which to create
-     configuration
-    :return: None
+                          configuration
+
+    :return:
+    :rtype: int
     """
     if value is not None:
         return write_config(card, currency_name, key, value)
@@ -61,14 +63,12 @@ def create_config_method(card: cryptnoxpy.Card, key: Union[str, None],  value: U
     return print_section_config(card, currency_name)
 
 
-def read_config(card: cryptnoxpy.Card, exclude=None) -> None:
+def print_config(card: cryptnoxpy.Card, exclude=None) -> None:
     """
     Prints contents of config.
 
-    :param Union[int, str] card_serial: Serial number of the card used
+    :param cryptnoxpy.Card card: Card to use for the operation
     :param Dict exclude: Exclude section from printing
-
-    :return: None
     """
     exclude = exclude or ["hidden"]
     config = get_configuration(card)
@@ -85,9 +85,11 @@ def print_section_config(card: cryptnoxpy.Card, section: str) -> int:
     """
     Prints contents of a section from configuration.
 
-    :param card_serial: Serial number of the card used
+    :param cryptnoxpy.Card card: Card to use for the operation
     :param section: Section of the configuration file wanted printed
+
     :return: Execution status
+    :rtype: int
     """
     config = get_configuration(card)
     if section not in config:
@@ -106,10 +108,12 @@ def print_key_config(card: cryptnoxpy.Card, section: str, key: str) -> int:
     """
     Prints key and value from section in config.
 
-    :param card_serial: Serial number of the card used
+    :param cryptnoxpy.Card card: Card to use for the operation
     :param section: Section of the configuration file wanted printed
     :param key: Name of the parameter we want to change
+
     :return: Execution status
+    :rtype: int
     """
     config = get_configuration(card)
     try:
@@ -129,8 +133,7 @@ def print_key_config(card: cryptnoxpy.Card, section: str, key: str) -> int:
     return 0
 
 
-def find_endpoint(section: str, key: str, value: str, append: str = "") \
-        -> str:
+def find_endpoint(section: str, key: str, value: str, append: str = "") -> str:
     if key == "network" and section == "btc":
         return f"\nendpoint: {BlkHubApi.get_api(value)}{append}"
 
@@ -141,11 +144,13 @@ def write_config(card: cryptnoxpy.Card, section: str, key: str, value: str) -> i
     """
     Writes new value at chosen section and key.
 
-    :param card_serial: Serial number of the card used
+    :param cryptnoxpy.Card card: Card to use for the operation
     :param section: Section of the config file to write to
     :param key: Name of the parameter we want to change
     :param value: Value we want to insert into the configuration file
+
     :return: Execution status
+    :rtype: int
     """
     config = get_configuration(card)
     try:

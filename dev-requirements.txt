@@ -13,21 +13,21 @@ aiohttp==3.7.4.post0; python_version >= '3.6'
 altgraph==0.17.2
 appdirs==1.4.4
 argparse==1.4.0
-astroid==2.8.0; python_version ~= '3.6'
+astroid==2.8.2; python_version ~= '3.6'
 async-timeout==3.0.1; python_full_version >= '3.5.3'
 atomicwrites==1.4.0; sys_platform == 'win32'
 attrs==21.2.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
 base58==2.1.0
 bitarray==1.2.2
-boto3==1.18.55
-botocore==1.21.55; python_version >= '3.6'
+boto3==1.18.56
+botocore==1.21.56; python_version >= '3.6'
 certifi==2021.5.30
 cffi==1.14.6
 chardet==4.0.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
 charset-normalizer==2.0.6; python_version >= '3'
 colander==1.8.3
 colorama==0.4.4; sys_platform == 'win32' and sys_platform == 'win32'
-cryptnoxpy==1.1.1
+cryptnoxpy==1.1.2
 cryptography==35.0.0; python_version >= '3.6'
 cytoolz==0.11.0; implementation_name == 'cpython'
 ecdsa==0.17.0
@@ -94,4 +94,4 @@ web3==5.24.0
 websockets==9.1; python_full_version >= '3.6.1'
 winrt==1.0.21033.1; sys_platform == 'win32'
 wrapt==1.12.1
-yarl==1.6.3; python_version >= '3.6'
+yarl==1.7.0; python_version >= '3.6'
