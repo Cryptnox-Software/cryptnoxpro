@@ -93,38 +93,24 @@ class EOSWallet:
 
     def get_account(self):
         """
-curl --header "Content-Type: application/json" --request POST --data '{"public_key":"PUB_K1_6iAMvpi8pk9KybiiNY27Kyy4fK1R9qx3TZJBKg8gwLNTXYDvkH"}' https://jungle3.eossweden.org/v1/history/get_key_accounts
         :return:
         """
         acci = self.var_ce.get_accounts(self.address)
         return acci["account_names"]
 
-    def get_balance(self, account_index: int = 0) -> str:
+    def get_balance(self, account: str) -> str:
         """
 
         :return: str
         """
         try:
-            bal = self.var_ce.get_currency_balance(
-                self.get_account()[account_index])
+            bal = self.var_ce.get_currency_balance(account)
         except IndexError:
             bal = ""
         if len(bal) > 0:
             return bal[0]
 
         return "0 EOS"
-
-    def create_account(self, account_name: str, from_account: str, pv_key: str) \
-            -> None:
-        """
-
-        :param account_name: str
-        :param from_account: str
-        :param pv_key: str
-        :return: None
-        """
-        self.var_ce.create_account(from_account, pv_key, account_name,
-                                   self.address, self.address)
 
     def choose_account(self) -> str:
         """
@@ -142,14 +128,12 @@ curl --header "Content-Type: application/json" --request POST --data '{"public_k
                 "the public key on the card")
         choice = accounts[0]
         if len(accounts) > 1:
-            tabulate_data = [
-                [index + 1, value, self.get_balance(index)]
-                for index, value in enumerate(accounts)]
+            tabulate_data = [[index + 1, value, self.get_balance(value)]
+                             for index, value in enumerate(accounts)]
             headers = ["", "ACCOUNT", "BALANCE"]
             print(f"\n{tabulate(tabulate_data, headers=headers)}\n")
             while True:
-                choice = input(f"Choose account you want to use "
-                               f"(1 - {len(accounts)}):").strip()
+                choice = input(f"Choose account you want to use (1 - {len(accounts)}):").strip()
                 if choice == "exit":
                     raise EOSWallet.ExitException()
                 try:

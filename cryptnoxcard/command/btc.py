@@ -2,12 +2,14 @@
 """
 Module containing command for sending funds
 """
+from typing import List
 
 import cryptnoxpy
 
 from .command import Command
 from .helper.config import create_config_method
 from .helper.helper_methods import sign
+from .helper.security import check_pin_code
 
 try:
     import enums
@@ -59,16 +61,24 @@ class Btc(Command):
 
         try:
             wallet.prepare(self.data.address, amount, fees)
-            signature = sign(card, wallet.data_hash, derivation, path=Btc.PATH)
 
-            if not signature:
-                print("Error in getting signature")
-                return
-
-            message = wallet.send(self.data.address, amount, signature)
+            signatures = Btc._sign(card, derivation, wallet.data_hash)
+            message = wallet.send(self.data.address, amount, signatures)
         except Exception as error:
             print(error)
             return
 
         if message.startswith("\nDONE"):
             print(f"\nTransaction id: {message[13:]}\nBalance might take 30 s to be refreshed")
+
+    @staticmethod
+    def _sign(card: cryptnoxpy.Card, derivation: cryptnoxpy.Derivation,
+              data_hashes: List[bytes]) -> List[bytes]:
+        signatures = []
+        pin_code = check_pin_code(card) if len(data_hashes) > 1 else None
+
+        for data_hash in data_hashes:
+            signature = sign(card, data_hash, derivation, path=Btc.PATH, pin_code=pin_code)
+            signatures.append(signature)
+
+        return signatures

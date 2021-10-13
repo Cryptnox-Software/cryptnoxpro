@@ -6,7 +6,8 @@ import typing
 from typing import List, Dict
 
 import cryptnoxpy
-from stdiomask import getpass
+
+from . import ui
 
 DEMO_PIN = "000000000"
 
@@ -137,7 +138,7 @@ def get_puk_code(card: cryptnoxpy.Card, text: str = "", allowed_values: List = N
 
 def _get_code(validation_method: typing.Callable, text: str = "", allowed_values: List = None) -> str:
     allowed_values = allowed_values or []
-    code = getpass(prompt=text)
+    code = ui.secret_with_exit(text, required=("" not in allowed_values))
 
     if not {code, ""}.isdisjoint(allowed_values):
         return code
@@ -147,7 +148,7 @@ def _get_code(validation_method: typing.Callable, text: str = "", allowed_values
             validation_method(code)
         except cryptnoxpy.DataValidationException as error:
             print(error, "\n")
-            code = getpass(prompt=text)
+            code = ui.secret_with_exit(text, required=("" not in allowed_values))
 
             if code in allowed_values:
                 break

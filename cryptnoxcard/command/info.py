@@ -10,7 +10,6 @@ from tabulate import tabulate
 
 from .command import Command
 from .helper.security import is_demo
-from .helper.helper_methods import printable_flags
 
 try:
     import enums
@@ -63,7 +62,7 @@ class Info(Command):
             "name": "EOS",
             "address": "Unknown address",
             "network": "Skip EOS as endpoint is not set in the configuration",
-            "balance": "--"
+            "balance": "Missing endpoint"
         }
 
         try:
@@ -83,23 +82,22 @@ class Info(Command):
         pubkey = card.get_public_key(derivation, key_type, path)
         wallet = EOSWallet(pubkey, endpoint, coin_symbol, key_type=key_type.name)
 
-        tabulate_data["address"] = wallet.address
+        tabulate_data.update({"address": wallet.address, "account": [], "balance": []})
 
         try:
-            tabulate_data["account"] = []
-            tabulate_data["balance"] = []
             accounts = wallet.get_account()
             if not accounts:
                 raise IndexError
-            for index in range(len(accounts)):
-                tabulate_data["account"].append(accounts[index])
-                tabulate_data["balance"].append(wallet.get_balance(index))
+            for account in accounts:
+                tabulate_data["account"].append(account)
+                tabulate_data["balance"].append(wallet.get_balance(account))
         except IndexError:
             tabulate_data["account"].append("No EOS account registered for this public key.")
-            tabulate_data["balance"].append("--")
-        except Exception:
+            tabulate_data["balance"].append("No account")
+        except Exception as error:
+            print(f"There's an issue in retrieving EOS data: {error}")
             tabulate_data["address"] = "Network issue"
-            tabulate_data["balance"].append("--")
+            tabulate_data["balance"].append("Network issue")
 
         return tabulate_data
 
@@ -126,8 +124,9 @@ class Info(Command):
 
         try:
             tabulate_data["balance"] = f"{wallet.get_balance() / 10.0 ** 8} BTC"
-        except Exception:
-            tabulate_data["balance"] = "--"
+        except Exception as error:
+            print(f"There's an issue in retrieving BTC data: {error}")
+            tabulate_data["balance"] = "Network issue"
 
         return tabulate_data
 
@@ -157,11 +156,10 @@ class Info(Command):
         }
 
         try:
-            balance = api.get_balance(address) / 10.0 ** 18
-        except Exception:
-            tabulate_data["balance"] = "--"
-        else:
-            tabulate_data["balance"] = f"{balance} ETH"
+            tabulate_data["balance"] = f"{api.get_balance(address) / 10.0 ** 18} ETH"
+        except Exception as error:
+            print(f"There's an issue in retrieving ETH data: {error}")
+            tabulate_data["balance"] = "Network issue"
 
         return tabulate_data
 

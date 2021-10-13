@@ -8,9 +8,11 @@ import sys
 import cryptnoxpy
 from tabulate import tabulate
 
-from .helper import security
 from .command import Command
-from tabulate import tabulate
+from .helper import (
+    security,
+    ui
+)
 
 try:
     import enums
@@ -22,6 +24,7 @@ class StringConvert(str):
     """
     Class for finding if string can be converted to ascii.
     """
+
     def isascii_(self) -> bool:
         """
         Finding if string can be converted or is ascii.
@@ -73,10 +76,8 @@ class Initialize(Command):
             print(tabulate(data, tablefmt="plain"))
         else:
             try:
-                owner_name = Initialize._handle_exit(
-                    Initialize._get_owner_name())
-                owner_email = Initialize._handle_exit(
-                    Initialize._get_owner_email())
+                owner_name = Initialize._get_owner_name()
+                owner_email = Initialize._get_owner_email()
                 pin_code = self._get_pin_code(card)
                 puk_code, puk_choice = self._get_puk_code(card)
             except KeyboardInterrupt:
@@ -104,10 +105,10 @@ class Initialize(Command):
 
     @staticmethod
     def _get_valid_input(text: str, valid, error: str = "Invalid value") -> str:
-        user_input = StringConvert(input(text))
+        user_input = StringConvert(ui.input_with_exit(text, required=False))
         while not valid(user_input):
             print(error)
-            user_input = StringConvert(input(text))
+            user_input = StringConvert(ui.input_with_exit(text))
 
         return user_input
 
@@ -115,10 +116,8 @@ class Initialize(Command):
     def _verify_input(card: cryptnoxpy.Card, method, text, verify_text,
                       error: str = "The given values are not the same.") -> str:
         while True:
-            value = Initialize._handle_exit(
-                method(card, text, allowed_values=["exit"]))
-            verify_value = Initialize._handle_exit(
-                method(card, verify_text, allowed_values=["exit"]))
+            value = method(card, text)
+            verify_value = method(card, verify_text)
 
             if value == verify_value:
                 break
@@ -130,10 +129,10 @@ class Initialize(Command):
     def _get_puk_code(self, card):
         print(f"For the PUK code: 1) Input your own {card.puk_rule} PUK")
         print("                   2) Generate a random one ")
-        puk_choice = Initialize._handle_exit(input("> "))
+        puk_choice = ui.input_with_exit("> ")
         while puk_choice not in ["1", "2"]:
             print("Not a valid choice. Please, enter 1 or 2.")
-            puk_choice = input("> ")
+            puk_choice = ui.input_with_exit("> ")
 
         if puk_choice == "2":
             puk_code = str(secrets.randbelow(10 ** card.PUK_LENGTH)).zfill(card.PUK_LENGTH)
@@ -175,9 +174,3 @@ class Initialize(Command):
             print('Type "y", "n" or leave empty for no.')
 
         return conf.lower() == "y"
-
-    @staticmethod
-    def _handle_exit(value):
-        if value == "exit":
-            raise KeyboardInterrupt
-        return value

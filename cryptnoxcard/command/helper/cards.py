@@ -5,15 +5,15 @@ from time import (
 from typing import (
     Dict,
     KeysView,
+    List,
     ValuesView
 )
 
 import cryptnoxpy
 from tabulate import tabulate
-from .helper_methods import (
-    printable_flags,
-    print_warning
-)
+
+from .ui import print_warning
+
 
 class ExitException(Exception):
     """
@@ -127,7 +127,7 @@ class Cards:
                 info["applet_version"],
                 info["name"] + ((" <" + info["email"] + ">") if info["email"]
                                 else ""),
-                ", ".join(printable_flags(card))
+                ", ".join(Cards.printable_flags(card))
             ]
 
             uninitialized |= not info["initialized"]
@@ -137,7 +137,7 @@ class Cards:
 
             data.append(entry)
 
-        alignment = ["right",] * len(headers)
+        alignment = ["right", ] * len(headers)
         alignment[-1] = "left"
         if data or print_with_one_card:
             print(tabulate(data, headers=headers, colalign=alignment))
@@ -179,6 +179,36 @@ class Cards:
         del self._cards[serial_number].connection
         del self._cards[serial_number]
         del self._cards_by_index[index]
+
+    @staticmethod
+    def printable_flags(card: cryptnoxpy.Card) -> List[str]:
+        flags = []
+
+        if card.initialized:
+            flags.append("initialized")
+        if card.valid_key:
+            try:
+                flags.append(f"{card.seed_source.name.lower()} seed")
+            except NotImplementedError:
+                flags.append("seed")
+        if card.pin_authentication:
+            flags.append("pin auth")
+        if card.pinless_enabled:
+            flags.append("pinless")
+        if card.extended_public_key:
+            flags.append("extended public key")
+
+        keys = []
+        for slot_index in cryptnoxpy.SlotIndex:
+            try:
+                if card.user_key_enabled(slot_index):
+                    keys.append(slot_index.name.lower())
+            except NotImplementedError:
+                break
+        if keys:
+            flags.append(f'user keys: "{", ".join(keys)}"')
+
+        return flags
 
     @property
     def _select_card(self) -> cryptnoxpy.Card:

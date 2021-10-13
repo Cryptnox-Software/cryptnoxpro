@@ -269,6 +269,8 @@ class InteractiveCli:
 
         self._cards.print_card_list(show_warnings=True, print_with_one_card=True)
         print("\n\nType help for list of commands.\n\n")
+        print("\n\nWith any input that is requested from you, to exit the current command "
+              "type: exit \n\n")
 
         while True:
             try:

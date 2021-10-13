@@ -6,8 +6,8 @@ import cryptnoxpy
 
 from .command import Command
 from .helper import (
-    helper_methods,
-    security
+    security,
+    ui
 )
 
 try:
@@ -24,7 +24,7 @@ class ChangePuk(Command):
 
     def _execute(self, card: cryptnoxpy.Card) -> int:
         if not card.initialized:
-            helper_methods.print_warning("Card is not initialized")
+            ui.print_warning("Card is not initialized")
             print("To initialize card run : init\nTo initialize card in demo mode run : init -d")
 
             return -1

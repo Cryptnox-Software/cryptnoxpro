@@ -183,11 +183,12 @@ class BlkHubApi:
             if len(b_rep) == 64 and b_rep[0] != ord('{'):
                 b_rep = b'{"txid":"' + b_rep + b'"}'
             self.js_res = json.loads(b_rep)
+        except urllib.error.HTTPError as error:
+            raise IOError(f"Error while processing request:\n{error.code} - "
+                          f"{error.read().decode('utf8')}") from error
         except Exception as error:
-            print(error)
-            raise IOError("Error while processing request:\n%s" % (
-                    self.url + endpoint + "?" + params_enc
-            )) from error
+            raise IOError(f"Error while processing request:\n{self.url}{endpoint}?params_enc\n"
+                          f"{error}") from error
 
     def check_api_resp(self) -> None:
         """
@@ -290,7 +291,7 @@ class BTCwallet:
         self.balance = None
         self.var_tx = None
         self.len_inputs = None
-        self.data_hash = None
+        self.data_hash = []
         self.fee = 2000
 
     def get_utx_os(self, n_conf: int = 0):
@@ -341,13 +342,11 @@ class BTCwallet:
         self.len_inputs = len(inputs)
         for i in range(self.len_inputs):
             print("\nSigning INPUT #", i)
-            signing_tx = cryptos.signature_form(self.var_tx, i, script,
-                                                cryptos.SIGHASH_ALL)
-            self.data_hash = cryptos.bin_txhash(signing_tx,
-                                                cryptos.SIGHASH_ALL)
+            signing_tx = cryptos.signature_form(self.var_tx, i, script, cryptos.SIGHASH_ALL)
+            self.data_hash.append(cryptos.bin_txhash(signing_tx, cryptos.SIGHASH_ALL))
         return 0
 
-    def send(self, to_addr: str, payment_value: float, signature: bytes) -> str:
+    def send(self, to_addr: str, payment_value: float, signature: List[bytes]) -> str:
         """
 
         :param to_addr: str
@@ -355,9 +354,8 @@ class BTCwallet:
         :return: str
         """
         # Cryptnox Sign
-        serialized = cryptos.serialize_script([signature.hex() + "01", self.pubkey])
         for i in range(0, self.len_inputs):
-            self.var_tx["ins"][i]["script"] = serialized
+            self.var_tx["ins"][i]["script"] = cryptos.serialize_script([signature[i].hex() + "01", self.pubkey])
 
         tabulate_table = [
             ["BALANCE:", f"{self.balance}", "BTC", "ON", "ACCOUNT:",

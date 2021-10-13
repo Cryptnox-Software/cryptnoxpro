@@ -1,18 +1,12 @@
 import ast
 import collections
-from typing import Any, List
+from typing import Any
 
 import argparse
 import cryptnoxpy
-from stdiomask import getpass
-from tabulate import tabulate
 
 from . import security
 from .. import user_keys
-
-
-class ExitException(Exception):
-    """Raised when user has indicated he want's to exit the command"""
 
 
 def deep_update(source, overrides):
@@ -27,20 +21,6 @@ def deep_update(source, overrides):
         else:
             source[key] = overrides[key]
     return source
-
-
-def input_with_exit(text, required=True, input_method=None):
-    input_method = input_method or input
-    while True:
-        value = input_method(text).strip()
-        if value.lower() == "exit":
-            raise ExitException
-        if required and not value:
-            print("This entry is required")
-        else:
-            break
-
-    return value
 
 
 class IntRange:
@@ -72,54 +52,10 @@ class IntRange:
             return argparse.ArgumentTypeError("Must be an integer")
 
 
-def option_input(options: List[str], name: str = ""):
-    name = name or "option"
-    print(tabulate(enumerate(options, 1)))
-    length = len(options)
-
-    while True:
-        choice = input_with_exit(f"\nChoose {name} (1 - {length}): ")
-
-        try:
-            return options[int(choice) - 1]
-        except (IndexError, ValueError):
-            print(f"Please, enter a number between 1 and {length}")
-
-
-def printable_flags(card: cryptnoxpy.Card) -> List[str]:
-    flags = []
-
-    if card.initialized:
-        flags.append("initialized")
-    if card.valid_key:
-        try:
-            flags.append(f"{card.seed_source.name.lower()} seed")
-        except NotImplementedError:
-            flags.append("seed")
-    if card.pin_authentication:
-        flags.append("pin auth")
-    if card.pinless_enabled:
-        flags.append("pinless")
-    if card.extended_public_key:
-        flags.append("extended public key")
-
-    keys = []
-    for slot_index in cryptnoxpy.SlotIndex:
-        try:
-            if card.user_key_enabled(slot_index):
-                keys.append(slot_index.name.lower())
-        except NotImplementedError:
-            break
-    if keys:
-        flags.append(f'user keys: "{", ".join(keys)}"')
-
-    return flags
-
-
 def sign(card: cryptnoxpy.Card, message: bytes,
          derivation: cryptnoxpy.Derivation = cryptnoxpy.Derivation.CURRENT_KEY,
          key_type: cryptnoxpy.KeyType = cryptnoxpy.KeyType.K1, path: str = "",
-         filter_eos: bool = False) -> bytes:
+         filter_eos: bool = False, pin_code=None) -> bytes:
     """
     Open the card with a user key or PIN code and sign the given message in the given card
     
@@ -129,6 +65,7 @@ def sign(card: cryptnoxpy.Card, message: bytes,
     :param cryptnoxpy.KeyType key_type: Key type to use when signing
     :param str path: Path to use for signature generation
     :param bool filter_eos: Filter signature to be compatible with eos requirements
+    :param bool pin_code: If PIN code is given use it instead of asking for it
 
     :return: Signature of the message generated in the card
     :rtype: bytes
@@ -139,8 +76,12 @@ def sign(card: cryptnoxpy.Card, message: bytes,
         signature = card.sign(message, derivation, key_type, path, filter_eos=filter_eos)
 
     if not signature:
-        pin_code = security.check_pin_code(card)
+        if not pin_code:
+            pin_code = security.check_pin_code(card)
         signature = card.sign(message, derivation, key_type, path, pin_code, filter_eos)
+
+    if not signature:
+        raise ValueError("Error in getting the signature")
 
     return signature
 
@@ -157,12 +98,3 @@ def try_eval(value: str) -> Any:
     except ValueError:
         pass
     return value
-
-
-def secret_with_exit(text, required=True):
-    return input_with_exit(text, required, getpass)
-
-def print_warning(text):
-    print()
-    print(tabulate([[str(text).upper()]], tablefmt="rst"))
-    print()

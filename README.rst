@@ -82,6 +82,16 @@ The application can receive commands directly in any command line, or can be sta
 `Interactive Mode <#interactive-mode>`_ by starting without any arguments or options.
 The later will also start if the executable is called from a GUI, like Windows Explorer.
 
+Exit input
+^^^^^^^^^^
+
+Whenever an input is requested from the user: PIN or PUK code or any other information,
+the command execution can be exited with the keyword ``exit``. When this is used the
+command stops the execution.
+
+To not overcrowd the interface this is not mentioned when information is requested by
+the CLI.
+
 Development environment
 -----------------------
 

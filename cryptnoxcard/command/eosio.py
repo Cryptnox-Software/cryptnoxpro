@@ -163,7 +163,7 @@ class Eosio(Command):
         to_account = self.data.recipient
         memo = self.data.memo
         amount = self.data.amount
-        balance = float(wallet.get_balance().split(" " + wallet.coin_symbol)[0])
+        balance = float(wallet.get_balance(account).split(" " + wallet.coin_symbol)[0])
 
         if amount > balance:
             print("Not enough fund for the tx")

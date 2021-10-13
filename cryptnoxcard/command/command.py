@@ -9,7 +9,10 @@ from argparse import Namespace
 from tabulate import tabulate
 
 from . import user_keys
-from .helper import helper_methods, security
+from .helper import (
+    security,
+    ui
+)
 from .helper.cards import (
     Cards,
     ExitException,
@@ -98,11 +101,9 @@ class Command(metaclass=abc.ABCMeta):
     def run_execute(self, card) -> int:
         print(f"Using card with serial number {card.serial_number}")
         if card.origin == cryptnoxpy.enums.Origin.UNKNOWN:
-            helper_methods.print_warning("Origin of card can't be checked. "
-                                         "Internet connection required.")
+            ui.print_warning("Origin of card can't be checked. Internet connection required.")
         elif card.origin == cryptnoxpy.enums.Origin.FAKE:
-            helper_methods.print_warning(f"Card with serial number{card.serial_number} is not "
-                                         f"genuine.")
+            ui.print_warning(f"Card with serial number{card.serial_number} is not genuine.")
 
         try:
             result = self._execute(card)
@@ -117,7 +118,7 @@ class Command(metaclass=abc.ABCMeta):
         except (cryptnoxpy.CryptnoxException, NotImplementedError) as error:
             print(error)
             result = -1
-        except helper_methods.ExitException:
+        except ui.ExitException:
             print("Exited by user.")
             result = -1
         except Unauthorized as error:

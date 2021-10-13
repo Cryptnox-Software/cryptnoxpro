@@ -10,8 +10,12 @@ from tabulate import tabulate
 
 from . import user_keys
 from .command import Command
-from .helper import backup, helper_methods, security
-from .helper.cards import ExitException, TimeoutException
+from .helper import (
+    backup,
+    cards,
+    security,
+    ui
+)
 
 try:
     import enums
@@ -63,7 +67,7 @@ class Seed(Command):
         if not service:
             return False
 
-        name = helper_methods.input_with_exit("Name of the seed on the KMS in HSM: ")
+        name = ui.input_with_exit("Name of the seed on the KMS in HSM: ")
 
         seed = card.generate_random_number(32)
         print("Backing up seed...")
@@ -99,15 +103,15 @@ class Seed(Command):
         backup_file.write_text(tabulate(data))
         print(f"\nBackup data also saved to: {backup_file}")
 
-        helper_methods.print_warning("It is advised to delete your AWS access keys if you "
-                                     "don't plan to use them.")
+        ui.print_warning("It is advised to delete your AWS access keys if you don't plan to use "
+                         "them.")
 
         return 0
 
     @staticmethod
     def _backup_service() -> Union[None, backup.AWS]:
-        access_key_id = helper_methods.input_with_exit("Access Key ID: ")
-        secret_access_key = helper_methods.secret_with_exit("Secret Access Key: ")
+        access_key_id = ui.input_with_exit("Access Key ID: ")
+        secret_access_key = ui.secret_with_exit("Secret Access Key: ")
 
         try:
             service = backup.AWS(access_key_id, secret_access_key)
@@ -119,7 +123,7 @@ class Seed(Command):
         for client, options in service.regions.items():
             for option in regions.values():
                 options.remove(option)
-            regions[client] = helper_methods.option_input(options)
+            regions[client] = ui.option_input(options)
 
         try:
             service.region = regions
@@ -168,7 +172,7 @@ class Seed(Command):
 
         try:
             card = self._cards[serial_number]
-        except (ExitException, TimeoutException) as error:
+        except (cards.ExitException, cards.TimeoutException) as error:
             print(error)
             print("First card seed has been generated. Reset it before doing dual seed generation "
                   "again.")
@@ -235,7 +239,7 @@ class Seed(Command):
         pin_code = Seed._get_pin_code(card)
 
         print("\nEnter the mnemonic root to recover :")
-        mnemonic = input("> ")
+        mnemonic = ui.input_with_exit("> ")
         Seed._load_mnemonic(card, mnemonic, pin_code)
         print("Mnemonic loaded, please keep it safe for backup.")
 
@@ -245,7 +249,7 @@ class Seed(Command):
         service = Seed._backup_service()
         if not service:
             return -1
-        name = helper_methods.input_with_exit("Name of the seed on the KMS in HSM: ")
+        name = ui.input_with_exit("Name of the seed on the KMS in HSM: ")
 
         print("Retrieving seed from service...")
         try:
@@ -267,8 +271,8 @@ class Seed(Command):
         Seed._load_mnemonic(card, mnemonic, pin_code)
         print("\nMnemonic loaded from backup service.")
 
-        helper_methods.print_warning("It is advised to delete your AWS access keys if you "
-                                     "don't plan to use them.")
+        ui.print_warning("It is advised to delete your AWS access keys if you don't plan to use "
+                         "them.")
 
         return 0
 

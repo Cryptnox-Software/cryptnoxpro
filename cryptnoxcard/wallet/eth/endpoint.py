@@ -101,21 +101,19 @@ class CryptnoxEndpoint(Endpoint):
     """
     name = "cryptnox"
 
-    _PORTS = {
-        enums.EthNetwork.MAINNET: "8745",
-        enums.EthNetwork.ROPSTEN: "8775",
-        enums.EthNetwork.RINKEBY: "8755"
-    }
+    _NETWORKS = [enums.EthNetwork.MAINNET, enums.EthNetwork.ROPSTEN, enums.EthNetwork.RINKEBY]
 
-    available_networks = [x.name for x in _PORTS.keys()]
+    available_networks = [x.name for x in _NETWORKS]
 
     @property
     def domain(self) -> str:
-        return "demo01.cryptnox.xeos.me:" + CryptnoxEndpoint._PORTS[self.network]
+        domain = self.network.name.lower()
+        domain = domain if domain != "mainnet" else "ethereum"
+        return f"{domain}.nodes.cryptnox.tech"
 
     @property
     def provider(self) -> str:
-        return f"http://{self.domain}"
+        return f"https://{self.domain}"
 
 
 def factory(endpoint: str, network: enums.EthNetwork, api_key: str = "") -> Endpoint:

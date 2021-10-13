@@ -7,10 +7,25 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_\ ,
 and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
-`Unreleased <https://github.com/Cryptnox-Software/cryptnoxcard/compare/v1.3.1...HEAD>`_
+`Unreleased <https://github.com/Cryptnox-Software/cryptnoxcard/compare/v1.3.2...HEAD>`_
 -------------------------------------------------------------------------------------------
 
-`1.3.1 <https://github.com/Cryptnox-Software/cryptnoxcard/compare/v1.3.0...1.3.1>`_ - 2021-09-16
+`1.3.2 <https://github.com/Cryptnox-Software/cryptnoxcard/compare/v1.3.1...1.3.2>`_ - 2021-10-13
+------------------------------------------------------------------------------------------------
+
+Changed
+^^^^^^^
+
+* Ethereum endpoint through cryptnox node updated to use different domains on standard ports
+* With ``info`` command for balance show the issue instead of "--"
+
+Fixed
+^^^^^
+
+* ``exit`` keyword when input is requested from user, like PIN or PUK code
+* Bitcoin sending with multiple inputs is rejected by the node
+
+`1.3.1 <https://github.com/Cryptnox-Software/cryptnoxcard/compare/v1.3.0...1.3.1>`_ - 2021-10-07
 ------------------------------------------------------------------------------------------------
 
 Fixed
@@ -18,7 +33,7 @@ Fixed
 
 * Crash when calling config under currencies
 
-`1.3.0 <https://github.com/Cryptnox-Software/cryptnoxcard/compare/v1.2.0...1.3.0>`_ - 2021-09-16
+`1.3.0 <https://github.com/Cryptnox-Software/cryptnoxcard/compare/v1.2.0...1.3.0>`_ - 2021-10-06
 ------------------------------------------------------------------------------------------------
 
 Added

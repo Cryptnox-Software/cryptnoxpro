@@ -4,7 +4,6 @@ Module containing command for working with user keys like:
 YubiKey or Windows Hello
 """
 import shutil
-from typing import Callable
 
 import cryptnoxpy
 from tabulate import tabulate
@@ -12,8 +11,8 @@ from tabulate import tabulate
 from . import user_keys
 from .command import Command
 from .helper import (
-    helper_methods,
-    security
+    security,
+    ui
 )
 
 try:
@@ -33,7 +32,7 @@ class UserKey(Command):
             return self._list(card)
 
         if not card.initialized:
-            helper_methods.print_warning("Card is not initialized")
+            ui.print_warning("Card is not initialized")
             print("To initialize card run : init\nTo initialize card in demo mode run : init -d")
 
             return -1
@@ -96,4 +95,3 @@ class UserKey(Command):
         print(tabulate(data, headers=headers))
 
         return 0
-
