@@ -1,4 +1,5 @@
 import re
+from decimal import Decimal
 
 import argparse
 
@@ -60,7 +61,7 @@ def _btc_options(subparsers, interactive_mode):
                                                              "system token")
         send_sub_parser.add_argument("address", type=_validate,
                                      help="Address where to send funds")
-        send_sub_parser.add_argument("amount", type=float, help="Amount to send")
+        send_sub_parser.add_argument("amount", type=Decimal, help="Amount to send")
         send_sub_parser.add_argument("-n", "--network", choices=["mainnet", "testnet"],
                                      help="Network to use for transaction")
         send_sub_parser.add_argument("-f", "--fees", type=int,
@@ -167,6 +168,7 @@ def _seed_options(subparsers, interactive_mode):
     action_sub_parser.add_parser("restore", help="Restore from seed stored on KMS in HSM.")
     action_sub_parser.add_parser("upload", help="Generate seed in host, upload to card and show "
                                                 "BIP39 word list for backup.")
+
 
 def _unlock_pin_options(subparsers, _: bool):
     subparsers.add_parser(enums.Command.UNLOCK_PIN.value,

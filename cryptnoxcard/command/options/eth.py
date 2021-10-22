@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import argparse
 
 from .common import (
@@ -106,7 +108,7 @@ def _add_send(subparsers):
     sub_parser = subparsers.add_parser("send", help="Simple command to send Ethereum system token")
     sub_parser.add_argument("address", type=_validate,
                             help="Address where to send funds")
-    sub_parser.add_argument("amount", type=float, help="Amount to send")
+    sub_parser.add_argument("amount", type=Decimal, help="Amount to send")
     _add_options(sub_parser)
 
 

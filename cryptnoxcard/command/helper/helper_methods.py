@@ -55,7 +55,7 @@ class IntRange:
 def sign(card: cryptnoxpy.Card, message: bytes,
          derivation: cryptnoxpy.Derivation = cryptnoxpy.Derivation.CURRENT_KEY,
          key_type: cryptnoxpy.KeyType = cryptnoxpy.KeyType.K1, path: str = "",
-         filter_eos: bool = False, pin_code=None) -> bytes:
+         filter_eos: bool = False, pin_code: str = "") -> bytes:
     """
     Open the card with a user key or PIN code and sign the given message in the given card
     
@@ -65,7 +65,7 @@ def sign(card: cryptnoxpy.Card, message: bytes,
     :param cryptnoxpy.KeyType key_type: Key type to use when signing
     :param str path: Path to use for signature generation
     :param bool filter_eos: Filter signature to be compatible with eos requirements
-    :param bool pin_code: If PIN code is given use it instead of asking for it
+    :param str pin_code: If PIN code is given use it instead of asking for it
 
     :return: Signature of the message generated in the card
     :rtype: bytes

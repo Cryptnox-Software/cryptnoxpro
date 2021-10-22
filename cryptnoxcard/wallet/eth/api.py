@@ -2,13 +2,9 @@
 """
 A basic Ethereum wallet library
 """
-from typing import (
-    Any,
-    Dict, Union
-)
-
 import cryptnoxpy
 import ecdsa
+import web3
 from cryptnoxpy import Derivation
 from eth_account._utils.legacy_transactions import (
     encode_transaction,
@@ -16,7 +12,10 @@ from eth_account._utils.legacy_transactions import (
 )
 from eth_utils.curried import keccak
 from hexbytes import HexBytes
-from web3 import Web3
+from typing import (
+    Any,
+    Dict, Union
+)
 
 from . import endpoint as ep
 from .. import validators
@@ -34,25 +33,12 @@ def address(public_key: str) -> str:
 
 
 def checksum_address(public_key: str) -> str:
-    return Web3.toChecksumAddress(address(public_key))
-
-
-def convert_values(sanitized_transaction: Dict) -> Dict:
-    """
-    Convert values to wei/gwei
-
-    :param sanitized_transaction: Passed transaction
-    :return: Dictionary with values in wei
-    """
-    sanitized_transaction["gasPrice"] = Web3.toWei(
-        sanitized_transaction["gasPrice"], "gwei")
-    sanitized_transaction["value"] = Web3.toWei(
-        sanitized_transaction["value"], "wei")
-
-    return sanitized_transaction
+    return web3.Web3.toChecksumAddress(address(public_key))
 
 
 class Api:
+    PATH = "m/44'/60'/0'/0/0"
+
     def __init__(self, card: cryptnoxpy.Card, endpoint: str, network: Union[enums.EthNetwork, str],
                  api_key: str):
         if isinstance(network, str):
@@ -72,10 +58,14 @@ class Api:
         return self._web3.eth.contract(address=address, abi=abi)
 
     def get_transaction_count(self, address: str, blocks: str = None) -> int:
-        return self._web3.eth.get_transaction_count(Web3.toChecksumAddress(address), blocks)
+        return self._web3.eth.get_transaction_count(web3.Web3.toChecksumAddress(address), blocks)
 
     def get_balance(self, address: str) -> float:
-        return self._web3.eth.get_balance(Web3.toChecksumAddress(address))
+        return self._web3.eth.get_balance(web3.Web3.toChecksumAddress(address))
+
+    @property
+    def gas_price(self):
+        return self._web3.eth.gas_price
 
     @property
     def network(self):
@@ -130,8 +120,8 @@ class Api:
         return var_v, var_r, var_s
 
     @property
-    def _web3(self) -> Web3:
-        return Web3(Web3.HTTPProvider(self.endpoint.provider))
+    def _web3(self) -> web3.Web3:
+        return web3.Web3(web3.Web3.HTTPProvider(self.endpoint.provider))
 
 
 class EthValidator:

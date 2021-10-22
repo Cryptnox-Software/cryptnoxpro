@@ -4,6 +4,7 @@ Module for creating and adding logic for eosio commands.
 """
 import json
 import re
+from decimal import Decimal
 
 import cryptnoxpy
 import requests
@@ -30,7 +31,6 @@ class Eosio(Command):
     Command to work with eosio network
     """
     DERIVATION = cryptnoxpy.Derivation.DERIVE
-    PATH = "m/44'/194'/0'/0"
 
     _name = enums.Command.EOSIO.value
 
@@ -152,7 +152,11 @@ class Eosio(Command):
         wallet = self._wallet(card)
 
         try:
-            account = self.data.account
+            account = self.data.sender
+            accounts = wallet.get_account()
+            if account not in accounts:
+                print("Sender account not found for public key")
+                return -1
         except AttributeError:
             try:
                 account = wallet.choose_account()
@@ -161,9 +165,9 @@ class Eosio(Command):
                 return 0
 
         to_account = self.data.recipient
-        memo = self.data.memo
+        memo = self.data.memo[0] if self.data.memo else ""
         amount = self.data.amount
-        balance = float(wallet.get_balance(account).split(" " + wallet.coin_symbol)[0])
+        balance = Decimal(wallet.get_balance(account).split(" " + wallet.coin_symbol)[0])
 
         if amount > balance:
             print("Not enough fund for the tx")
@@ -173,9 +177,9 @@ class Eosio(Command):
 
         transaction = wallet.send(account, to_account, amount, memo)
         tabulate_table = [
-            ["BALANCE:", f"{balance}", "ETH", "ON", "ACCOUNT:",
+            ["BALANCE:", f"{balance}", "EOS", "ON", "ACCOUNT:",
              f"{account}"],
-            ["TRANSACTION:", f"{amount}", "ETH", "TO", "ACCOUNT:",
+            ["TRANSACTION:", f"{amount}", "EOS", "TO", "ACCOUNT:",
              f"{to_account}"]
         ]
 
@@ -196,10 +200,10 @@ class Eosio(Command):
             raise Eosio.DataValidationException("Derivation error.") from error
 
         public_key = card.get_public_key(derivation, key_type,
-                                         path=Eosio.PATH, compressed=False)
+                                         path=EOSWallet.PATH, compressed=False)
 
         digest = wallet.var_ce.transaction_hash(transaction)
-        signature = sign(card, bytes.fromhex(digest), derivation, key_type, Eosio.PATH, True)
+        signature = sign(card, bytes.fromhex(digest), derivation, key_type, EOSWallet.PATH, True)
 
         if not signature:
             print("Error in getting signature")
@@ -252,7 +256,7 @@ class Eosio(Command):
             raise Eosio.DataValidationException("Derivation error.") from error
 
         coin_symbol = config.get("coin_symbol", "EOS")
-        public_key = card.get_public_key(derivation, key_type, Eosio.PATH)
+        public_key = card.get_public_key(derivation, key_type, EOSWallet.PATH)
         wallet = EOSWallet(public_key, endpoint, coin_symbol, key_type.name)
 
         print(f"Public key: {wallet.address}")
@@ -262,7 +266,6 @@ class Eosio(Command):
     def _wallet(self, card) -> EOSWallet:
         self._check(card)
 
-        path = self.data.path
         config = get_configuration(card)["eosio"]
         endpoint = self.data.url or config.get(
             "endpoint", "https://jungle3.eossweden.org")
@@ -278,9 +281,9 @@ class Eosio(Command):
         except KeyError as error:
             raise Eosio.DataValidationException("Derivation error.") from error
 
-        public_key = card.get_public_key(derivation, key_type, path)
+        public_key = card.get_public_key(derivation, key_type, EOSWallet.PATH)
 
         wallet = EOSWallet(public_key, endpoint, coin_symbol, key_type.name)
-        card.derive(key_type, path=path)
+        card.derive(key_type, path=EOSWallet.PATH)
 
         return wallet

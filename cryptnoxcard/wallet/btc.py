@@ -2,7 +2,7 @@
 """
 A basic BTC wallet library
 """
-
+import math
 import json
 import re
 import urllib.parse
@@ -202,6 +202,15 @@ class BlkHubApi:
             print(" !! ERRORS :")
             raise Exception(self.js_res['errors'])
 
+    def get_fee_estimates(self, blocks=6) -> int:
+        self.get_data("fee-estimates")
+        block_entries = [int(x) for x in self.js_res.keys() if int(x) <= blocks]
+        block_entries.sort()
+        try:
+            return math.ceil(self.js_res[str(block_entries.pop())])
+        except KeyError:
+            return 0
+
     def get_utx_os(self, addr: str, _n_conf: int) -> List:
         """
 
@@ -268,6 +277,7 @@ class BTCwallet:
     """
     BTCwallet
     """
+    PATH = "m/44'/0'/0'/0/0"
 
     def __init__(self, pubkey: str, coin_type: str, api,
                  card) -> None:
@@ -309,6 +319,9 @@ class BTCwallet:
         utx_os = self.get_utx_os()
         return self.balance_fm_utxos(utx_os)
 
+    def get_fee_estimate(self):
+        return self.api.get_fee_estimates()
+
     def prepare(self, to_addr: str, payment_value: float, fee: float) \
             -> Union[float, int]:
         """
@@ -341,7 +354,6 @@ class BTCwallet:
         # Sign each input
         self.len_inputs = len(inputs)
         for i in range(self.len_inputs):
-            print("\nSigning INPUT #", i)
             signing_tx = cryptos.signature_form(self.var_tx, i, script, cryptos.SIGHASH_ALL)
             self.data_hash.append(cryptos.bin_txhash(signing_tx, cryptos.SIGHASH_ALL))
         return 0

@@ -28,9 +28,10 @@ class TimeoutException(Exception):
 
 
 class Cards:
-    def __init__(self):
+    def __init__(self, debug: bool = False):
         self._cards: Dict[int, cryptnoxpy.Card] = {}
         self._cards_by_index: Dict[int, cryptnoxpy.Card] = {}
+        self.debug = debug
 
     def __contains__(self, key: int) -> bool:
         return key in self._cards.keys() or key in self._cards_by_index.keys()
@@ -160,8 +161,8 @@ class Cards:
         raise ValueError
 
     def _open_card(self, index: int) -> cryptnoxpy.Card:
-        connection = cryptnoxpy.Connection(index)
-        card = cryptnoxpy.factory.get_card(connection)
+        connection = cryptnoxpy.Connection(index, self.debug)
+        card = cryptnoxpy.factory.get_card(connection, self.debug)
         self._cards[card.serial_number] = self._cards_by_index[index] = card
 
         return card

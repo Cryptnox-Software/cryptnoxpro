@@ -40,7 +40,7 @@ class Command(metaclass=abc.ABCMeta):
 
     def __init__(self, data: Namespace, cards: Cards = None):
         self.data = data
-        self._cards = cards or Cards()
+        self._cards = cards or Cards(self.data.verbose)
         self.serial_number = None
         # self.notification = Notification()
 
@@ -100,10 +100,11 @@ class Command(metaclass=abc.ABCMeta):
 
     def run_execute(self, card) -> int:
         print(f"Using card with serial number {card.serial_number}")
-        if card.origin == cryptnoxpy.enums.Origin.UNKNOWN:
-            ui.print_warning("Origin of card can't be checked. Internet connection required.")
-        elif card.origin == cryptnoxpy.enums.Origin.FAKE:
-            ui.print_warning(f"Card with serial number{card.serial_number} is not genuine.")
+        origin = card.origin
+        if origin == cryptnoxpy.enums.Origin.UNKNOWN:
+            ui.print_warning("Origin of card can't be checked. Check your internet connection.")
+        elif origin == cryptnoxpy.enums.Origin.FAKE:
+            ui.print_warning(f"Card with serial number {card.serial_number} is not genuine.")
 
         try:
             result = self._execute(card)

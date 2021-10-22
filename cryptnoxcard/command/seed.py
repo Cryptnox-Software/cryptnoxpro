@@ -63,7 +63,12 @@ class Seed(Command):
     def _backup(card: cryptnoxpy.Card) -> int:
         pin_code = Seed._get_pin_code(card)
 
-        service = Seed._backup_service()
+        try:
+            service = Seed._backup_service()
+        except backup.BackupException as error:
+            print(error)
+            return -1
+
         if not service:
             return False
 
@@ -231,7 +236,7 @@ class Seed(Command):
 
     @staticmethod
     def _load_mnemonic(card: cryptnoxpy.Card, mnemonic: str, pin_code: str) -> None:
-        seed = cryptos.cryptnox_mnemonic_to_seed(mnemonic)
+        seed = cryptos.bip39_mnemonic_to_seed(mnemonic)
         card.load_seed(seed, pin_code)
 
     @staticmethod

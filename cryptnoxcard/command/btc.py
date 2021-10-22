@@ -25,8 +25,6 @@ class Btc(Command):
     """
     Command for sending payment on Bitcoin and Ethereum networks
     """
-    PATH = "m/44'/0'/0'/0"
-
     _name = enums.Command.BTC.value
 
     def _execute(self, card) -> int:
@@ -42,7 +40,6 @@ class Btc(Command):
     def _send(self, card: cryptnoxpy.Card) -> None:
         config = get_configuration(card)["btc"]
         network = self.data.network or config.get("network", "testnet")
-        fees = self.data.fees or int(config.get("fees", 2000))
 
         try:
             derivation = cryptnoxpy.Derivation[config["derivation"]]
@@ -52,12 +49,17 @@ class Btc(Command):
 
         endpoint = BlkHubApi(network)
 
-        pubkey = card.get_public_key(derivation, path=Btc.PATH)
+        pubkey = card.get_public_key(derivation, path=BTCwallet.PATH)
         wallet = BTCwallet(pubkey, network, endpoint, card)
         print("Sending BTC")
         amount = int(self.data.amount * 10 ** 8)
-        # btc path in the current key
-        card.derive(path=Btc.PATH)
+        card.derive(path=BTCwallet.PATH)
+
+        if self.data.fees:
+            fees = self.data.fees
+        else:
+            fees = wallet.get_fee_estimate()
+            print(f"\nUsing fee (override with -f): {fees} Satoshi\n")
 
         try:
             wallet.prepare(self.data.address, amount, fees)
@@ -75,10 +77,13 @@ class Btc(Command):
     def _sign(card: cryptnoxpy.Card, derivation: cryptnoxpy.Derivation,
               data_hashes: List[bytes]) -> List[bytes]:
         signatures = []
-        pin_code = check_pin_code(card) if len(data_hashes) > 1 else None
+        if card.auth_type == cryptnoxpy.AuthType.PIN and len(data_hashes) > 1:
+            pin_code = check_pin_code(card)
+        else:
+            pin_code = ""
 
-        for data_hash in data_hashes:
-            signature = sign(card, data_hash, derivation, path=Btc.PATH, pin_code=pin_code)
-            signatures.append(signature)
+        for index, data_hash in enumerate(data_hashes):
+            print("\nSigning INPUT #", index + 1)
+            signatures.append(sign(card, data_hash, derivation, path=BTCwallet.PATH, pin_code=pin_code))
 
         return signatures

@@ -171,24 +171,18 @@ def bip39_is_checksum_valid(mnemonic):
     return checksum == calculated_checksum, True
 
 def mnemonic_to_seed(mnemonic_phrase, passphrase='', passphrase_prefix=b"mnemonic"):
-   passphrase = bip39_normalize_passphrase(passphrase)
-   passphrase = from_string_to_bytes(passphrase)
-   if isinstance(mnemonic_phrase, (list, tuple)):
-       mnemonic_phrase = ' '.join(mnemonic_phrase)
-   mnemonic = unicodedata.normalize('NFKD', ' '.join(mnemonic_phrase.split()))
-   mnemonic = from_string_to_bytes(mnemonic)
-   return PBKDF2(mnemonic, passphrase_prefix + passphrase, iterations=2048, macmodule=hmac, digestmodule=hashlib.sha512).read(64)
+    passphrase = bip39_normalize_passphrase(passphrase)
+    passphrase = from_string_to_bytes(passphrase)
+    if isinstance(mnemonic_phrase, (list, tuple)):
+        mnemonic_phrase = ' '.join(mnemonic_phrase)
+    mnemonic = unicodedata.normalize('NFKD', ' '.join(mnemonic_phrase.split()))
+    mnemonic = from_string_to_bytes(mnemonic)
+    return PBKDF2(mnemonic, passphrase_prefix + passphrase, iterations=2048, macmodule=hmac, digestmodule=hashlib.sha512).read(64)
 
 def bip39_mnemonic_to_seed(mnemonic_phrase, passphrase=''):
     if not bip39_is_checksum_valid(mnemonic_phrase)[1]:
         raise Exception("BIP39 Checksum is invalid for this mnemonic")
     return mnemonic_to_seed(mnemonic_phrase, passphrase=passphrase, passphrase_prefix=b"mnemonic")
-
-# The BIP39 seed is reduced to 256 bits with SHA2
-#  to become the BIP32 entropy master seed
-def cryptnox_mnemonic_to_seed(mnemonic_phrase):
-    bip39seed = bip39_mnemonic_to_seed(mnemonic_phrase)
-    return hashlib.sha256(bip39seed).digest()
 
 def electrum_mnemonic_to_seed(mnemonic_phrase, passphrase='', ):
     return mnemonic_to_seed(mnemonic_phrase, passphrase=passphrase, passphrase_prefix=b"electrum")
@@ -232,4 +226,3 @@ def words_mine(prefix,entbits,satisfunction,wordlist=wordlist_english,randombits
             print("Searched %f percent of the space" % (float(count)/float(1 << mine_bits)))
 
     return entropy_to_words(eint_to_bytes(pint+dint,entbits))
-

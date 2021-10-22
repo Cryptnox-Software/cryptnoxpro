@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from .common import (
     add_config_sub_parser,
     add_pin_option
@@ -75,6 +77,7 @@ def _add_get_sub_parser(sub_parser):
                               help="Reference account to return accounts created by this "
                                    "account")
 
+
 def _add_push_sub_parser(sub_parser):
     push_parser = sub_parser.add_parser("push", help="Push action or transaction to the "
                                                      "selected network")
@@ -93,6 +96,7 @@ def _add_push_sub_parser(sub_parser):
     push_transaction.add_argument("transaction", type=str, action="store", nargs="+",
                                   help="Transaction to push")
 
+
 def _add_transfer_sub_parser(sub_parser, name: str, sender: bool, help_text: str):
     transfer_sub_parser = sub_parser.add_parser(name, help=help_text)
     if sender:
@@ -100,19 +104,17 @@ def _add_transfer_sub_parser(sub_parser, name: str, sender: bool, help_text: str
                                          help="The account sending tokens")
     transfer_sub_parser.add_argument("recipient", type=str, action="store",
                                      help="The account receiving tokens")
-    transfer_sub_parser.add_argument("amount", type=float, action="store",
+    transfer_sub_parser.add_argument("amount", type=Decimal, action="store",
                                      help="The amount of tokens to send")
-    transfer_sub_parser.add_argument("memo", type=str, action="store", nargs="?", default="",
+    transfer_sub_parser.add_argument("memo", type=str, action="store", nargs="*", default="",
                                      help="The memo for the transfer")
+
 
 def options(subparsers, pin_option: bool):
     sub_parser = subparsers.add_parser(enums.Command.EOSIO.value, help="EOSIO commands")
     sub_parser.add_argument("-u", "--url", metavar="URL", type=str, nargs="?",
                             help="URL of the API node")
     sub_parser.add_argument("-k", "--key_type", choices=["K1, R1"], help="Key type.")
-    sub_parser.add_argument("-P", "--path", metavar="path", type=str, nargs="?",
-                            default="m/44'/194'/0'/0", help="BIP32 path from Cryptnox seed for the"
-                                                            " EC keypair")
     sub_parser.add_argument("-s", "--symbol", metavar="coin_symbol", type=str, nargs="?",
                             help="Coin symbol")
 

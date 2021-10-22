@@ -56,7 +56,6 @@ class Info(Command):
 
     @staticmethod
     def _get_eosio_info(card) -> dict:
-        path = "m/44'/194'/0'/0"
         config = get_configuration(card)["eosio"]
         tabulate_data = {
             "name": "EOS",
@@ -79,7 +78,7 @@ class Info(Command):
         except KeyError:
             return tabulate_data
 
-        pubkey = card.get_public_key(derivation, key_type, path)
+        pubkey = card.get_public_key(derivation, key_type, EOSWallet.PATH)
         wallet = EOSWallet(pubkey, endpoint, coin_symbol, key_type=key_type.name)
 
         tabulate_data.update({"address": wallet.address, "account": [], "balance": []})
@@ -103,7 +102,6 @@ class Info(Command):
 
     @staticmethod
     def _get_btc_info(card) -> dict:
-        path = "m/44'/0'/0'/0"
         config = get_configuration(card)["btc"]
         try:
             derivation = cryptnoxpy.Derivation[config["derivation"]].value
@@ -112,7 +110,7 @@ class Info(Command):
         network = config.get("network", "testnet").lower()
         endpoint = BlkHubApi(network)
 
-        pubkey = card.get_public_key(derivation, path=path)
+        pubkey = card.get_public_key(derivation, path=BTCwallet.PATH)
         wallet = BTCwallet(pubkey, network, endpoint, card)
 
         tabulate_data = {
@@ -132,7 +130,6 @@ class Info(Command):
 
     @staticmethod
     def _get_eth_info(card) -> dict:
-        path = "m/44'/60'/0'/0"
         config = get_configuration(card)["eth"]
         network = enums.EthNetwork[config.get("network", "ropsten").upper()]
         try:
@@ -146,7 +143,7 @@ class Info(Command):
             print(error)
             return {}
 
-        public_key = card.get_public_key(derivation, path=path, compressed=False)
+        public_key = card.get_public_key(derivation, path=eth.Api.PATH, compressed=False)
         address = eth.checksum_address(public_key)
 
         tabulate_data = {

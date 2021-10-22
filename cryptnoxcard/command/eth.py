@@ -2,17 +2,18 @@
 """
 Module containing command for sending funds
 """
-import json
-import re
-import shutil
-from pathlib import Path
-from typing import Dict, Any, List
-
 import cryptnoxpy
+import json
+import math
+import re
 import requests
+import shutil
 import web3
 from argparse import Namespace
+from decimal import Decimal
+from pathlib import Path
 from tabulate import tabulate
+from typing import Dict, Any, List, Tuple
 
 from .command import Command
 from .helper.config import create_config_method
@@ -30,9 +31,13 @@ except ImportError:
     from ..wallet import eth as wallet
     from ..lib import cryptos
 
-BLOCK_OFFSET = 500
-LARGE_SCREEN_SIZE = (4 - 1) * 3 + 4 + (64 + 2) + (42 + 2 + 6) + 8
-ERC_PATH = Path(__file__).parent.parent.joinpath("contract_abi")
+_BLOCK_OFFSET = 500
+_LARGE_SCREEN_SIZE = (4 - 1) * 3 + 4 + (64 + 2) + (42 + 2 + 6) + 8
+_ERC_PATH = Path(__file__).parent.parent.joinpath("contract_abi")
+_LIMIT = {
+    "transfer": 21000,
+    "contract": 180000
+}
 
 
 class ApiKeyException(Exception):
@@ -40,8 +45,9 @@ class ApiKeyException(Exception):
     API key is empty
     """
 
+
 def _erc_abi_file(value):
-    return ERC_PATH.joinpath(f"erc{value}.json").absolute()
+    return _ERC_PATH.joinpath(f"erc{value}.json").absolute()
 
 
 def _abi(config) -> Dict[str, Any]:
@@ -60,7 +66,7 @@ def _abi(config) -> Dict[str, Any]:
 
 
 def _large_screen():
-    return shutil.get_terminal_size((80, 20)).columns > LARGE_SCREEN_SIZE
+    return shutil.get_terminal_size((80, 20)).columns > _LARGE_SCREEN_SIZE
 
 
 def _get_processed_json_argument(data: str) -> str:
@@ -185,7 +191,7 @@ class Event:
     def _get_logs(event) -> List[Dict[str, Any]]:
         min_offset = 0
         max_offset = MONTH_PERIOD_IN_BLOCKS
-        offset = BLOCK_OFFSET
+        offset = _BLOCK_OFFSET
         current_block = event.web3.eth.block_number
         event_filter = event.createFilter(fromBlock=current_block - offset,
                                           toBlock=current_block)
@@ -306,7 +312,7 @@ class Contract(Command):
             "network": endpoint.network.name,
             "block": endpoint.block_number
         }
-        save_to_config(card.serial_number, config)
+        save_to_config(card, config)
         print(f"Contract added to application. Use it with alias:"
               f" {self.data.alias}")
 
@@ -461,12 +467,11 @@ class Contract(Command):
             print(f"Error occurred with execution: {error}")
             return -4
 
-        price = self.data.price or int(config["eth"]["price"])
-        limit = self.data.limit or int(config["eth"]["limit"])
+        price, limit = Eth._gas(endpoint.gas_price, self.data.price, self.data.limit, _LIMIT["contract"])
 
-        public_key = card.get_public_key(derivation, path=Eth.PATH, compressed=False)
+        public_key = card.get_public_key(derivation, path=wallet.Api.PATH, compressed=False)
         balance = endpoint.get_balance(wallet.address(public_key))
-        if balance - (web3.Web3.fromWei(price, "gwei") * limit) < 0:
+        if balance - price * limit < 0:
             print("Not enough fund for the transaction")
             return -2
 
@@ -475,18 +480,16 @@ class Contract(Command):
             "gasPrice": price,
             "gas": limit
         })
-        set_data = wallet.convert_values(set_data)
 
         print("\nSigning with the Cryptnox")
         digest = endpoint.transaction_hash(set_data)
-        signature = sign(card, digest, derivation, path=Eth.PATH)
+        signature = sign(card, digest, derivation, path=wallet.Api.PATH)
 
         if not signature:
             print("Error in getting signature")
             return -1
 
-        if not Contract._confirm(public_key, contract.address, balance, 0,
-                                 price, limit):
+        if not Contract._confirm(public_key, contract.address, balance, 0, price, limit):
             print("Canceled by user")
             return -1
 
@@ -506,10 +509,11 @@ class Contract(Command):
 
     @staticmethod
     def _confirm(public_key, address, balance, value, price, limit):
-        gas_price = web3.Web3.fromWei(price, "gwei")
-        gas = float(gas_price * limit)
+        gas_price = web3.Web3.fromWei(price, "ether")
+        gas = Decimal(gas_price * limit)
+        balance = web3.Web3.fromWei(balance, "ether")
         tabulate_table = [
-            ["BALANCE:", f"{balance / 10 ** 18}", "ETH", "ON", "ACCOUNT:",
+            ["BALANCE:", f"{balance}", "ETH", "ON", "ACCOUNT:",
              f"{wallet.checksum_address(public_key)}"],
             ["TRANSACTION:", f"{value}", "ETH", "TO", "CONTRACT:",
              f"{address}"],
@@ -532,16 +536,14 @@ class Eth(Command):
     """
     Command for sending payment on Bitcoin and Ethereum networks
     """
-    PATH = "m/44'/60'/0'/0"
-
     _name = enums.Command.ETH.value
 
     def _execute(self, card) -> int:
+        self._check(card)
         try:
             if self.data.eth_action == "send":
                 return self._send(card)
             if self.data.eth_action == "config":
-                self._check(card)
                 return create_config_method(card, self.data.key, self.data.value, "eth")
             if self.data.eth_action == "contract":
                 contract = Contract(self.data)
@@ -558,9 +560,30 @@ class Eth(Command):
 
         return 0
 
-    def _send(self, card) -> int:
-        self._check(card)
+    @staticmethod
+    def _gas(gas_price: int, set_price: int, set_limit: int,
+             default_limit: int = _LIMIT["transfer"]) -> Tuple[int]:
+        if set_price:
+            price = web3.Web3.toWei(set_price, "gwei")
+        else:
+            gwei_price = math.ceil(web3.Web3.fromWei(gas_price, "gwei"))
+            price = web3.Web3.toWei(gwei_price, "gwei")
+            print(f"\nUsing gas price (override with -p): {gwei_price} Gwei")
 
+        if set_limit:
+            limit = set_limit
+        else:
+            if set_price:
+                print()
+            limit = default_limit
+            print(f"Using gas limit (override with -l): {limit}")
+
+        if not set_price or not set_limit:
+            print()
+
+        return price, limit
+
+    def _send(self, card) -> int:
         config = get_configuration(card)["eth"]
 
         try:
@@ -569,13 +592,13 @@ class Eth(Command):
             print("Derivation is invalid")
             return 1
 
-        price = self.data.price or int(config.get("price", 8))
-        limit = self.data.limit or int(config.get("limit", 21000))
         try:
             endpoint = wallet.Api(card, config["endpoint"], config["network"], config["api_key"])
         except ValueError as error:
             print(error)
             return -1
+
+        price, limit = Eth._gas(endpoint.gas_price, self.data.price, self.data.limit)
 
         print("Sending ETH")
         try:
@@ -597,14 +620,13 @@ class Eth(Command):
 
     @staticmethod
     def _send_funds(card, derivation, endpoint, address, amount, price, limit):
-        public_key = card.get_public_key(derivation, path=Eth.PATH, compressed=False)
-        card.derive(path=Eth.PATH)
+        public_key = card.get_public_key(derivation, path=wallet.Api.PATH, compressed=False)
+        card.derive(path=wallet.Api.PATH)
         from_address = wallet.checksum_address(public_key)
         balance = endpoint.get_balance(from_address)
-        max_spendable = balance - ((price * limit) * 10 ** 9)
-        if amount * 10 ** 18 > max_spendable:
+        max_spendable = balance - price * limit
+        if web3.Web3.toWei(amount, "ether") > max_spendable:
             raise ValueError({"message": "Not enough fund for the tx"})
-        balance = balance / 10 ** 18
 
         sanitized_transaction = dict(
             nonce=endpoint.get_transaction_count(from_address, "pending"),
@@ -615,18 +637,17 @@ class Eth(Command):
             data=b''
         )
         print("\nSigning with the Cryptnox")
-        sanitized_transaction = wallet.convert_values(sanitized_transaction)
         digest = endpoint.transaction_hash(sanitized_transaction)
 
-        signature = sign(card, digest, derivation, path=Eth.PATH)
+        signature = sign(card, digest, derivation, path=wallet.Api.PATH)
 
         if not signature:
             print("Error in getting signature")
             return -1
 
-        gas = float(web3.Web3.fromWei(price, "gwei") * limit)
+        gas = Decimal(web3.Web3.fromWei(price, "ether") * limit)
         tabulate_table = [
-            ["BALANCE:", f"{balance}", "ETH", "ON", "ACCOUNT:",
+            ["BALANCE:", f"{web3.Web3.fromWei(balance, 'ether')}", "ETH", "ON", "ACCOUNT:",
              f"{wallet.checksum_address(public_key)}"],
             ["TRANSACTION:", f"{amount}", "ETH", "TO", "ACCOUNT:",
              f"{web3.Web3.toChecksumAddress(address)}"],

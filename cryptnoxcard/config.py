@@ -29,16 +29,13 @@ def get_default_configuration() -> Dict:
     config = {
         "btc": {
             "derivation": "DERIVE",
-            "fees": "2000",
             "network": "testnet",
         },
         "eth": {
             "api_key": "",
             "derivation": "DERIVE",
             "endpoint": "cryptnox",
-            "limit": "30000",
             "network": "ropsten",
-            "price": "8",
         },
         "eosio": {
             "coin_symbol": "EOS",

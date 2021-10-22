@@ -7,8 +7,33 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_\ ,
 and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
-`Unreleased <https://github.com/Cryptnox-Software/cryptnoxcard/compare/v1.3.2...HEAD>`_
+`Unreleased <https://github.com/Cryptnox-Software/cryptnoxcard/compare/v2.0.0...HEAD>`_
 -------------------------------------------------------------------------------------------
+
+`2.0.0 <https://github.com/Cryptnox-Software/cryptnoxcard/compare/v1.3.2...2.0.0>`_ - 2021-10-13
+------------------------------------------------------------------------------------------------
+
+Added
+^^^^^
+
+* Dynamic fee calculation for Bitcoin and Ethereum networks.
+
+Changed
+^^^^^^^
+
+* Recovering seed from mnemonic compliant with BIP39
+* Derivation paths to be compliant with BIP44
+
+Fixed
+^^^^^
+
+* Send/transfer memo for EOSIO
+* Signing multi-input transaction for BTC with user key
+* Precision of amounts for sending
+* AWS backup wrong credentials crash the application
+* verbose option is not doing anything
+* EOS transfer doesn't use sender but behaves as send command
+
 
 `1.3.2 <https://github.com/Cryptnox-Software/cryptnoxcard/compare/v1.3.1...1.3.2>`_ - 2021-10-13
 ------------------------------------------------------------------------------------------------

@@ -56,6 +56,7 @@ class EOSWallet:
     """
     EOSWallet
     """
+    PATH = "m/44'/194'/0'/0/0"
 
     class NoAccountsException(Exception):
         """
