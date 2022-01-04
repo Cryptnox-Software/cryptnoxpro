@@ -118,13 +118,14 @@ class Cards:
         data = []
 
         uninitialized = False
-        headers = ["", "Serial number", "Applet version", "Owner", "Flags"]
+        headers = ["", "Serial number", "Type", "Applet version", "Owner", "Flags"]
 
         iterator = 1
         for card in self._cards.values():
             info = card.info
             entry = [
                 info["serial_number"],
+                info["type"],
                 info["applet_version"],
                 info["name"] + ((" <" + info["email"] + ">") if info["email"]
                                 else ""),

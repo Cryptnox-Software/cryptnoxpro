@@ -5,6 +5,7 @@ Module containing abstract class for creating command child classes
 import abc
 
 import cryptnoxpy
+import requests.exceptions
 from argparse import Namespace
 from tabulate import tabulate
 
@@ -38,10 +39,11 @@ class Command(metaclass=abc.ABCMeta):
     :param Namespace data: Command line arguments
     """
 
-    def __init__(self, data: Namespace, cards: Cards = None):
+    def __init__(self, data: Namespace, cards: Cards = None, card_type: int = 0):
         self.data = data
-        self._cards = cards or Cards(self.data.verbose)
+        self._cards = cards or Cards(self.data.verbose if "verbose" in self.data else False)
         self.serial_number = None
+        self.card_type = card_type
         # self.notification = Notification()
 
     def execute(self, serial_number: int = None) -> int:
@@ -69,6 +71,13 @@ class Command(metaclass=abc.ABCMeta):
             card = self._cards[self.serial_number]
         except (ExitException, TimeoutException, cryptnoxpy.CryptnoxException) as error:
             print(error)
+            return -1
+        except requests.exceptions.RequestException as error:
+            print(f"Error in retrieving information: {error}")
+            return -1
+
+        if self.card_type and self.card_type != card.type:
+            print("This card type is not supported by this application")
             return -1
 
         self.run_execute(card)
@@ -116,6 +125,9 @@ class Command(metaclass=abc.ABCMeta):
         except cryptnoxpy.SeedException:
             print("The seed is not generated\nRun seed command to generate seed")
             result = -1
+        except cryptnoxpy.GenericException as error:
+            print(f"Generic exception with status code: 0x{error.status.hex().upper()}")
+            return -2
         except (cryptnoxpy.CryptnoxException, NotImplementedError) as error:
             print(error)
             result = -1

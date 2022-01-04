@@ -3,8 +3,6 @@ from decimal import Decimal
 
 import argparse
 
-from . import eosio
-from . import eth
 from .common import (
     add_config_sub_parser,
     add_pin_option
@@ -18,38 +16,7 @@ except ImportError:
     from ... import enums
 
 
-def add(parser, interactive: bool = False):
-    subparsers = parser.add_subparsers(dest="command", help="Command options")
-
-    _btc_options(subparsers, interactive)
-    eth.options(subparsers, interactive)
-    eosio.options(subparsers, interactive)
-    _info_options(subparsers, interactive)
-    _history_options(subparsers, interactive)
-    _config_options(subparsers, interactive)
-
-    _card_configuration(subparsers, interactive)
-    _change_pin_options(subparsers, interactive)
-    _change_puk_options(subparsers, interactive)
-    _user_key_options(subparsers, interactive)
-    _unlock_pin_options(subparsers, interactive)
-
-    _list_options(subparsers, interactive)
-
-    _initialize_options(subparsers, interactive)
-    _seed_options(subparsers, interactive)
-    _reset_options(subparsers, interactive)
-
-    if interactive:
-        use_sub_parser = subparsers.add_parser("use", help="Change card to be used by default")
-        use_sub_parser.add_argument("serial_index", type=int, nargs="?",
-                                    help="Serial number or index of card to be used")
-        subparsers.add_parser("exit", help="Full application exit")
-
-    return subparsers
-
-
-def _btc_options(subparsers, interactive_mode):
+def btc_options(subparsers, interactive_mode):
     def add_send(sub_parser):
         def _validate(address: str) -> str:
             if re.match('^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$', address) or \
@@ -77,7 +44,7 @@ def _btc_options(subparsers, interactive_mode):
     add_config_sub_parser(action_sub_parser, "Bitcoin")
 
 
-def _card_configuration(subparsers, interactive_mode):
+def card_configuration(subparsers, interactive_mode):
     sub_parser = subparsers.add_parser(enums.Command.CARD_CONFIGURATION.value,
                                        help="Show card configuration and set PIN-less path, "
                                             "PIN authentication ")
@@ -91,7 +58,7 @@ def _card_configuration(subparsers, interactive_mode):
                             help="Set/unset card configuration")
 
 
-def _change_pin_options(subparsers, interactive_mode):
+def change_pin_options(subparsers, interactive_mode):
     sub_parser = subparsers.add_parser(enums.Command.CHANGE_PIN.value,
                                        help="Change PIN code of the card")
 
@@ -99,11 +66,11 @@ def _change_pin_options(subparsers, interactive_mode):
         add_pin_option(sub_parser)
 
 
-def _change_puk_options(subparsers, _: bool):
+def change_puk_options(subparsers, _: bool):
     subparsers.add_parser(enums.Command.CHANGE_PUK.value, help="Change PUK code of the card")
 
 
-def _config_options(subparsers, _: bool):
+def config_options(subparsers, _: bool):
     sub_parser = subparsers.add_parser(enums.Command.CONFIG.value,
                                        help="Lists blockchain configurations per type")
     sub_parser.add_argument("section", nargs="?", type=str, default=None,
@@ -113,7 +80,7 @@ def _config_options(subparsers, _: bool):
                             help="Define a new value for the given section and key")
 
 
-def _history_options(subparsers, interactive_mode):
+def history_options(subparsers, interactive_mode):
     entries_per_page = 25
     number_of_history_entries = 148
 
@@ -128,7 +95,7 @@ def _history_options(subparsers, interactive_mode):
         add_pin_option(sub_parser)
 
 
-def _info_options(subparsers, pin_options: bool):
+def info_options(subparsers, pin_options: bool):
     sub_parser = subparsers.add_parser(enums.Command.INFO.value,
                                        help="Default accounts information")
 
@@ -136,22 +103,22 @@ def _info_options(subparsers, pin_options: bool):
         add_pin_option(sub_parser)
 
 
-def _initialize_options(subparsers, _: bool):
+def initialize_options(subparsers, _: bool):
     sub_parser = subparsers.add_parser(enums.Command.INITIALIZE.value, help="Initialize a card")
 
     sub_parser.add_argument("-d", "--demo", action="store_true", default=False,
                             help="Initialize card in demo mode")
 
 
-def _list_options(subparsers, _: bool):
+def list_options(subparsers, _: bool):
     subparsers.add_parser(enums.Command.CARD.value, help="List all cards")
 
 
-def _reset_options(subparsers, _: bool):
+def reset_options(subparsers, _: bool):
     subparsers.add_parser(enums.Command.RESET.value, help="Reset card")
 
 
-def _seed_options(subparsers, interactive_mode):
+def seed_options(subparsers, interactive_mode):
     sub_parser = subparsers.add_parser(enums.Command.SEED.value, help="Generate seed for the card")
 
     if interactive_mode:
@@ -170,12 +137,12 @@ def _seed_options(subparsers, interactive_mode):
                                                 "BIP39 word list for backup.")
 
 
-def _unlock_pin_options(subparsers, _: bool):
+def unlock_pin_options(subparsers, _: bool):
     subparsers.add_parser(enums.Command.UNLOCK_PIN.value,
                           help="Set new PIN code for the card, PUK code required")
 
 
-def _user_key_options(subparsers, _: bool):
+def user_key_options(subparsers, _: bool):
     def _add_key_type_options(sub_parser):
         types = []
 

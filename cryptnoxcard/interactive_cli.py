@@ -2,7 +2,7 @@
 """
 Module for application that behaves as command line interface
 """
-import re
+import abc
 import shutil
 import sys
 import traceback
@@ -15,7 +15,7 @@ import cryptnoxpy
 
 try:
     import enums
-    from command import options
+    from command.card import options
     from command.helper import security
     from command.helper.cards import (
         Cards,
@@ -24,7 +24,7 @@ try:
     )
 except ImportError:
     from . import enums
-    from .command import options
+    from .command.card import options
     from .command.helper import security
     from .command.helper.cards import (
         Cards,
@@ -201,7 +201,7 @@ class UsageParser(ErrorParser):
             parser._subparsers._actions[-1].add_parser("exit", help="Full application exit")
 
 
-class InteractiveCli:
+class InteractiveCli(metaclass=abc.ABCMeta):
     """
     Application running a command line interface.
 
@@ -215,8 +215,9 @@ class InteractiveCli:
         Exception to handle when the user requests to exit the application.
         """
 
-    def __init__(self, version: str, debug: bool = False):
+    def __init__(self, version: str, card_type: int = 0, debug: bool = False):
         self.version = version
+        self.card_type = card_type
         self.debug: bool = debug
 
         self._reconnect = False
@@ -289,6 +290,10 @@ class InteractiveCli:
         :rtype: bool
         """
         return len(self.subcommand) < len(new_subcommand) and execute == new_subcommand
+
+    @abc.abstractmethod
+    def _command(self, data: argparse.Namespace, cards: Cards = None, card_type: int = 0):
+        pass
 
     def _process_command(self):
         to_always_run = ["list"]
@@ -383,11 +388,6 @@ class InteractiveCli:
         return string_to_return
 
     def _run_command(self, args: argparse.Namespace, to_always_run: List = None) -> None:
-        try:
-            from command.factory import Factory
-        except ImportError:
-            from .command.factory import Factory
-
         to_always_run = [] or to_always_run
         always_run = args.command in to_always_run
 
@@ -398,8 +398,7 @@ class InteractiveCli:
             except IndexError:
                 print("No cards found.\n")
                 return
-        command_factory = Factory(args, self._cards)
-        command = command_factory.get_command()
+        command = self._command(args, self._cards, self.card_type)
         execute_result = command.execute(self._card_info["serial_number"] if self._card_info else None)
         if execute_result == -1:
             return
@@ -418,4 +417,3 @@ class InteractiveCli:
         self.parser.add_argument(" version", action="version",
                                  version=f"Cryptnox Card {self.version}",
                                  help="Show program's version number")
-        options.add(self.parser, True)

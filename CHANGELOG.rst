@@ -10,13 +10,24 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 `Unreleased <https://github.com/Cryptnox-Software/cryptnoxcard/compare/v2.0.0...HEAD>`_
 -------------------------------------------------------------------------------------------
 
+Added
+^^^^^
+
+* Separate CLI for working with NFT cards
+* eht command contract parameter to send ERC20 tokens
+
+Fixed
+^^^^^
+
+* Exception handling in multiple places.
+
 `2.0.0 <https://github.com/Cryptnox-Software/cryptnoxcard/compare/v1.3.2...2.0.0>`_ - 2021-10-13
 ------------------------------------------------------------------------------------------------
 
 Added
 ^^^^^
 
-* Dynamic fee calculation for Bitcoin and Ethereum networks.
+* Dynamic fee calculation for Bitcoin and Ethereum networks
 
 Changed
 ^^^^^^^

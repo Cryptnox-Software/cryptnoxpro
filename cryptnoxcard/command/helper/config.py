@@ -1,6 +1,7 @@
 from typing import Union
 
 import cryptnoxpy
+
 try:
     from config import (
         get_configuration,
@@ -41,7 +42,7 @@ def add_config_sub_parser(sub_parser, crypto_currency: str) -> None:
                              "and key")
 
 
-def create_config_method(card: cryptnoxpy.Card, key: Union[str, None],  value: Union[str, None],
+def create_config_method(card: cryptnoxpy.Card, key: Union[str, None], value: Union[str, None],
                          currency_name: str) -> int:
     """
     Create config method for specific cryptocurrency

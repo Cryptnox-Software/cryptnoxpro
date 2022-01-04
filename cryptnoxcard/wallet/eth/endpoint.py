@@ -116,6 +116,15 @@ class CryptnoxEndpoint(Endpoint):
         return f"https://{self.domain}"
 
 
+class DirectEndpoint:
+    def __init__(self, url: str, network: enums.EthNetwork):
+        self.network = network
+        self.url = url
+
+    @property
+    def provider(self) -> str:
+        return self.url
+
 def factory(endpoint: str, network: enums.EthNetwork, api_key: str = "") -> Endpoint:
     """
     Factory method for Endpoint instances

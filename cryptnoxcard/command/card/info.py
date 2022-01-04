@@ -6,10 +6,11 @@ the card
 from typing import List, Dict
 
 import cryptnoxpy
+import web3
 from tabulate import tabulate
 
-from .command import Command
-from .helper.security import is_demo
+from ..command import Command
+from ..helper.security import is_demo
 
 try:
     import enums
@@ -18,11 +19,11 @@ try:
     from wallet.btc import BTCwallet, BlkHubApi
     from wallet.eos import EOSWallet
 except ImportError:
-    from .. import enums
-    from ..config import get_configuration
-    from ..wallet import eth
-    from ..wallet.btc import BTCwallet, BlkHubApi
-    from ..wallet.eos import EOSWallet
+    from ... import enums
+    from ...config import get_configuration
+    from ...wallet import eth
+    from ...wallet.btc import BTCwallet, BlkHubApi
+    from ...wallet.eos import EOSWallet
 
 
 class Info(Command):
@@ -40,9 +41,8 @@ class Info(Command):
                                 + eosio_info.get('address', 'No address')
         eosio_info["balance"] = "".join(map(lambda x: f'{x}\n', eosio_info["balance"]))
         eth_info = Info._get_eth_info(card)
-        info = [Info._get_btc_info(card), eth_info, eosio_info]
 
-        Info._print_info_table(info)
+        Info._print_info_table([Info._get_btc_info(card), eth_info, eosio_info])
 
         config = get_configuration(card)
         if not config["eth"]["api_key"]:
@@ -136,14 +136,14 @@ class Info(Command):
             derivation = cryptnoxpy.Derivation[config["derivation"]].value
         except KeyError:
             return {"name": "Bad derivation type"}
-
         try:
-            api = eth.Api(card, config["endpoint"], network, config["api_key"])
+            api = eth.Api(config["endpoint"], network, config["api_key"])
         except ValueError as error:
             print(error)
             return {}
 
-        public_key = card.get_public_key(derivation, path=eth.Api.PATH, compressed=False)
+        path = "" if derivation == cryptnoxpy.Derivation.CURRENT_KEY else eth.Api.PATH
+        public_key = card.get_public_key(derivation, path=path, compressed=False)
         address = eth.checksum_address(public_key)
 
         tabulate_data = {
@@ -153,7 +153,7 @@ class Info(Command):
         }
 
         try:
-            tabulate_data["balance"] = f"{api.get_balance(address) / 10.0 ** 18} ETH"
+            tabulate_data["balance"] = f"{web3.Web3.fromWei(api.get_balance(address), 'ether')} ETH"
         except Exception as error:
             print(f"There's an issue in retrieving ETH data: {error}")
             tabulate_data["balance"] = "Network issue"

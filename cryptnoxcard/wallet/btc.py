@@ -320,7 +320,7 @@ class BTCwallet:
         return self.balance_fm_utxos(utx_os)
 
     def get_fee_estimate(self):
-        return self.api.get_fee_estimates()
+        return self.api.get_fee_estimate()
 
     def prepare(self, to_addr: str, payment_value: float, fee: float) \
             -> Union[float, int]:

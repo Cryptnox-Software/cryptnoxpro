@@ -26,3 +26,4 @@ class Command(Enum):
     SEED = "seed"
     UNLOCK_PIN = "unlock_pin"
     USER_KEY = "user_key"
+    TRANSFER = "transfer"

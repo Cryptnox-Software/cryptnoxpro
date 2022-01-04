@@ -2,20 +2,20 @@
 """
 Module containing command for sending funds
 """
-import cryptnoxpy
 import json
-import math
 import re
-import requests
 import shutil
+from decimal import Decimal
+from typing import Dict, Any, List
+
+import cryptnoxpy
+import requests
 import web3
 from argparse import Namespace
-from decimal import Decimal
-from pathlib import Path
 from tabulate import tabulate
-from typing import Dict, Any, List, Tuple
 
 from .command import Command
+from .erc_token import contract
 from .helper.config import create_config_method
 from .helper.helper_methods import sign
 from .helper.notification import MORE_THAN_X_RESULTS, MONTH_PERIOD_IN_BLOCKS
@@ -33,11 +33,6 @@ except ImportError:
 
 _BLOCK_OFFSET = 500
 _LARGE_SCREEN_SIZE = (4 - 1) * 3 + 4 + (64 + 2) + (42 + 2 + 6) + 8
-_ERC_PATH = Path(__file__).parent.parent.joinpath("contract_abi")
-_LIMIT = {
-    "transfer": 21000,
-    "contract": 180000
-}
 
 
 class ApiKeyException(Exception):
@@ -46,23 +41,11 @@ class ApiKeyException(Exception):
     """
 
 
-def _erc_abi_file(value):
-    return _ERC_PATH.joinpath(f"erc{value}.json").absolute()
-
-
-def _abi(config) -> Dict[str, Any]:
+def _abi(config) -> List[Any]:
     try:
-        path = _erc_abi_file(int(config))
+        return contract.abi(int(config))
     except TypeError:
-        return config
-
-    try:
-        abi = json.loads(path.read_text())
-    except (FileNotFoundError, PermissionError,
-            json.decoder.JSONDecodeError):
-        raise ValueError("ERC not recognized by the application.")
-
-    return abi
+        return json.loads(config)
 
 
 def _large_screen():
@@ -75,7 +58,7 @@ def _get_processed_json_argument(data: str) -> str:
         result = " ".join(result)
     result = result.strip("'")
     result = re.sub(r"(\w+):", r'"\1":', result)
-    result = re.sub(r"(:\s)((?!false|true)\d*\.?\d*_?\s?[a-zA-Z\.]+\d*)([,\s\}])",
+    result = re.sub(r"(:\s?)((?!false|true)\d*\.?\d*_?\s?[a-zA-Z\.]+\d*)([,\s\}])",
                     r'\1"\2"\3', result)
     result = re.sub(r'(:.?)(")([,\s])', r'\1\2"\3', result)
     result = re.sub(r'(:\s?)([,\}\]])', r'\1""\2', result)
@@ -108,8 +91,7 @@ class Event:
                 network = config["eth"]["network"].upper()
 
         try:
-            endpoint = wallet.Api(self.card, config["eth"]["endpoint"], network,
-                                  config["eth"]["api_key"])
+            endpoint = wallet.Api(config["eth"]["endpoint"], network, config["eth"]["api_key"])
         except ValueError as error:
             print(error)
             return -1
@@ -120,10 +102,10 @@ class Event:
             print(error)
             return 3
 
-        contract = endpoint.contract(address=contract_config["address"], abi=abi)
+        contract_endpoint = endpoint.contract(address=contract_config["address"], abi=abi)
 
         tabulate_table = []
-        for event in contract.abi:
+        for event in contract_endpoint.abi:
             if event["type"] == "event":
                 args = [[f"{arg['name']}:", arg["type"]] for arg
                         in event.get("inputs")]
@@ -153,7 +135,7 @@ class Event:
                 network = config_eth["network"].upper()
 
         try:
-            endpoint = wallet.Api(self.card, config_eth["endpoint"], network, config_eth["api_key"])
+            endpoint = wallet.Api(config_eth["endpoint"], network, config_eth["api_key"])
         except ValueError as error:
             print(error)
             return -1
@@ -164,10 +146,10 @@ class Event:
             print(error)
             return 3
 
-        contract = endpoint.contract(address=config_contract["address"], abi=abi)
+        contract_endpoint = endpoint.contract(address=config_contract["address"], abi=abi)
 
         try:
-            event = getattr(contract.events, self.data.event)
+            event = getattr(contract_endpoint.events, self.data.event)
         except web3.exceptions.ABIEventFunctionNotFound:
             print("The event is not defined")
             return 1
@@ -183,8 +165,8 @@ class Event:
             print(tabulate(tabulate_data, headers=header, tablefmt="grid"))
         else:
             print("No events have been found")
-        self.config["hidden"]["eth"]["contract"][self.data.alias][self.data.event] \
-            = endpoint.block_number
+        self.config["hidden"]["eth"]["contract"][self.data.alias][self.data.event] = \
+            endpoint.block_number
         save_to_config(self.card.serial_number, self.config)
 
     @staticmethod
@@ -272,26 +254,22 @@ class Contract(Command):
             except KeyError:
                 network = config["eth"]["network"].upper()
 
-        return wallet.Api(card, config["eth"]["endpoint"], network, config["eth"]["api_key"])
+        return wallet.Api(config["eth"]["endpoint"], network, config["eth"]["api_key"])
 
     def _add(self, card):
         abi = _get_processed_json_argument(self.data.abi)
 
         try:
-            abi_to_config = abi = json.loads(abi)
+            abi_to_config = json.loads(abi)
         except json.decoder.JSONDecodeError as error:
             print(f"Error in json: {error}")
             return -1
 
-        if isinstance(abi, int):
-            path = _erc_abi_file(abi)
-            abi_to_config = abi
-            try:
-                abi = json.loads(path.read_text())
-            except (FileNotFoundError, PermissionError,
-                    json.JSONDecodeError):
-                print("ERC not recognized by the application.")
-                return -1
+        try:
+            abi = _abi(abi)
+        except ValueError:
+            print("ERC not recognized by the application.")
+            return -1
 
         try:
             endpoint = self._get_endpoint(card)
@@ -321,17 +299,16 @@ class Contract(Command):
         config = get_configuration(card)
         print("\n")
 
-        table = []
         try:
-            for alias, contract in config["hidden"]["eth"]["contract"].items():
-                table.append([alias, contract['address']])
+            table = [[a, c['address']] for a, c in config["hidden"]["eth"]["contract"].items()]
         except KeyError:
             print("There are no contracts on the card")
+            return 0
+
+        if table:
+            print(tabulate(table, headers=("ALIAS", "ADDRESS")))
         else:
-            if table:
-                print(tabulate(table, headers=("ALIAS", "ADDRESS")))
-            else:
-                print("There are no contracts on the card")
+            print("There are no contracts on the card")
 
         return 0
 
@@ -353,22 +330,14 @@ class Contract(Command):
             print(error)
             return 3
 
-        try:
-            contract = self._get_endpoint(card).contract(address=config["address"], abi=abi)
-        except ValueError as error:
-            print(error)
-            return -1
-
-        for event in contract.abi:
+        for event in abi:
             if event["type"] == "function":
-                args = [[f"{arg['name'].strip('_')}:", arg["type"]] for arg
-                        in event.get("inputs")]
+                args = [[f"{arg['name'].strip('_')}:", arg["type"]] for arg in event.get("inputs")]
                 row = [event.get("name"), event.get("stateMutability"),
                        tabulate(args, tablefmt="plain")]
                 tabulate_table.append(row)
 
-        print(tabulate(tabulate_table, headers=tabulate_header,
-                       tablefmt="grid"))
+        print(tabulate(tabulate_table, headers=tabulate_header, tablefmt="grid"))
 
     def _call(self, card):
         config = get_configuration(card)
@@ -385,13 +354,14 @@ class Contract(Command):
             return 3
 
         try:
-            contract = self._get_endpoint(card).contract(address=config["address"], abi=abi)
+            contract_endpoint = self._get_endpoint(card).contract(address=config["address"],
+                                                                  abi=abi)
         except ValueError as error:
             print(error)
             return -1
 
         try:
-            function = contract.get_function_by_name(self.data.function)
+            function = contract_endpoint.get_function_by_name(self.data.function)
         except ValueError as error:
             print(error)
             print("Valid functions are:")
@@ -444,9 +414,9 @@ class Contract(Command):
             print(error)
             return -1
 
-        contract = endpoint.contract(address=contract_config["address"], abi=abi)
+        contract_endpoint = endpoint.contract(address=contract_config["address"], abi=abi)
         try:
-            function = contract.get_function_by_name(self.data.function)
+            function = contract_endpoint.get_function_by_name(self.data.function)
         except ValueError as error:
             print(error)
             print("Valid functions are:")
@@ -467,7 +437,8 @@ class Contract(Command):
             print(f"Error occurred with execution: {error}")
             return -4
 
-        price, limit = Eth._gas(endpoint.gas_price, self.data.price, self.data.limit, _LIMIT["contract"])
+        price, limit = contract.gas(endpoint.gas_price, self.data.price, self.data.limit,
+                                    contract.LIMIT["contract"])
 
         public_key = card.get_public_key(derivation, path=wallet.Api.PATH, compressed=False)
         balance = endpoint.get_balance(wallet.address(public_key))
@@ -489,7 +460,7 @@ class Contract(Command):
             print("Error in getting signature")
             return -1
 
-        if not Contract._confirm(public_key, contract.address, balance, 0, price, limit):
+        if not Contract._confirm(public_key, contract_endpoint.address, balance, 0, price, limit):
             print("Canceled by user")
             return -1
 
@@ -546,8 +517,8 @@ class Eth(Command):
             if self.data.eth_action == "config":
                 return create_config_method(card, self.data.key, self.data.value, "eth")
             if self.data.eth_action == "contract":
-                contract = Contract(self.data)
-                return contract._execute(card)
+                contract_instance = Contract(self.data)
+                return contract_instance._execute(card)
         except requests.HTTPError as error:
             if error.response.status_code == 401:
                 print("Access denied. Check your API key with: eth config api_key")
@@ -560,30 +531,11 @@ class Eth(Command):
 
         return 0
 
-    @staticmethod
-    def _gas(gas_price: int, set_price: int, set_limit: int,
-             default_limit: int = _LIMIT["transfer"]) -> Tuple[int]:
-        if set_price:
-            price = web3.Web3.toWei(set_price, "gwei")
-        else:
-            gwei_price = math.ceil(web3.Web3.fromWei(gas_price, "gwei"))
-            price = web3.Web3.toWei(gwei_price, "gwei")
-            print(f"\nUsing gas price (override with -p): {gwei_price} Gwei")
-
-        if set_limit:
-            limit = set_limit
-        else:
-            if set_price:
-                print()
-            limit = default_limit
-            print(f"Using gas limit (override with -l): {limit}")
-
-        if not set_price or not set_limit:
-            print()
-
-        return price, limit
-
     def _send(self, card) -> int:
+        if "contract" in self.data and self.data.contract:
+            self._send_token(card)
+            return 0
+
         config = get_configuration(card)["eth"]
 
         try:
@@ -593,12 +545,12 @@ class Eth(Command):
             return 1
 
         try:
-            endpoint = wallet.Api(card, config["endpoint"], config["network"], config["api_key"])
+            endpoint = wallet.Api(config["endpoint"], config["network"], config["api_key"])
         except ValueError as error:
             print(error)
             return -1
 
-        price, limit = Eth._gas(endpoint.gas_price, self.data.price, self.data.limit)
+        price, limit = contract.gas(endpoint.gas_price, self.data.price, self.data.limit)
 
         print("Sending ETH")
         try:
@@ -655,8 +607,7 @@ class Eth(Command):
             ["MAX TOTAL:", f"{gas + amount}"]
         ]
 
-        floating_points = cryptos.wallet_utils.number_of_significant_digits(
-            (gas + amount))
+        floating_points = cryptos.wallet_utils.number_of_significant_digits((gas + amount))
 
         print("\n\n--- Transaction Ready --- \n")
         print(tabulate(tabulate_table, tablefmt='plain',
@@ -665,3 +616,16 @@ class Eth(Command):
         if conf.lower() != "y":
             return "Canceled by the user."
         return "DONE: " + bytes(endpoint.push(sanitized_transaction, signature, public_key)).hex()
+
+    def _send_token(self, card):
+        config = get_configuration(card)["eth"]
+        try:
+            derivation = cryptnoxpy.Derivation[config["derivation"]]
+        except LookupError:
+            print("Derivation value not valid")
+            return 1
+
+        contract.transfer(card, config["endpoint"], config["network"], config["api_key"],
+                          self.data.contract, self.data.address, self.data.amount, self.data.price,
+                          self.data.limit, derivation)
+

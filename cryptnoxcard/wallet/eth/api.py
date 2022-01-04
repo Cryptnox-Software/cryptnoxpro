@@ -2,9 +2,12 @@
 """
 A basic Ethereum wallet library
 """
-import cryptnoxpy
+from typing import (
+    Any,
+    Dict, Union
+)
+
 import ecdsa
-import web3
 from cryptnoxpy import Derivation
 from eth_account._utils.legacy_transactions import (
     encode_transaction,
@@ -12,10 +15,7 @@ from eth_account._utils.legacy_transactions import (
 )
 from eth_utils.curried import keccak
 from hexbytes import HexBytes
-from typing import (
-    Any,
-    Dict, Union
-)
+from web3 import Web3
 
 from . import endpoint as ep
 from .. import validators
@@ -33,13 +33,15 @@ def address(public_key: str) -> str:
 
 
 def checksum_address(public_key: str) -> str:
-    return web3.Web3.toChecksumAddress(address(public_key))
+    return Web3.toChecksumAddress(address(public_key))
 
 
 class Api:
     PATH = "m/44'/60'/0'/0/0"
 
-    def __init__(self, card: cryptnoxpy.Card, endpoint: str, network: Union[enums.EthNetwork, str],
+    SYMBOL = "eth"
+
+    def __init__(self, endpoint: str, network: Union[enums.EthNetwork, str],
                  api_key: str):
         if isinstance(network, str):
             try:
@@ -47,8 +49,10 @@ class Api:
             except KeyError:
                 raise LookupError("Network is invalid")
 
-        self.card = card
-        self.endpoint = ep.factory(endpoint, network, api_key)
+        if endpoint.startswith("http"):
+            self.endpoint = ep.DirectEndpoint(endpoint, network)
+        else:
+            self.endpoint = ep.factory(endpoint, network, api_key)
 
     @property
     def block_number(self):
@@ -58,10 +62,10 @@ class Api:
         return self._web3.eth.contract(address=address, abi=abi)
 
     def get_transaction_count(self, address: str, blocks: str = None) -> int:
-        return self._web3.eth.get_transaction_count(web3.Web3.toChecksumAddress(address), blocks)
+        return self._web3.eth.get_transaction_count(Web3.toChecksumAddress(address), blocks)
 
-    def get_balance(self, address: str) -> float:
-        return self._web3.eth.get_balance(web3.Web3.toChecksumAddress(address))
+    def get_balance(self, address: str) -> int:
+        return self._web3.eth.get_balance(Web3.toChecksumAddress(address))
 
     @property
     def gas_price(self):
@@ -71,28 +75,32 @@ class Api:
     def network(self):
         return self.endpoint.network
 
-    def transaction_hash(self, transaction: Dict[str, Any]):
-        unsigned_transaction = serializable_unsigned_transaction_from_dict(
-            transaction)
-        encoded_transaction = encode_transaction(unsigned_transaction,
-                                                 vrs=(self.endpoint.network.value, 0, 0))
+    def transaction_hash(self, transaction: Dict[str, Any], vrs: bool = False):
+        try:
+            del transaction["maxFeePerGas"]
+            del transaction["maxPriorityFeePerGas"]
+        except KeyError:
+            pass
+        unsigned_transaction = serializable_unsigned_transaction_from_dict(transaction)
+        encoded_transaction = encode_transaction(unsigned_transaction, (self._chain_id, 0, 0))
         return keccak(encoded_transaction)
 
     def push(self, transaction, signature, public_key):
-        unsigned_transaction = serializable_unsigned_transaction_from_dict(
-            transaction)
-        var_v, var_r, var_s = Api._decode_vrs(signature, self.endpoint.network.value,
+        unsigned_transaction = serializable_unsigned_transaction_from_dict(transaction)
+        var_v, var_r, var_s = Api._decode_vrs(signature, self._chain_id,
                                               self.transaction_hash(transaction),
                                               cryptos.decode_pubkey(public_key))
 
-        rlp_encoded = encode_transaction(unsigned_transaction,
-                                         vrs=(var_v, var_r, var_s))
+        rlp_encoded = encode_transaction(unsigned_transaction, (var_v, var_r, var_s))
 
         return self._web3.eth.send_raw_transaction(HexBytes(rlp_encoded))
 
+    @property
+    def _chain_id(self) -> int:
+        return self.endpoint.network.value
+
     @staticmethod
-    def _decode_vrs(signature_der: bytes, chain_id: int, transaction: bytes,
-                    q_pub: tuple) -> tuple:
+    def _decode_vrs(signature_der: bytes, chain_id: int, transaction: bytes, q_pub: tuple) -> tuple:
         """
         Method used for getting v, r and s values
 
@@ -120,8 +128,12 @@ class Api:
         return var_v, var_r, var_s
 
     @property
-    def _web3(self) -> web3.Web3:
-        return web3.Web3(web3.Web3.HTTPProvider(self.endpoint.provider))
+    def _provider(self) -> str:
+        return self.endpoint.provider
+
+    @property
+    def _web3(self) -> Web3:
+        return Web3(Web3.HTTPProvider(self._provider))
 
 
 class EthValidator:

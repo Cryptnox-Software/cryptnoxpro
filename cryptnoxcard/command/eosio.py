@@ -57,8 +57,15 @@ class Eosio(Command):
                 result = create_config_method(card, self.data.key, self.data.value, "eosio")
             else:
                 print("Action not found")
+        except EOSWallet.NoAccountsException as error:
+            print(error)
         except requests.exceptions.RequestException as error:
-            print(f"Error with connection: {error}")
+            try:
+                message = json.loads(error.args[0].replace("Error: ", "").replace("'", '"'))
+                print(f"Error with connection. \nCode: {message['code']}\n"
+                      f"Message: {message['error']['details'][0]['message']}")
+            except Exception:
+                print(f"Error with connection: {error}")
 
         return result
 

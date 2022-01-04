@@ -6,23 +6,23 @@
 #
 
 -i https://pypi.org/simple
-aiohttp==3.8.0; python_version >= '3.6'
+aiohttp==3.8.1; python_version >= '3.6'
 aiosignal==1.2.0; python_version >= '3.6'
 appdirs==1.4.4
 argparse==1.4.0
-async-timeout==4.0.0; python_version >= '3.6'
-attrs==21.2.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
+async-timeout==4.0.2; python_version >= '3.6'
+attrs==21.4.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
 base58==2.1.1
 bitarray==1.2.2
-boto3==1.19.10
-botocore==1.22.10; python_version >= '3.6'
+boto3==1.20.27
+botocore==1.23.27; python_version >= '3.6'
 certifi==2021.10.8
 cffi==1.15.0
-charset-normalizer==2.0.7; python_version >= '3'
+charset-normalizer==2.0.9; python_version >= '3'
 colander==1.8.3
-cryptnoxpy==1.1.6
-cryptography==35.0.0; python_version >= '3.6'
-cytoolz==0.11.0; implementation_name == 'cpython'
+cryptnoxpy==2.0.1
+cryptography==36.0.1; python_version >= '3.6'
+cytoolz==0.11.2; python_version >= '3.5'
 ecdsa==0.17.0
 eth-abi==2.1.1; python_version >= '3.6' and python_version < '4'
 eth-account==0.5.6; python_version >= '3.6' and python_version < '4'
@@ -36,7 +36,7 @@ frozenlist==1.2.0; python_version >= '3.6'
 hexbytes==0.2.2; python_version >= '3.6' and python_version < '4'
 idna==3.3; python_version >= '3'
 ipfshttpclient==0.8.0a2; python_full_version >= '3.6.2' and python_full_version not in '3.7.0, 3.7.1'
-iso8601==0.1.16
+iso8601==1.0.2; python_version < '4' and python_full_version >= '3.6.2'
 jmespath==0.10.0; python_version >= '2.6' and python_version not in '3.0, 3.1, 3.2, 3.3'
 jsonschema==3.2.0
 lazy-import==0.2.2
@@ -46,25 +46,25 @@ multidict==5.2.0; python_version >= '3.6'
 netaddr==0.8.0
 parsimonious==0.8.1
 protobuf==3.19.1; python_version >= '3.5'
-pycparser==2.20; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
-pycryptodome==3.11.0
+pycparser==2.21; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
+pycryptodome==3.12.0
 pyrsistent==0.18.0; python_version >= '3.6'
-pyscard==2.0.2
+pyscard==2.0.1
 python-dateutil==2.8.2; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
 pytz==2021.3
-pywin32==302; platform_system == 'Windows'
-requests==2.26.0
+pywin32==303; platform_system == 'Windows'
+requests==2.27.0
 rlp==2.0.1
 s3transfer==0.5.0; python_version >= '3.6'
+setuptools==60.2.0; python_version >= '3.7'
 six==1.16.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
 stdiomask==0.0.6
 tabulate==0.8.9
-toolz==0.11.1; python_version >= '3.5'
+toolz==0.11.2; python_version >= '3.5'
 translationstring==1.4
-typing-extensions==3.10.0.2
 urllib3==1.26.7; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4' and python_version < '4'
 varint==1.0.2
-web3==5.24.0
+web3==5.25.0
 websockets==9.1; python_full_version >= '3.6.1'
 winrt==1.0.21033.1; sys_platform == 'win32'
 yarl==1.7.2; python_version >= '3.6'

@@ -1,23 +1,26 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-Command line interface for Cryptnox Cards
-"""
-import lazy_import
 import sys
 
 import argparse
+import lazy_import
+
+import interactive_cli
 
 try:
-    from command import options
-    from command import factory
     from __init__ import __version__
-    import interactive_cli
+    from command.erc_token import (
+        factory,
+        interactive,
+        options
+    )
 except ImportError:
-    from .command import options
-    from .command import factory
-    from . import interactive_cli
     from . import __version__
+    from .command.erc_token import (
+        factory,
+        interactive,
+        options
+    )
 
 cryptnoxpy = lazy_import.lazy_module("cryptnoxpy")
 json = lazy_import.lazy_module("json")
@@ -27,7 +30,6 @@ requests = lazy_import.lazy_module("requests")
 web3 = lazy_import.lazy_module("web3")
 
 APPLICATION_NAME = "CryptnoxCard"
-
 
 def get_parser() -> argparse.ArgumentParser:
     """
@@ -44,9 +46,7 @@ def get_parser() -> argparse.ArgumentParser:
                         help="Turn on logging")
     serial_index_parser = parser.add_mutually_exclusive_group()
     serial_index_parser.add_argument("-s", "--serial", type=int,
-                                     help="Serial number of the card to be"
-                                          " used for the"
-                                          " command")
+                                     help="Serial number of the card to be used for the command")
 
     options.add(parser)
 
@@ -54,8 +54,7 @@ def get_parser() -> argparse.ArgumentParser:
 
 
 def execute(args: argparse.Namespace) -> int:
-    command_factory = factory.Factory(args)
-    command = command_factory.get_command()
+    command = factory.command(args, card_type=ord("N"))
     result = command.execute()
 
     return result
@@ -63,7 +62,7 @@ def execute(args: argparse.Namespace) -> int:
 
 def main() -> int:
     """
-    Main method to call when the script is executed on the comman line
+    Main method to call when the script is executed on the command line
 
     :return: 0 if the command executed without issues. Other number
              indicating and issue
@@ -82,7 +81,7 @@ def main() -> int:
     if args.command:
         result = execute(args)
     else:
-        cli = interactive_cli.InteractiveCli(__version__, args.verbose)
+        cli = interactive.Interactive(__version__, args.verbose)
         cli.run()
 
     return result

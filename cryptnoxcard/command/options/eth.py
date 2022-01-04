@@ -106,9 +106,11 @@ def _add_contract_options(subparsers):
 
 def _add_send(subparsers):
     sub_parser = subparsers.add_parser("send", help="Simple command to send Ethereum system token")
-    sub_parser.add_argument("address", type=_validate,
-                            help="Address where to send funds")
+    sub_parser.add_argument("address", type=_validate, help="Address where to send funds")
     sub_parser.add_argument("amount", type=Decimal, help="Amount to send")
+    sub_parser.add_argument("-c", "--contract", type=_validate,
+                            help="Contract address of the contract")
+
     _add_options(sub_parser)
 
 

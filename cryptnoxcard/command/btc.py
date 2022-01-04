@@ -58,7 +58,7 @@ class Btc(Command):
         if self.data.fees:
             fees = self.data.fees
         else:
-            fees = wallet.get_fee_estimate()
+            fees = endpoint.get_fee_estimates()
             print(f"\nUsing fee (override with -f): {fees} Satoshi\n")
 
         try:

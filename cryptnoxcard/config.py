@@ -81,7 +81,7 @@ def save_to_config(card: cryptnoxpy.Card, config: Dict[str, Any]) -> None:
     """
     _CONFIGURATION[card.serial_number] = config
 
-    card.user_data = gzip.compress(bytes(json.dumps(config), "UTF-8"))
+    card.user_data[0] = gzip.compress(bytes(json.dumps(config), "UTF-8"))
 
 
 def read_card_config(card: cryptnoxpy.Card) -> Dict:
@@ -96,7 +96,7 @@ def read_card_config(card: cryptnoxpy.Card) -> Dict:
 
     config = get_default_configuration()
     try:
-        card_config = json.loads(gzip.decompress(card.user_data))
+        card_config = json.loads(gzip.decompress(card.user_data[0]))
     except (json.decoder.JSONDecodeError, FileNotFoundError, gzip.BadGzipFile):
         save_to_config(card, config)
     else:

@@ -120,7 +120,7 @@ class Seed(Command):
 
         try:
             service = backup.AWS(access_key_id, secret_access_key)
-        except backup.ConnectionException as error:
+        except backup.BackupException as error:
             print(f"Error in connecting to service: {error}")
             return None
 
