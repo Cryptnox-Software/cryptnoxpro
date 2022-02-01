@@ -1,16 +1,16 @@
 =============
-Cryptnox Card
+Cryptnox Pro
 =============
 
-.. image:: https://img.shields.io/pypi/v/cryptnoxcard
-    :target: https://pypi.org/project/cryptnoxcard
+.. image:: https://img.shields.io/pypi/v/cryptnoxpro
+    :target: https://pypi.org/project/cryptnoxpro
 
 
 **Warning: This is a beta release of the software.
 It is released for development purposes.
 Use at your own risk.**
 
-A command line user interface to manage and use of `Cryptnox cards <https://www.cryptnox.com/>`_.
+A command line user interface to manage and use of `Cryptnox Smart cards <https://www.cryptnox.com/>`_.
 
 This provides basic wallets for `Bitcoin <https://bitcoin.org>`_ and
 `Ethereum <https://ethereum.org>`_.
@@ -35,7 +35,7 @@ The package can be installed using pip package manager with:
 
 .. code-block:: bash
 
-    pip install cryptnoxcard
+    pip install cryptnoxpro
 
 The application can also be installed from source as python package.
 In the root of the project, execute:
@@ -45,7 +45,7 @@ In the root of the project, execute:
     pip install .
 
 This installs the application into your python packages and makes the
-``crytpnoxcard`` available as executable.
+``crytpnox`` available as executable.
 
 If during python installation its path was added to system path the executable,
 e.g. command is available system wide.
@@ -123,13 +123,13 @@ From here the CLI is available as a script:
 
 .. code-block:: bash
 
-    python cryptnoxcard/main.py
+    python cryptnoxpro/main.py
 
 or as a module:
 
 .. code-block:: bash
 
-    python -m cryptnoxcard.main
+    python -m cryptnoxpro.main
 
 Secrets
 -------
@@ -151,27 +151,27 @@ PUK code
 
 The PUK code must be 15 alphanumerical characters ('a'-'z', 'A'-'Z', '0'-'9').
 
-Demo mode
+Easy mode
 ---------
 
 **Warning:** Only use for testing purposes.
 
-The card can be initialized in demo mode. This is done for convenience of the
+The card can be initialized in easy mode. This is done for convenience of the
 user as you don't have to enter the card secrets. For this reason it comes at
 the expense of security.
 
 The card is initialized with following infomation:
 
 
-* Owner name: "DEMO"
-* Owner email: "DEMO"
+* Owner name: "EASY MODE"
+* Owner email: "EASY MODE"
 * PIN code 000000000
-* PIK code 000000000000
+* PIK code 000000000000 (the length depends on te card type)
 
 When the application asks for any secret, PIN or PUK code, press "ENTER" key.
 The application will use the predefined information to fill it for you.
 
-Demo mode on card is determined from the owner name and email.
+Easy mode on card is determined from the owner name and email.
 
 Interactive mode
 ----------------
@@ -187,9 +187,9 @@ When the mode starts it will show list of available cards.
 The prompt is also showing useful information:
 
 
-* **cryptnoxcard** indicates that the user is in interactive mode
+* **cryptnoxpro** indicates that the user is in interactive mode
 * Serial number of the selected card on which the command will be executed
-* Indication that the card is in demo mode
+* Indication that the card is in easy mode
 
 Seed generation
 ---------------
