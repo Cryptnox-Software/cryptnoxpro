@@ -31,13 +31,13 @@ class UnlockPin(Command):
 
     @staticmethod
     def unblock_pin(card, puk):
-        is_demo = security.is_easy_mode(card.info)
-        if is_demo:
+        is_easy_mode = security.is_easy_mode(card.info)
+        if is_easy_mode:
             pin_code = security.EASY_MODE_PIN
         else:
             pin_code = security.get_pin_code(card, f"Set card PIN code ({card.pin_rule}): ")
 
         card.unblock_pin(puk, pin_code)
 
-        if is_demo:
-            print(f"Demo card setting demo PIN code: {security.EASY_MODE_PIN}")
+        if is_easy_mode:
+            print(f"Easy mode card setting easy mode PIN code: {security.EASY_MODE_PIN}")

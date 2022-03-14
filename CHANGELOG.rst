@@ -7,8 +7,21 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_\ ,
 and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
-`Unreleased <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.2.0...HEAD>`_
--------------------------------------------------------------------------------------------
+`Unreleased <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.2.1...HEAD>`_
+--------------------------------------------------------------------------------------
+
+`2.2.1 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.2.0...2.2.1>`_ - 2022-03-14
+------------------------------------------------------------------------------------------------
+
+Fixed
+^^^^^
+
+* Application crashes when initializing NFT card
+* Help not show on some commands
+* List of cards is doubled when executing list command
+* Seed backup to KMS name of backup error message not clear enough
+* Card not reloaded after dual seed generation
+* Application crashes during dual seed generation while waiting for second card
 
 `2.2.0 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.1.0...2.2.0>`_ - 2022-01-31
 ------------------------------------------------------------------------------------------------

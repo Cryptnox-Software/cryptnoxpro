@@ -29,7 +29,7 @@ class Initialize:
 
         print("Cryptnox Initialisation\n")
 
-        init_data = ui.get_init_data(card, self.data.demo)
+        init_data = ui.get_init_data(card, self.data.easy_mode)
         nfc_sign = ui.confirm("Sign with NFC:")
 
         print("Select type of token to initialize the card with:")
@@ -59,8 +59,8 @@ class Initialize:
             Initialize._seed(card, init_data.pin)
 
             print("Cards have been initialized.")
-            if self.data.demo:
-                print("Cards are in demo mode.\n\nPress enter for all pin and puk prompts.\n")
+            if self.data.easy_mode:
+                print("Cards are in easy mode.\n\nPress enter for all pin and puk prompts.\n")
 
         return 0
 
@@ -101,8 +101,8 @@ class Initialize:
         card.dual_seed_load(second_pair, init_data.pin)
 
         print("Card has been initialized.")
-        if self.data.demo:
-            print("Card is in demo mode.\n\nPress enter for all pin and puk prompts.\n")
+        if self.data.easy_mode:
+            print("Card is in easy mode.\n\nPress enter for all pin and puk prompts.\n")
 
     def _init_card(self, card: cryptnoxpy.Card, init_data: ui.InitData, nfc_sign: bool,
                    slots: List[str]):

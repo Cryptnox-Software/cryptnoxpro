@@ -92,6 +92,9 @@ class ErrorParser(argparse.ArgumentParser):
             "-h,": "General"
         }
         message = super().format_help()
+        if not message.find("{"):
+            return message
+
         lines = message.split("\n")
         ErrorParser._remove_lines(lines)
 
@@ -104,13 +107,15 @@ class ErrorParser(argparse.ArgumentParser):
                 continue
             if skip:
                 continue
+            if not line:
+                continue
 
             command = line.strip().split(" ")[0]
             if command in groups:
                 lines_out += ["", f"{groups[command]}:", ""]
             lines_out.append(line)
 
-        message = "\n".join(lines_out)
+        message = "\n".join(lines_out) if lines_out else message
 
         return message
 
@@ -407,12 +412,13 @@ class InteractiveCli:
         if execute_result == -1:
             return
 
-        try:
-            self._card_info = self._cards[command.serial_number].info
-        except KeyError:
-            pass
-        except (cryptnoxpy.CryptnoxException, ExitException, TimeoutException) as error:
-            print(error)
+        if not always_run:
+            try:
+                self._card_info = self._cards[command.serial_number].info
+            except KeyError:
+                pass
+            except (cryptnoxpy.CryptnoxException, ExitException, TimeoutException) as error:
+                print(error)
 
         print("\n")
 

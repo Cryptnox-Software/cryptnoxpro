@@ -25,7 +25,7 @@ class ChangePin(Command):
     def _execute(self, card: cryptnoxpy.Card) -> int:
         if not card.initialized:
             ui.print_warning("Card is not initialized")
-            print("To initialize card run : init\nTo initialize card in demo mode run : init -d")
+            print("To initialize card run : init\nTo initialize card in easy mode run : init -e")
 
             return -1
 
@@ -33,7 +33,7 @@ class ChangePin(Command):
             security.check_pin_code(card)
 
         if security.is_easy_mode(card.info):
-            print("Card is in demo mode. Setting same PIN code")
+            print("Card is in easy mode. Setting same PIN code")
             pin_code = security.EASY_MODE_PIN
         else:
             pin_code = security.get_pin_code(card, f"Set new PIN code ({card.pin_rule}): ")

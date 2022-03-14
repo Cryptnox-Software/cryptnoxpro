@@ -2,6 +2,7 @@
 """
 Module containing command for generating keys on the card
 """
+import re
 from pathlib import Path
 from typing import Union
 
@@ -73,7 +74,11 @@ class Seed(Command):
         if not service:
             return False
 
-        name = ui.input_with_exit("Name of the seed on the KMS in HSM: ")
+        while True:
+            name = ui.input_with_exit("Name of the seed on the KMS in HSM: ")
+            if re.match("^[a-zA-Z0-9:/_-]+$", name):
+                break
+            print("Name of seed can only contain small and large letters, numbers and characters :/_-")
 
         seed = card.generate_random_number(32)
         print("Backing up seed...")
@@ -167,7 +172,11 @@ class Seed(Command):
               f"card into same reader with index {index}.")
         input("Insert card and press ENTER to continue")
 
-        second_card = self._get_second_card(index, serial_number)
+        try:
+            second_card = self._get_second_card(index, serial_number)
+        except (cards.ExitException, cards.TimeoutException) as error:
+            print(error)
+            return -2
 
         pin_code = Seed._get_pin_code(second_card)
         second_card_data = second_card.dual_seed_public_key(pin_code)
@@ -188,8 +197,9 @@ class Seed(Command):
 
         pin_code = Seed._get_pin_code(card)
         card.dual_seed_load(second_card_data, pin_code)
-        print("Dual seed generation has been finished. Check with command `info` that both of them"
+        print("Dual seed generation has been finished. Check with command `info` that both of them "
               "have the same addresses.")
+        del self._cards[serial_number]
 
         return 0
 
