@@ -10,6 +10,14 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 `Unreleased <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.2.1...HEAD>`_
 --------------------------------------------------------------------------------------
 
+`2.2.2 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.2.1...2.2.2>`_ - 2022-03-17
+------------------------------------------------------------------------------------------------
+
+Fixed
+^^^^^
+
+* Init not finished with NFT card when ABI is large
+
 `2.2.1 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.2.0...2.2.1>`_ - 2022-03-14
 ------------------------------------------------------------------------------------------------
 

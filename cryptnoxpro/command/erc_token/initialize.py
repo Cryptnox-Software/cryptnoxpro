@@ -101,6 +101,7 @@ class Initialize:
         card.dual_seed_load(second_pair, init_data.pin)
 
         print("Card has been initialized.")
+        print("Use 'info' command to see all information regarding your token.")
         if self.data.easy_mode:
             print("Card is in easy mode.\n\nPress enter for all pin and puk prompts.\n")
 
@@ -136,6 +137,7 @@ class Initialize:
                 "contract_address": contract_address,
                 "nft_id": nft_id,
             }),
+            "",
             ui.input_with_exit("ABI: "),
             ui.input_with_exit("Metadata: ")
         ]
