@@ -5,8 +5,12 @@ Module for application that behaves as command line interface
 import shutil
 import sys
 import traceback
+import threading
+import server
+import config
 from pathlib import Path
 from typing import List
+import exit
 
 import argparse
 import cryptnoxpy
@@ -92,9 +96,6 @@ class ErrorParser(argparse.ArgumentParser):
             "-h,": "General"
         }
         message = super().format_help()
-        if not message.find("{"):
-            return message
-
         lines = message.split("\n")
         ErrorParser._remove_lines(lines)
 
@@ -107,15 +108,13 @@ class ErrorParser(argparse.ArgumentParser):
                 continue
             if skip:
                 continue
-            if not line:
-                continue
 
             command = line.strip().split(" ")[0]
             if command in groups:
                 lines_out += ["", f"{groups[command]}:", ""]
             lines_out.append(line)
 
-        message = "\n".join(lines_out) if lines_out else message
+        message = "\n".join(lines_out)
 
         return message
 
@@ -264,7 +263,9 @@ class InteractiveCli:
         return 0
 
     def _run(self):
-        print("Loading cards...")
+        print("Starting server and loading cards...")
+        server_thread = server.server_thread('Server_thread')
+        server_thread.start()
         try:
             self._cards.refresh()
             self._card_info = list(self._cards.values())[0].info
@@ -280,6 +281,8 @@ class InteractiveCli:
             try:
                 self._process_command()
             except InteractiveCli.ExitException:
+                exit.initiate_exit()
+                server_thread.join()
                 break
 
     def is_valid_subcommand(self, new_subcommand: List[str],
@@ -412,13 +415,12 @@ class InteractiveCli:
         if execute_result == -1:
             return
 
-        if not always_run:
-            try:
-                self._card_info = self._cards[command.serial_number].info
-            except KeyError:
-                pass
-            except (cryptnoxpy.CryptnoxException, ExitException, TimeoutException) as error:
-                print(error)
+        try:
+            self._card_info = self._cards[command.serial_number].info
+        except KeyError:
+            pass
+        except (cryptnoxpy.CryptnoxException, ExitException, TimeoutException) as error:
+            print(error)
 
         print("\n")
 
