@@ -14,6 +14,7 @@ from tabulate import tabulate
 
 from . import security
 from .ui import print_warning
+from ... import config
 
 
 class ExitException(Exception):
@@ -164,7 +165,7 @@ class Cards:
         raise ValueError
 
     def _open_card(self, index: int) -> cryptnoxpy.Card:
-        connection = cryptnoxpy.Connection(index, self.debug)
+        connection = cryptnoxpy.Connection(index, self.debug,config._REMOTE_CONNECTIONS)
         card = cryptnoxpy.factory.get_card(connection, self.debug)
         self._cards[card.serial_number] = self._cards_by_index[index] = card
 

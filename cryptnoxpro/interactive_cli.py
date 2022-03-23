@@ -5,12 +5,10 @@ Module for application that behaves as command line interface
 import shutil
 import sys
 import traceback
-import threading
-import server
-import config
+from . import server
 from pathlib import Path
 from typing import List
-import exit
+from . import exit
 
 import argparse
 import cryptnoxpy
