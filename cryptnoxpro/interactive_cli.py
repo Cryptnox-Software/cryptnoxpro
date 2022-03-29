@@ -287,13 +287,16 @@ class InteractiveCli:
             try:
                 self._process_command()
             except InteractiveCli.ExitException:
-                message = '!Exit'.encode('utf-8')
-                msg_length = len(message)
-                send_length = str(msg_length).encode('utf-8')
-                send_length += b' ' * (64 - len(send_length))
-                client.send(send_length)
-                client.send(message)
-                client.close()
+                try:
+                    message = '!Close'.encode('utf-8')
+                    msg_length = len(message)
+                    send_length = str(msg_length).encode('utf-8')
+                    send_length += b' ' * (64 - len(send_length))
+                    client.send(send_length)
+                    client.send(message)
+                    client.close()
+                except Exception as e:
+                    print(f'Probably no socket to close: {e}')
                 break
 
     def is_valid_subcommand(self, new_subcommand: List[str],
