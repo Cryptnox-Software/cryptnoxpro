@@ -18,6 +18,7 @@ except ImportError:
 
 _CONFIGURATION = {}
 _REMOTE_CONNECTIONS = []
+_REMOTE = False
 _STOP_THREADS = False
 
 

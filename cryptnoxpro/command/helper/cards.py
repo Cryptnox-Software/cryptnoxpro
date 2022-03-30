@@ -74,7 +74,7 @@ class Cards:
     def __len__(self):
         return len(self._cards)
 
-    def refresh(self) -> None:
+    def refresh(self,remote: bool = False) -> None:
         index = 0
 
         while True:
@@ -90,7 +90,7 @@ class Cards:
                     self._remove_card(card.serial_number)
 
             try:
-                self._open_card(index)
+                self._open_card(index,remote)
             except cryptnoxpy.ReaderException:
                 break
             except cryptnoxpy.CryptnoxException:
@@ -164,9 +164,9 @@ class Cards:
                 return index
         raise ValueError
 
-    def _open_card(self, index: int) -> cryptnoxpy.Card:
-        connection = cryptnoxpy.Connection(index, self.debug,config._REMOTE_CONNECTIONS)
-        card = cryptnoxpy.factory.get_card(connection, self.debug)
+    def _open_card(self, index: int,remote: bool = False) -> cryptnoxpy.Card:
+        connection = cryptnoxpy.Connection(index, self.debug,config._REMOTE_CONNECTIONS,remote)
+        card = cryptnoxpy.factory.get_card(connection, self.debug,remote)
         self._cards[card.serial_number] = self._cards_by_index[index] = card
 
         return card

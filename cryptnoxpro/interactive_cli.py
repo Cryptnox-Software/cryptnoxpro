@@ -8,7 +8,10 @@ import traceback
 import socket
 from pathlib import Path
 from typing import List
-from . import config
+try:
+    from . import config
+except:
+    import config
 
 import argparse
 import cryptnoxpy
@@ -208,6 +211,8 @@ class InteractiveCli:
     :param str version: Version of the application the interface should return
     :param bool debug: Print out debug information in regards to the
                        communication to the card
+    :param bool remote: Determines whether the application should use remote feature
+                        or look for local readers
     """
 
     class ExitException(Exception):
@@ -215,10 +220,11 @@ class InteractiveCli:
         Exception to handle when the user requests to exit the application.
         """
 
-    def __init__(self, version: str, card_type: int = 0, debug: bool = False):
+    def __init__(self, version: str, card_type: int = 0, port: int = None,debug: bool = False):
         self.version = version
         self.card_type = card_type
         self.debug: bool = debug
+        self.port: int = port
 
         self._reconnect = False
         self._card_info = None
@@ -261,19 +267,21 @@ class InteractiveCli:
         return 0
 
     def _run(self):
-        print("Starting server and loading cards...")
-        try:
-            client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            server = socket.gethostbyname(socket.gethostname() + ".local")
-            port = 5055
-            client.connect((server,port))
-            config._REMOTE_CONNECTIONS.append(client)
-        except Exception as e:
-            print(f'Remote card connection not found: {e}')
+        print("Loading cards...")
+        print(f'{self.port}')
+        if self.port:
+            print(f"Found port {self.port} defined, searching remotely.")
+            try:
+                client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                server = socket.gethostbyname(socket.gethostname() + ".local")
+                client.connect((server,self.port))
+                config._REMOTE_CONNECTIONS.append(client)
+            except Exception as e:
+                print(f'Remote card connection not found: {e}')
 
         try:
-            self._cards.refresh()
+            self._cards.refresh(self.port!=None)
             self._card_info = list(self._cards.values())[0].info
         except IndexError:
             pass
@@ -287,16 +295,17 @@ class InteractiveCli:
             try:
                 self._process_command()
             except InteractiveCli.ExitException:
-                try:
-                    message = '!Close'.encode('utf-8')
-                    msg_length = len(message)
-                    send_length = str(msg_length).encode('utf-8')
-                    send_length += b' ' * (64 - len(send_length))
-                    client.send(send_length)
-                    client.send(message)
-                    client.close()
-                except Exception as e:
-                    print(f'Probably no socket to close: {e}')
+                if self.port:
+                    try:
+                        message = '!Close'.encode('utf-8')
+                        msg_length = len(message)
+                        send_length = str(msg_length).encode('utf-8')
+                        send_length += b' ' * (64 - len(send_length))
+                        client.send(send_length)
+                        client.send(message)
+                        client.close()
+                    except Exception as e:
+                        print(f'Probably no socket to close: {e}')
                 break
 
     def is_valid_subcommand(self, new_subcommand: List[str],
@@ -417,7 +426,7 @@ class InteractiveCli:
 
         if not self._card_info and not always_run:
             try:
-                self._cards.refresh()
+                self._cards.refresh(self.port!=None)
                 self._card_info = list(self._cards.values())[0].info
             except IndexError:
                 print("No cards found.\n")
