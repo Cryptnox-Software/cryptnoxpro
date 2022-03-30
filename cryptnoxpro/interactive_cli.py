@@ -220,7 +220,7 @@ class InteractiveCli:
         Exception to handle when the user requests to exit the application.
         """
 
-    def __init__(self, version: str, card_type: int = 0, port: int = None,debug: bool = False):
+    def __init__(self, version: str, card_type: int = 0,debug: bool = False,port: int = None):
         self.version = version
         self.card_type = card_type
         self.debug: bool = debug

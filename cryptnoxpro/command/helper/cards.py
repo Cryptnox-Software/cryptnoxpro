@@ -75,6 +75,8 @@ class Cards:
         return len(self._cards)
 
     def refresh(self,remote: bool = False) -> None:
+        if remote:
+            print(f'Refreshing cards remotely\n')
         index = 0
 
         while True:
@@ -166,7 +168,7 @@ class Cards:
 
     def _open_card(self, index: int,remote: bool = False) -> cryptnoxpy.Card:
         connection = cryptnoxpy.Connection(index, self.debug,config._REMOTE_CONNECTIONS,remote)
-        card = cryptnoxpy.factory.get_card(connection, self.debug,remote)
+        card = cryptnoxpy.factory.get_card(connection, self.debug)
         self._cards[card.serial_number] = self._cards_by_index[index] = card
 
         return card
