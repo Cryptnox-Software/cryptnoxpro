@@ -75,8 +75,6 @@ class Cards:
         return len(self._cards)
 
     def refresh(self,remote: bool = False) -> None:
-        if remote:
-            print(f'Refreshing cards remotely\n')
         index = 0
 
         while True:

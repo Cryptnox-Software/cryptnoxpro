@@ -74,7 +74,7 @@ def main() -> int:
         result = factory.command(args).execute()
     else:
         print(f'Port: {args.port}')
-        result = interactive_cli.InteractiveCli(__version__, args.verbose,args.port).run()
+        result = interactive_cli.InteractiveCli(__version__, args.verbose,port=args.port).run()
 
     return result
 

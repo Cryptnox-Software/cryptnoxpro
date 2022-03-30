@@ -268,7 +268,6 @@ class InteractiveCli:
 
     def _run(self):
         print("Loading cards...")
-        print(f'{self.port}')
         if self.port:
             print(f"Found port {self.port} defined, searching remotely.")
             try:
