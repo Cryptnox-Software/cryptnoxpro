@@ -82,6 +82,20 @@ The application can receive commands directly in any command line, or can be sta
 `Interactive Mode <#interactive-mode>`_ by starting without any arguments or options.
 The later will also start if the executable is called from a GUI, like Windows Explorer.
 
+
+Remote mode
+^^^^^^^^^^^
+While running the application without arguments starts a local mode, a port number can be provided as argument to start remote mode.
+This enables the application to connect to an interface on the same machine via the provided port. 
+
+An example below:
+
+.. code-block:: bash
+
+    cryptnox --port 1234
+    
+Note: An interface to relay commands to remote reader should be developed in advance to accept this connection.    
+
 Exit input
 ^^^^^^^^^^
 
@@ -91,6 +105,8 @@ command stops the execution.
 
 To not overcrowd the interface this is not mentioned when information is requested by
 the CLI.
+
+Exiting the CLI closes existing card interface connections for remote mode.
 
 Development environment
 -----------------------
