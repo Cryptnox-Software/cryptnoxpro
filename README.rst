@@ -64,9 +64,29 @@ On some Debian/Ubuntu Linux systems there binaries for sme libraries are not
 delivered with the installed package. In this case install the following tools,
 so that they can be compiled during installation process.
 
+Ubuntu / Debian
+
 .. code-block:: bash
 
     sudo apt-get install build-essential autoconf libtool pkg-config python3-dev swig libpcsclite-dev
+    pip install -U setuptools
+
+Fedora / CentOS / RHEL
+
+.. code-block:: bash
+
+    yum install swig python3-pip python3-setuptools pcsc-lite-ccid
+    pip install -U setuptools
+
+MacOS additional packages
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+On MacOS to install CryptnoxPro with pip you need to add swig to the system as there are some
+dependencies written in C/C++
+
+.. code-block:: bash
+
+    brew install swig
 
 MacOS missing certificates
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
