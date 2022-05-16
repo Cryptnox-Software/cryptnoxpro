@@ -44,6 +44,7 @@ def get_parser() -> argparse.ArgumentParser:
 
     parser.add_argument("-v", "--version", action="version", version=f"Cryptnox Pro {__version__}")
     parser.add_argument("--verbose", action="store_true", help="Turn on logging")
+    parser.add_argument('--port', nargs='?', type=int, default=None, help='Define port to enable remote feature')
     serial_index_parser = parser.add_mutually_exclusive_group()
     serial_index_parser.add_argument("-s", "--serial", type=int,
                                      help="Serial number of the card to be used for the command")
@@ -72,7 +73,8 @@ def main() -> int:
     if args.command:
         result = factory.command(args).execute()
     else:
-        result = interactive_cli.InteractiveCli(__version__, args.verbose).run()
+        print(f'Port: {args.port}')
+        result = interactive_cli.InteractiveCli(__version__, args.verbose,port=args.port).run()
 
     return result
 

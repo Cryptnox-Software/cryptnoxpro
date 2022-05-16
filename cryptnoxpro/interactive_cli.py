@@ -5,8 +5,13 @@ Module for application that behaves as command line interface
 import shutil
 import sys
 import traceback
+import socket
 from pathlib import Path
 from typing import List
+try:
+    from . import config
+except:
+    import config
 
 import argparse
 import cryptnoxpy
@@ -92,9 +97,6 @@ class ErrorParser(argparse.ArgumentParser):
             "-h,": "General"
         }
         message = super().format_help()
-        if not message.find("{"):
-            return message
-
         lines = message.split("\n")
         ErrorParser._remove_lines(lines)
 
@@ -107,15 +109,13 @@ class ErrorParser(argparse.ArgumentParser):
                 continue
             if skip:
                 continue
-            if not line:
-                continue
 
             command = line.strip().split(" ")[0]
             if command in groups:
                 lines_out += ["", f"{groups[command]}:", ""]
             lines_out.append(line)
 
-        message = "\n".join(lines_out) if lines_out else message
+        message = "\n".join(lines_out)
 
         return message
 
@@ -211,6 +211,8 @@ class InteractiveCli:
     :param str version: Version of the application the interface should return
     :param bool debug: Print out debug information in regards to the
                        communication to the card
+    :param bool remote: Determines whether the application should use remote feature
+                        or look for local readers
     """
 
     class ExitException(Exception):
@@ -218,10 +220,11 @@ class InteractiveCli:
         Exception to handle when the user requests to exit the application.
         """
 
-    def __init__(self, version: str, card_type: int = 0, debug: bool = False):
+    def __init__(self, version: str, card_type: int = 0,debug: bool = False,port: int = None):
         self.version = version
         self.card_type = card_type
         self.debug: bool = debug
+        self.port: int = port
 
         self._reconnect = False
         self._card_info = None
@@ -265,8 +268,19 @@ class InteractiveCli:
 
     def _run(self):
         print("Loading cards...")
+        if self.port:
+            print(f"Found port {self.port} defined, searching remotely.")
+            try:
+                client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                server = socket.gethostbyname(socket.gethostname() + ".local")
+                client.connect((server,self.port))
+                config._REMOTE_CONNECTIONS.append(client)
+            except Exception as e:
+                print(f'Remote card connection not found: {e}')
+
         try:
-            self._cards.refresh()
+            self._cards.refresh(self.port!=None)
             self._card_info = list(self._cards.values())[0].info
         except IndexError:
             pass
@@ -280,6 +294,17 @@ class InteractiveCli:
             try:
                 self._process_command()
             except InteractiveCli.ExitException:
+                if self.port:
+                    try:
+                        message = '!Close'.encode('utf-8')
+                        msg_length = len(message)
+                        send_length = str(msg_length).encode('utf-8')
+                        send_length += b' ' * (64 - len(send_length))
+                        client.send(send_length)
+                        client.send(message)
+                        client.close()
+                    except Exception as e:
+                        print(f'Probably no socket to close: {e}')
                 break
 
     def is_valid_subcommand(self, new_subcommand: List[str],
@@ -400,7 +425,7 @@ class InteractiveCli:
 
         if not self._card_info and not always_run:
             try:
-                self._cards.refresh()
+                self._cards.refresh(self.port!=None)
                 self._card_info = list(self._cards.values())[0].info
             except IndexError:
                 print("No cards found.\n")
@@ -412,13 +437,12 @@ class InteractiveCli:
         if execute_result == -1:
             return
 
-        if not always_run:
-            try:
-                self._card_info = self._cards[command.serial_number].info
-            except KeyError:
-                pass
-            except (cryptnoxpy.CryptnoxException, ExitException, TimeoutException) as error:
-                print(error)
+        try:
+            self._card_info = self._cards[command.serial_number].info
+        except KeyError:
+            pass
+        except (cryptnoxpy.CryptnoxException, ExitException, TimeoutException) as error:
+            print(error)
 
         print("\n")
 
