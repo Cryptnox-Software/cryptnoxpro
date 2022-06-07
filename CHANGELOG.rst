@@ -10,6 +10,14 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 `Unreleased <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.2.1...HEAD>`_
 --------------------------------------------------------------------------------------
 
+`2.3.0 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.2.2...2.3.0>`_ - 2022-06-07
+------------------------------------------------------------------------------------------------
+
+Added
+^^^^^
+
+- Remote mode for connecting over a port
+
 Changed
 ^^^^^^^
 

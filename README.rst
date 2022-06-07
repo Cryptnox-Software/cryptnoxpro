@@ -105,8 +105,9 @@ The later will also start if the executable is called from a GUI, like Windows E
 
 Remote mode
 ^^^^^^^^^^^
-While running the application without arguments starts a local mode, a port number can be provided as argument to start remote mode.
-This enables the application to connect to an interface on the same machine via the provided port. 
+While running the application without arguments starts a local mode, a port number can be provided
+as argument to start remote mode. This enables the application to connect to an interface on the
+same machine via the provided port.
 
 An example below:
 

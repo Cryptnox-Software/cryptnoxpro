@@ -3,20 +3,17 @@
 Module for application that behaves as command line interface
 """
 import shutil
+import socket
 import sys
 import traceback
-import socket
 from pathlib import Path
 from typing import List
-try:
-    from . import config
-except:
-    import config
 
 import argparse
 import cryptnoxpy
 
 try:
+    import config
     import enums
     from command.options import options
     from command.helper import security
@@ -26,6 +23,7 @@ try:
         TimeoutException
     )
 except ImportError:
+    from . import config
     from . import enums
     from .command.options import options
     from .command.helper import security
@@ -209,8 +207,7 @@ class InteractiveCli:
     Application running a command line interface.
 
     :param str version: Version of the application the interface should return
-    :param bool debug: Print out debug information in regards to the
-                       communication to the card
+    :param bool debug: Print out debug information in regard to the communication to the card
     :param bool remote: Determines whether the application should use remote feature
                         or look for local readers
     """
@@ -220,9 +217,8 @@ class InteractiveCli:
         Exception to handle when the user requests to exit the application.
         """
 
-    def __init__(self, version: str, card_type: int = 0,debug: bool = False,port: int = None):
+    def __init__(self, version: str, debug: bool = False, port: int = None):
         self.version = version
-        self.card_type = card_type
         self.debug: bool = debug
         self.port: int = port
 
@@ -266,45 +262,59 @@ class InteractiveCli:
 
         return 0
 
-    def _run(self):
-        print("Loading cards...")
-        if self.port:
-            print(f"Found port {self.port} defined, searching remotely.")
-            try:
-                client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-                server = socket.gethostbyname(socket.gethostname() + ".local")
-                client.connect((server,self.port))
-                config._REMOTE_CONNECTIONS.append(client)
-            except Exception as e:
-                print(f'Remote card connection not found: {e}')
+    def _client(self):
+        if not self.port:
+            return None
+
+        print(f"Found port {self.port} defined, searching remotely.")
+        try:
+            client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            server = socket.gethostbyname(socket.gethostname() + ".local")
+            client.connect((server, self.port))
+        except Exception as error:
+            client = None
+            print(f'Remote card connection not found: {error}')
+        else:
+            config.REMOTE_CONNECTIONS.append(client)
+
+        return client
+
+    def _close_client(self, client):
+        if not self.port or not client:
+            return
+
+        message = '!Close'.encode('utf-8')
+        msg_length = len(message)
+        send_length = str(msg_length).encode('utf-8')
+        send_length += b' ' * (64 - len(send_length))
 
         try:
-            self._cards.refresh(self.port!=None)
+            client.send(send_length)
+            client.send(message)
+            client.close()
+        except Exception as e:
+            print(f'Probably no socket to close: {e}')
+
+    def _run(self):
+        print("Loading cards...")
+        client = self._client()
+
+        try:
+            self._cards.refresh(self.port and client is not None)
             self._card_info = list(self._cards.values())[0].info
         except IndexError:
             pass
 
         self._cards.print_card_list(show_warnings=True, print_with_one_card=True)
         print("\n\nType help for list of commands.\n\n")
-        print("\n\nWith any input that is requested from you, to exit the current command "
-              "type: exit \n\n")
+        print("\n\nWith any input that is requested from you, to exit the current command type: exit \n\n")
 
         while True:
             try:
                 self._process_command()
             except InteractiveCli.ExitException:
-                if self.port:
-                    try:
-                        message = '!Close'.encode('utf-8')
-                        msg_length = len(message)
-                        send_length = str(msg_length).encode('utf-8')
-                        send_length += b' ' * (64 - len(send_length))
-                        client.send(send_length)
-                        client.send(message)
-                        client.close()
-                    except Exception as e:
-                        print(f'Probably no socket to close: {e}')
+                self._close_client(client)
                 break
 
     def is_valid_subcommand(self, new_subcommand: List[str],
@@ -425,7 +435,7 @@ class InteractiveCli:
 
         if not self._card_info and not always_run:
             try:
-                self._cards.refresh(self.port!=None)
+                self._cards.refresh(self.port != None)
                 self._card_info = list(self._cards.values())[0].info
             except IndexError:
                 print("No cards found.\n")

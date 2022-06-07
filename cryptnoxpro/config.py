@@ -17,9 +17,7 @@ except ImportError:
     from .command.helper import helper_methods
 
 _CONFIGURATION = {}
-_REMOTE_CONNECTIONS = []
-_REMOTE = False
-_STOP_THREADS = False
+REMOTE_CONNECTIONS = []
 
 
 def get_default_configuration() -> Dict:

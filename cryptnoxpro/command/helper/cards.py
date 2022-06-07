@@ -14,7 +14,10 @@ from tabulate import tabulate
 
 from . import security
 from .ui import print_warning
-from ... import config
+try:
+    from ... import config
+except ImportError:
+    import config
 
 
 class ExitException(Exception):
@@ -59,7 +62,6 @@ class Cards:
             self._remove_card(card.serial_number)
 
         self.refresh()
-        card = None
 
         try:
             card = self._cards_by_index[key]
@@ -74,7 +76,7 @@ class Cards:
     def __len__(self):
         return len(self._cards)
 
-    def refresh(self,remote: bool = False) -> None:
+    def refresh(self, remote: bool = False) -> None:
         index = 0
 
         while True:
@@ -90,7 +92,7 @@ class Cards:
                     self._remove_card(card.serial_number)
 
             try:
-                self._open_card(index,remote)
+                self._open_card(index, remote)
             except cryptnoxpy.ReaderException:
                 break
             except cryptnoxpy.CryptnoxException:
@@ -164,8 +166,8 @@ class Cards:
                 return index
         raise ValueError
 
-    def _open_card(self, index: int,remote: bool = False) -> cryptnoxpy.Card:
-        connection = cryptnoxpy.Connection(index, self.debug,config._REMOTE_CONNECTIONS,remote)
+    def _open_card(self, index: int, remote: bool = False) -> cryptnoxpy.Card:
+        connection = cryptnoxpy.Connection(index, self.debug, config.REMOTE_CONNECTIONS, remote)
         card = cryptnoxpy.factory.get_card(connection, self.debug)
         self._cards[card.serial_number] = self._cards_by_index[index] = card
 

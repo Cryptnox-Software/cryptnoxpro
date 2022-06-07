@@ -3,10 +3,10 @@
 """
 Command line interface for Cryptnox Cards
 """
-import lazy_import
 import sys
 
 import argparse
+import lazy_import
 
 try:
     from __init__ import __version__
@@ -44,7 +44,8 @@ def get_parser() -> argparse.ArgumentParser:
 
     parser.add_argument("-v", "--version", action="version", version=f"Cryptnox Pro {__version__}")
     parser.add_argument("--verbose", action="store_true", help="Turn on logging")
-    parser.add_argument('--port', nargs='?', type=int, default=None, help='Define port to enable remote feature')
+    parser.add_argument('--port', nargs='?', type=int, default=None,
+                        help='Define port to enable remote feature')
     serial_index_parser = parser.add_mutually_exclusive_group()
     serial_index_parser.add_argument("-s", "--serial", type=int,
                                      help="Serial number of the card to be used for the command")
@@ -74,7 +75,7 @@ def main() -> int:
         result = factory.command(args).execute()
     else:
         print(f'Port: {args.port}')
-        result = interactive_cli.InteractiveCli(__version__, args.verbose,port=args.port).run()
+        result = interactive_cli.InteractiveCli(__version__, args.verbose, args.port).run()
 
     return result
 
