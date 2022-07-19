@@ -146,6 +146,9 @@ class Eosio(Command):
         elif self.data.push == "transaction":
             data = [trx]
             action = wallet.push
+        else:
+            print("ERROR : Invalid action")
+            return 1
 
         try:
             transaction = action(*data)
@@ -194,7 +197,7 @@ class Eosio(Command):
              f"{to_account}"]
         ]
 
-        floating_points = max([number_of_significant_digits(balance),
+        floating_points = max([number_of_significant_digits(float(balance)),
                                number_of_significant_digits(amount)])
 
         return self._process(card, wallet, transaction,
@@ -210,8 +213,8 @@ class Eosio(Command):
         except KeyError as error:
             raise Eosio.DataValidationException("Derivation error.") from error
 
-        public_key = card.get_public_key(derivation, key_type,
-                                         path=EOSWallet.PATH, compressed=False)
+        path = b"" if derivation == cryptnoxpy.Derivation.CURRENT_KEY else EOSWallet.PATH
+        public_key = card.get_public_key(derivation, key_type, path=path, compressed=False)
 
         digest = wallet.var_ce.transaction_hash(transaction)
         signature = sign(card, bytes.fromhex(digest), derivation, key_type, EOSWallet.PATH, True)
@@ -267,7 +270,10 @@ class Eosio(Command):
             raise Eosio.DataValidationException("Derivation error.") from error
 
         coin_symbol = config.get("coin_symbol", "EOS")
-        public_key = card.get_public_key(derivation, key_type, EOSWallet.PATH)
+
+        path = b"" if derivation == cryptnoxpy.Derivation.CURRENT_KEY else EOSWallet.PATH
+        public_key = card.get_public_key(derivation, key_type, path)
+
         wallet = EOSWallet(public_key, endpoint, coin_symbol, key_type.name)
 
         print(f"Public key: {wallet.address}")
@@ -292,7 +298,8 @@ class Eosio(Command):
         except KeyError as error:
             raise Eosio.DataValidationException("Derivation error.") from error
 
-        public_key = card.get_public_key(derivation, key_type, EOSWallet.PATH)
+        path = b"" if derivation == cryptnoxpy.Derivation.CURRENT_KEY else EOSWallet.PATH
+        public_key = card.get_public_key(derivation, key_type, path)
 
         wallet = EOSWallet(public_key, endpoint, coin_symbol, key_type.name)
         card.derive(key_type, path=EOSWallet.PATH)

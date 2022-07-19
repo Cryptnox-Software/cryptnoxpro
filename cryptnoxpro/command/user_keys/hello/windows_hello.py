@@ -4,13 +4,13 @@ Module for signing messages with Windows Hello
 
 import asyncio
 
-from winrt.windows.security.credentials import (
+from winsdk.windows.security.credentials import (
     KeyCredentialManager,
     KeyCredentialCreationOption,
     KeyCredentialStatus,
     KeyCredential
 )
-from winrt.windows.security.cryptography import (
+from winsdk.windows.security.cryptography import (
     CryptographicBuffer
 )
 

@@ -1,5 +1,5 @@
 import ast
-import collections
+from collections.abc import Mapping
 from typing import Any
 
 import argparse
@@ -15,7 +15,7 @@ def deep_update(source, overrides):
     Modify ``source`` in place.
     """
     for key, value in overrides.items():
-        if isinstance(value, collections.Mapping) and value:
+        if isinstance(value, Mapping) and value:
             returned = deep_update(source.get(key, {}), value)
             source[key] = returned
         else:

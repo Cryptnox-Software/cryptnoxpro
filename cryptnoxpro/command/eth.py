@@ -440,7 +440,9 @@ class Contract(Command):
         price, limit = contract.gas(endpoint.gas_price, self.data.price, self.data.limit,
                                     contract.LIMIT["contract"])
 
-        public_key = card.get_public_key(derivation, path=wallet.Api.PATH, compressed=False)
+        path = b"" if derivation == cryptnoxpy.Derivation.CURRENT_KEY else wallet.Api.PATH
+        public_key = card.get_public_key(derivation, path=path, compressed=False)
+
         balance = endpoint.get_balance(wallet.address(public_key))
         if balance - price * limit < 0:
             print("Not enough fund for the transaction")
@@ -572,7 +574,9 @@ class Eth(Command):
 
     @staticmethod
     def _send_funds(card, derivation, endpoint, address, amount, price, limit):
-        public_key = card.get_public_key(derivation, path=wallet.Api.PATH, compressed=False)
+        path = b"" if derivation == cryptnoxpy.Derivation.CURRENT_KEY else wallet.Api.PATH
+        public_key = card.get_public_key(derivation, path=path, compressed=False)
+
         card.derive(path=wallet.Api.PATH)
         from_address = wallet.checksum_address(public_key)
         balance = endpoint.get_balance(from_address)

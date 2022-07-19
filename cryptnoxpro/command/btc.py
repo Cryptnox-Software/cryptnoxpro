@@ -53,7 +53,9 @@ class Btc(Command):
 
         endpoint = BlkHubApi(network)
 
-        pubkey = card.get_public_key(derivation, path=BTCwallet.PATH)
+        path = b"" if derivation == cryptnoxpy.Derivation.CURRENT_KEY else BTCwallet.PATH
+        pubkey = card.get_public_key(derivation, path=path)
+
         wallet = BTCwallet(pubkey, network, endpoint, card)
         print("Sending BTC")
         amount = int(self.data.amount * 10 ** 8)

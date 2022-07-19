@@ -10,6 +10,24 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 `Unreleased <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.2.1...HEAD>`_
 --------------------------------------------------------------------------------------
 
+`2.4.0 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.3.0...2.4.0>`_ - 2022-07-19
+------------------------------------------------------------------------------------------------
+
+Added
+^^^^^
+
+- Python 3.10 support
+
+Removed
+^^^^^^^
+
+- Python 3.6 support
+
+Fixed
+^^^^^
+
+- Application crashing when using current key with derivation path
+
 `2.3.0 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.2.2...2.3.0>`_ - 2022-06-07
 ------------------------------------------------------------------------------------------------
 

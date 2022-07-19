@@ -435,7 +435,7 @@ class InteractiveCli:
 
         if not self._card_info and not always_run:
             try:
-                self._cards.refresh(self.port != None)
+                self._cards.refresh(self.port is not None)
                 self._card_info = list(self._cards.values())[0].info
             except IndexError:
                 print("No cards found.\n")

@@ -1,9 +1,12 @@
 import gzip
 import json
+import urllib
+from argparse import Namespace
 from typing import List
+from urllib import parse
 
 import cryptnoxpy
-from argparse import Namespace
+import requests
 
 from ..helper import ui
 from ..helper.cards import ExitException, Cards
@@ -41,9 +44,17 @@ class Initialize:
 
         print(token_type)
         if token_type == "nft":
-            slots = Initialize._nft_slots()
+            try:
+                slots = Initialize._nft_slots()
+            except ValueError as error:
+                print(f"Error in getting input for NFT: {error}")
+                return -1
         elif token_type == "token":
-            slots = Initialize._token_slots()
+            try:
+                slots = Initialize._token_slots()
+            except ValueError as error:
+                print(f"Error in getting input for Token: {error}")
+                return -1
         else:
             return -1
 
@@ -138,7 +149,7 @@ class Initialize:
                 "nft_id": nft_id,
             }),
             "",
-            ui.input_with_exit("ABI: "),
+            Initialize._abi(),
             ui.input_with_exit("Metadata: ")
         ]
 
@@ -153,7 +164,7 @@ class Initialize:
                          f"\nTransfer tokens to it to complete the initialization process.")
 
     @staticmethod
-    def _token_slots():
+    def _token_slots() -> list[str]:
         print("-------------------------------------------------")
         print("\n\nToken data")
         print("-------------------------------------------------")
@@ -169,3 +180,43 @@ class Initialize:
                 "contract_address": contract_address,
             })
         ]
+
+    @staticmethod
+    def _abi() -> str:
+        def uri_validator(x):
+            try:
+                result = parse.urlparse(x)
+                return all([result.scheme, result.netloc])
+            except Exception:
+                return False
+
+        abi = ui.input_with_exit("ABI: ")
+
+        if uri_validator(abi):
+            return Initialize._get_abi_from_url(abi)
+        try:
+            int(abi)
+        except ValueError:
+            try:
+                json.loads(abi)
+            except json.JSONDecodeError:
+                raise ValueError("Invalid abi")
+
+        return abi
+
+    @staticmethod
+    def _get_abi_from_url(url):
+        try:
+            data_request = requests.get(url)
+        except urllib.error.URLError as error:
+            raise ValueError(f"Error in retrieving {url}: {error}") from error
+
+        try:
+            data = data_request.json()
+        except json.JSONDecodeError as error:
+            raise ValueError("Error in decoding ABI url response") from error
+
+        if data.get('status') != '1':
+            raise ValueError(f"Error in retrieving ABI url response: {data.get('message')}")
+
+        return data_request.text

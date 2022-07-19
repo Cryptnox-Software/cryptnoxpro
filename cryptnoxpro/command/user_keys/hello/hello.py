@@ -70,7 +70,7 @@ class Hello(user_key_base.UserKey):
             raise user_key_base.NotFoundException(error) from error
         except exceptions.CanceledException as error:
             raise user_key_base.ExitException(error) from error
-        except exceptions.NotSupportedException as error:
+        except (ModuleNotFoundError, exceptions.NotSupportedException) as error:
             raise user_key_base.NotSupportedException(error) from error
         except exceptions.WindowsHelloExceptions as error:
             raise user_key_base.ProcessingException(error) from error

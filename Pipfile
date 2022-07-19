@@ -24,7 +24,7 @@ requests = "*"
 tabulate = "*"
 stdiomask = "*"
 web3 = "*"
-winrt = {version = "*", sys_platform = "== 'win32'"}
+winsdk = {version = "*", sys_platform = "== 'win32'"}
 
 [requires]
-python_version = "3.9"
+python_version = "3.10"

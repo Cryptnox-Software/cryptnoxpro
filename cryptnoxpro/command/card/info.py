@@ -79,7 +79,9 @@ class Info:
         except KeyError:
             return tabulate_data
 
-        pubkey = card.get_public_key(derivation, key_type, EOSWallet.PATH)
+        path = b"" if derivation == cryptnoxpy.Derivation.CURRENT_KEY else EOSWallet.PATH
+        pubkey = card.get_public_key(derivation, key_type, path)
+
         wallet = EOSWallet(pubkey, endpoint, coin_symbol, key_type=key_type.name)
 
         tabulate_data.update({"address": wallet.address, "account": [], "balance": []})
@@ -111,7 +113,9 @@ class Info:
         network = config.get("network", "testnet").lower()
         endpoint = BlkHubApi(network)
 
-        pubkey = card.get_public_key(derivation, path=BTCwallet.PATH)
+        path = b"" if derivation == cryptnoxpy.Derivation.CURRENT_KEY else BTCwallet.PATH
+        pubkey = card.get_public_key(derivation, path=path)
+
         wallet = BTCwallet(pubkey, network, endpoint, card)
 
         tabulate_data = {
