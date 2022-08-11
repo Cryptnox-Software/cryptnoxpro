@@ -5,7 +5,6 @@ Module for application that behaves as command line interface
 import shutil
 import socket
 import sys
-import traceback
 from pathlib import Path
 from typing import List
 
@@ -230,35 +229,25 @@ class InteractiveCli:
         self.parser = None
 
     def run(self) -> int:
-        """
-        Entry point for the interactive command line interface
+        print("Loading cards...")
+        client = self._client()
 
-        :return: 0 if the command executed without issues. Other number
-                 indicating and issue
-        :rtype: int
-        """
         try:
-            self._run()
-        except KeyboardInterrupt:
-            return 0
-        except Exception:
-            print("This is something we haven't foreseen. Please, help us in "
-                  "making the application better by reporting this issue.")
-            traceback.print_exc()
+            self._cards.refresh(self.port and client is not None)
+            self._card_info = list(self._cards.values())[0].info
+        except IndexError:
+            pass
+
+        self._cards.print_card_list(show_warnings=True, print_with_one_card=True)
+        print("\n\nType help for list of commands.\n\n")
+        print("\n\nWith any input that is requested from you, to exit the current command type: exit \n\n")
+
+        while True:
             try:
-                with open("error.log", "w") as log:
-                    traceback.print_exc(file=log)
-            except Exception:
-                print("Please, copy this error and send it to us, so that we "
-                      "can make the application better.")
-            else:
-                print("Error has been also saved into file error.log in the "
-                      "application folder. Please, send it to us, so that we "
-                      "can make the application better.")
-
-            input("Press enter to exit application")
-
-            return -1
+                self._process_command()
+            except InteractiveCli.ExitException:
+                self._close_client(client)
+                break
 
         return 0
 
@@ -295,27 +284,6 @@ class InteractiveCli:
             client.close()
         except Exception as e:
             print(f'Probably no socket to close: {e}')
-
-    def _run(self):
-        print("Loading cards...")
-        client = self._client()
-
-        try:
-            self._cards.refresh(self.port and client is not None)
-            self._card_info = list(self._cards.values())[0].info
-        except IndexError:
-            pass
-
-        self._cards.print_card_list(show_warnings=True, print_with_one_card=True)
-        print("\n\nType help for list of commands.\n\n")
-        print("\n\nWith any input that is requested from you, to exit the current command type: exit \n\n")
-
-        while True:
-            try:
-                self._process_command()
-            except InteractiveCli.ExitException:
-                self._close_client(client)
-                break
 
     def is_valid_subcommand(self, new_subcommand: List[str],
                             execute: List[str]) -> bool:

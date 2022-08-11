@@ -98,22 +98,30 @@ def get_init_data(card: cryptnoxpy.card, easy_mode: bool = False) -> InitData:
     return init_data
 
 
-def option_input(options: Union[Dict[str, str], List[str]], name: str = ""):
+def option_input(options: Union[Dict[str, str], List[str]], name: str = "", default: str = ""):
     if isinstance(options, list):
         options = {x: x for x in options}
     name = name or "option"
-    print(tabulate(enumerate([value for value in options.values()], 1)))
+    if default:
+        print('Default value is marked with a star, press ENTER to select it.')
+
+    print(tabulate(enumerate([("* " if key == default else "") + value
+                              for key, value in options.items()], 1)))
     length = len(options)
 
     while True:
-        choice = input_with_exit(f"\nChoose {name} (1 - {length}): ")
+        choice = input_with_exit(f"\nChoose {name} (1 - {length}): ", not default)
         if choice.lower() == "exit":
             raise ExitException("Exited by user")
+
+        if default and not choice:
+            return default
 
         try:
             return list(options.keys())[int(choice) - 1]
         except (IndexError, ValueError):
-            print(f"Please, enter a number between 1 and {length}")
+            print(f"Please, enter a number between 1 and {length}" +
+                  (" or press ENTER for default value" if default else ""))
 
 
 def print_warning(text):

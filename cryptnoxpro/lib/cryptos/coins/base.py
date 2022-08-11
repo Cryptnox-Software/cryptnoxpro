@@ -1,12 +1,12 @@
-from ..transaction import *
-from ..blocks import mk_merkle_proof
 from .. import segwit_addr
-#from ..explorers import blockchain
-#from ..electrumx_client.rpc import ElectrumXClient
+from ..blocks import mk_merkle_proof
+# from ..explorers import blockchain
+# from ..electrumx_client.rpc import ElectrumXClient
 from ..keystore import *
+from ..specials import *
+from ..transaction import *
 from ..wallet import *
-from ..py3specials import *
-from ..py2specials import *
+
 
 class BaseCoin(object):
     """
@@ -21,8 +21,8 @@ class BaseCoin(object):
     magicbyte = None
     script_magicbyte = None
     segwit_hrp = None
-    #explorer = blockchain
-    #client = ElectrumXClient
+    # explorer = blockchain
+    # client = ElectrumXClient
     client_kwargs = {
         'server_file': 'bitcoin.json',
         'servers': (),
@@ -64,7 +64,6 @@ class BaseCoin(object):
     electrum_xprv_headers = xprv_headers
     electrum_xpub_headers = xpub_headers
 
-
     def __init__(self, testnet=False, **kwargs):
         if testnet:
             self.is_testnet = True
@@ -75,7 +74,8 @@ class BaseCoin(object):
             setattr(self, key, value)
         if not self.enabled:
             if self.is_testnet:
-                raise NotImplementedError("Due to explorer limitations, testnet support for this coin has not been implemented yet!")
+                raise NotImplementedError(
+                    "Due to explorer limitations, testnet support for this coin has not been implemented yet!")
             else:
                 raise NotImplementedError("Support for this coin has not been implemented yet!")
         self.address_prefixes = magicbyte_to_prefix(magicbyte=self.magicbyte)
@@ -94,7 +94,6 @@ class BaseCoin(object):
         if not self._rpc_client:
             self._rpc_client = self.client(**self.client_kwargs)
         return self._rpc_client
-
 
     def unspent(self, *addrs):
         """
@@ -356,7 +355,7 @@ class BaseCoin(object):
         for o in outs:
             if isinstance(o, string_or_bytes_types):
                 addr = o[:o.find(':')]
-                val = int(o[o.find(':')+1:])
+                val = int(o[o.find(':') + 1:])
                 o = {}
                 if re.match('^[0-9a-fA-F]*$', addr):
                     o["script"] = addr
@@ -428,7 +427,8 @@ class BaseCoin(object):
         private key.It will also be used, along with the privkey, to automatically detect a segwit transaction for coins
         which support segwit, overriding the segwit kw
         """
-        return self.preparesignedmultitx(privkey, to + ":" + str(value), fee, change_addr=change_addr, segwit=segwit, addr=addr)
+        return self.preparesignedmultitx(privkey, to + ":" + str(value), fee, change_addr=change_addr, segwit=segwit,
+                                         addr=addr)
 
     def send(self, privkey, to, value, fee=10000, change_addr=None, segwit=False, addr=None):
         """
@@ -452,7 +452,7 @@ class BaseCoin(object):
         which support segwit, overriding the segwit kw
         """
         if addr:
-            frm =  addr
+            frm = addr
             if self.segwit_supported:
                 segwit = self.is_segwit(privkey, addr)
         elif segwit:
@@ -568,7 +568,7 @@ class BaseCoin(object):
         ks = p2wpkh_p2sh_from_bip39_seed(seed, passphrase, coin=self)
         return HDWallet(ks, **kwargs)
 
-    def watch_p2wpkh_p2sh_wallet(self, xpub,**kwargs):
+    def watch_p2wpkh_p2sh_wallet(self, xpub, **kwargs):
         ks = from_xpub(xpub, self, 'p2wpkh-p2sh')
         return HDWallet(ks, **kwargs)
 

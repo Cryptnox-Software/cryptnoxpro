@@ -71,4 +71,5 @@ class Piv(user_key_base.UserKey):
             except piv_card.PinException as error:
                 if error.retries_left == 0:
                     raise
-                print(f"Wrong pin code. You have {error.retries_left} before the card is locked.")
+                try_str = "tries" if error.retries_left > 1 else "try"
+                print(f"Wrong pin code. You have {error.retries_left} {try_str} before the card is locked.")

@@ -2,9 +2,10 @@
 """
 Module containing command for generating keys on the card
 """
+import random
 import re
 from pathlib import Path
-from typing import Union
+from typing import Union, Tuple
 
 import cryptnoxpy
 from tabulate import tabulate
@@ -17,6 +18,8 @@ from .helper import (
     security,
     ui
 )
+from .helper.backup import DEFAULT_REGIONS
+from .helper.download_folder import get_download_folder
 
 try:
     import enums
@@ -65,18 +68,31 @@ class Seed(Command):
     def _backup(card: cryptnoxpy.Card) -> int:
         pin_code = Seed._get_pin_code(card)
 
+        credentials_file = Path(get_download_folder()).joinpath('rootkey.csv')
+        access_key_id, secret_access_key = Seed._credentials(credentials_file)
+
         try:
-            service = Seed._backup_service()
+            service = Seed._backup_service(access_key_id, secret_access_key)
         except backup.BackupException as error:
             print(error)
             return -1
 
         if not service:
-            return False
+            return -1
+
+        indexes = list(range(100, 999))
+        for alias in service.aliases:
+            if alias.startswith('cryptnox'):
+                try:
+                    indexes.remove(int(alias))
+                except ValueError:
+                    continue
 
         while True:
-            name = ui.input_with_exit("Name of the seed on the KMS in HSM: ")
-            if re.match("^[a-zA-Z0-9:/_-]+$", name):
+            name = f'cryptnox{random.choice(indexes)}'
+            name = ui.input_with_exit(f'Name of the seed on the KMS in HSM ({name}): ',
+                                      required=False) or name
+            if re.match("^[a-zA-Z\\d:/_-]+$", name):
                 break
             print("Name of seed can only contain small and large letters, numbers and characters :/_-")
 
@@ -114,15 +130,14 @@ class Seed(Command):
         backup_file.write_text(tabulate(data))
         print(f"\nBackup data also saved to: {backup_file}")
 
-        ui.print_warning("It is advised to delete your AWS access keys if you don't plan to use "
-                         "them.")
+        Seed._remove_credentials(credentials_file)
 
         return 0
 
     @staticmethod
-    def _backup_service() -> Union[None, backup.AWS]:
-        access_key_id = ui.input_with_exit("Access Key ID: ")
-        secret_access_key = ui.secret_with_exit("Secret Access Key: ")
+    def _backup_service(access_key_id: str = '', secret_access_key: str = '') -> Union[None, backup.AWS]:
+        access_key_id = access_key_id or ui.input_with_exit("Access Key ID: ")
+        secret_access_key = secret_access_key or ui.secret_with_exit("Secret Access Key: ")
 
         try:
             service = backup.AWS(access_key_id, secret_access_key)
@@ -134,7 +149,7 @@ class Seed(Command):
         for client, options in service.regions.items():
             for option in regions.values():
                 options.remove(option)
-            regions[client] = ui.option_input(options)
+            regions[client] = ui.option_input(options, default=DEFAULT_REGIONS[client])
 
         try:
             service.region = regions
@@ -152,6 +167,23 @@ class Seed(Command):
         print("New key generated in card.")
 
         return 0
+
+    @staticmethod
+    def _credentials(credential_file: Path = None) -> Tuple[str, str]:
+        access_key_id = ''
+        secret_access_key = ''
+        credential_file = credential_file or Path(get_download_folder()).joinpath('rootkey.csv')
+        try:
+            with open(credential_file, 'r') as file:
+                id_line = file.readline().strip()
+                secret_line = file.readline().strip()
+                if id_line.startswith('AWSAccessKeyId=') and secret_line.startswith('AWSSecretKey='):
+                    access_key_id = id_line[len('AWSAccessKeyId='):]
+                    secret_access_key = secret_line[len('AWSSecretKey='):]
+        except FileNotFoundError:
+            print('Credentials file not found.')
+
+        return access_key_id, secret_access_key
 
     def _dual_seed(self, card: cryptnoxpy.Card) -> int:
         try:
@@ -249,6 +281,8 @@ class Seed(Command):
 
     @staticmethod
     def _load_mnemonic(card: cryptnoxpy.Card, mnemonic: str, pin_code: str) -> None:
+        if len(mnemonic.split(' ')) not in (12, 24):
+            raise ValueError('Only mnemonic passphrases of length 12 and 24 are supported')
         seed = cryptos.bip39_mnemonic_to_seed(mnemonic)
         card.load_seed(seed, pin_code)
 
@@ -269,11 +303,25 @@ class Seed(Command):
         return 0
 
     @staticmethod
+    def _remove_credentials(credentials_file: Path) -> None:
+        try:
+            credentials_file.unlink()
+        except FileNotFoundError:
+            ui.print_warning("It is advised to delete your AWS access keys if you don't plan to use them.")
+        else:
+            service.delete_access_key()
+            print('Your credential file and credentials have been deleted.')
+
+    @staticmethod
     def _restore(card: cryptnoxpy.Card) -> int:
         pin_code = Seed._get_pin_code(card)
-        service = Seed._backup_service()
+        credentials_file = Path(get_download_folder()).joinpath('rootkey.csv')
+        access_key_id, secret_access_key = Seed._credentials(credentials_file)
+
+        service = Seed._backup_service(access_key_id, secret_access_key)
         if not service:
             return -1
+
         name = ui.input_with_exit("Name of the seed on the KMS in HSM: ")
 
         print("Retrieving seed from service...")
@@ -296,8 +344,7 @@ class Seed(Command):
         Seed._load_mnemonic(card, mnemonic, pin_code)
         print("\nMnemonic loaded from backup service.")
 
-        ui.print_warning("It is advised to delete your AWS access keys if you don't plan to use "
-                         "them.")
+        Seed._remove_credentials(credentials_file)
 
         return 0
 

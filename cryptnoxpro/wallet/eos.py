@@ -37,8 +37,7 @@ def bin_to_b58eosio(inp, key_type: str) -> str:
         leading_z_bytes += 1
     checksum = hashlib.new('ripemd160',
                            inp + bytes(key_type, "ascii")).digest()[:4]
-    return '1' * leading_z_bytes + \
-           cryptos.py3specials.changebase(inp + checksum, 256, 58)
+    return '1' * leading_z_bytes + cryptos.specials.changebase(inp + checksum, 256, 58)
 
 
 def pubkey2adr(pub_key_hex: str, key_type: str) -> str:

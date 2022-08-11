@@ -7,16 +7,38 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_\ ,
 and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
-`Unreleased <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.2.1...HEAD>`_
+`Unreleased <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.5.0...HEAD>`_
 --------------------------------------------------------------------------------------
 
-`2.4.0 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.3.0...2.4.0>`_ - 2022-07-19
+`2.5.0 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.4.0...v2.5.0>`_ - 2022-08-11
+------------------------------------------------------------------------------------------------
+
+Added
+^^^^^
+
+- Default servers for AWS backup and restore
+- Default randomized alias for AWS backup
+- Use `rootkey.csv` file from download folder for AWS backup and restore, delete credentials after operation
+
+Changed
+^^^^^^^
+
+- In case of exception write the error log into user folder instead of installation folder
+
+Fixed
+^^^^^
+
+- Missing word for retrying PIN code
+- Seed phrase of length other than 12 or 24 words is accepted by the system
+
+`2.4.0 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.3.0...v2.4.0>`_ - 2022-07-19
 ------------------------------------------------------------------------------------------------
 
 Added
 ^^^^^
 
 - Python 3.10 support
+- For NFT cards abi url parsing
 
 Removed
 ^^^^^^^
@@ -28,7 +50,7 @@ Fixed
 
 - Application crashing when using current key with derivation path
 
-`2.3.0 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.2.2...2.3.0>`_ - 2022-06-07
+`2.3.0 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.2.2...v2.3.0>`_ - 2022-06-07
 ------------------------------------------------------------------------------------------------
 
 Added
@@ -41,7 +63,7 @@ Changed
 
 - Installation instructions added missing instructions
 
-`2.2.2 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.2.1...2.2.2>`_ - 2022-03-17
+`2.2.2 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.2.1...v2.2.2>`_ - 2022-03-17
 ------------------------------------------------------------------------------------------------
 
 Fixed
@@ -49,7 +71,7 @@ Fixed
 
 * Init not finished with NFT card when ABI is large
 
-`2.2.1 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.2.0...2.2.1>`_ - 2022-03-14
+`2.2.1 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.2.0...v2.2.1>`_ - 2022-03-14
 ------------------------------------------------------------------------------------------------
 
 Fixed
@@ -62,7 +84,7 @@ Fixed
 * Card not reloaded after dual seed generation
 * Application crashes during dual seed generation while waiting for second card
 
-`2.2.0 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.1.0...2.2.0>`_ - 2022-01-31
+`2.2.0 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.1.0...v2.2.0>`_ - 2022-01-31
 ------------------------------------------------------------------------------------------------
 
 Changed
@@ -80,7 +102,7 @@ Fixed
 * Input for user key description to allow numbers and letters
 * Crash when showing seed backup options for AWS server
 
-`2.1.0 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.0.0...2.1.0>`_ - 2022-01-04
+`2.1.0 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.0.0...v2.1.0>`_ - 2022-01-04
 ------------------------------------------------------------------------------------------------
 
 Added
@@ -94,7 +116,7 @@ Fixed
 
 * Exception handling in multiple places.
 
-`2.0.0 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v1.3.2...2.0.0>`_ - 2021-10-13
+`2.0.0 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v1.3.2...v2.0.0>`_ - 2021-10-13
 ------------------------------------------------------------------------------------------------
 
 Added
@@ -119,7 +141,7 @@ Fixed
 * EOS transfer doesn't use sender but behaves as send command
 
 
-`1.3.2 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v1.3.1...1.3.2>`_ - 2021-10-13
+`1.3.2 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v1.3.1...v1.3.2>`_ - 2021-10-13
 ------------------------------------------------------------------------------------------------
 
 Changed
@@ -134,7 +156,7 @@ Fixed
 * ``exit`` keyword when input is requested from user, like PIN or PUK code
 * Bitcoin sending with multiple inputs is rejected by the node
 
-`1.3.1 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v1.3.0...1.3.1>`_ - 2021-10-07
+`1.3.1 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v1.3.0...v1.3.1>`_ - 2021-10-07
 ------------------------------------------------------------------------------------------------
 
 Fixed
@@ -142,7 +164,7 @@ Fixed
 
 * Crash when calling config under currencies
 
-`1.3.0 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v1.2.0...1.3.0>`_ - 2021-10-06
+`1.3.0 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v1.2.0...v1.3.0>`_ - 2021-10-06
 ------------------------------------------------------------------------------------------------
 
 Added
@@ -161,7 +183,7 @@ Fixed
 * When waiting for card after card is detected the application crashes.
 * Ethereum network name conversion
 
-`1.2.0 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v1.1.0...1.2.0>`_ - 2021-09-16
+`1.2.0 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v1.1.0...v1.2.0>`_ - 2021-09-16
 ------------------------------------------------------------------------------------------------
 
 Added
@@ -185,7 +207,7 @@ Fixed
 * In demo mode when asked for PUK code, entering anything will go into loop asking for the code.
 * There is no message when adding piv, but piv is not present
 
-`1.1.0 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v1.0.2...1.1.0>`_ - 2021-09-16
+`1.1.0 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v1.0.2...v1.1.0>`_ - 2021-09-16
 ------------------------------------------------------------------------------------------------
 
 Added
@@ -194,7 +216,7 @@ Added
 * Backup and restore of entropy for seed generation to KMS in HSM.
 
 
-`1.0.2 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v1.0.1...1.0.2>`_ - 2021-09-09
+`1.0.2 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v1.0.1...v1.0.2>`_ - 2021-09-09
 ------------------------------------------------------------------------------------------------
 
 Changed
@@ -203,7 +225,7 @@ Changed
 * Improve setup process.
 
 
-`1.0.1 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v1.0.0...1.0.1>`_ - 2021-08-20
+`1.0.1 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v1.0.0...v1.0.1>`_ - 2021-08-20
 ------------------------------------------------------------------------------------------------
 
 Fixed

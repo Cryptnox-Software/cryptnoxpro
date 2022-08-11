@@ -154,7 +154,8 @@ def _check_pin_code(card, pin_code, handle_exception: bool = True) -> bool:
         number_of_retries = error.number_of_retries
         if number_of_retries == 0:
             raise
-        print(f"Wrong pin code. You have {number_of_retries} before the card is locked.")
+        try_str = "tries" if number_of_retries > 1 else "try"
+        print(f"Wrong pin code. You have {number_of_retries} {try_str} before the card is locked.")
 
         return False
 

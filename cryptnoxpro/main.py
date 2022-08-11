@@ -4,9 +4,13 @@
 Command line interface for Cryptnox Cards
 """
 import sys
+import traceback
+from os import makedirs
+from pathlib import Path
 
 import argparse
 import lazy_import
+from appdirs import user_log_dir
 
 try:
     from __init__ import __version__
@@ -55,6 +59,16 @@ def get_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def execute(args):
+    if args.command:
+        result = factory.command(args).execute()
+    else:
+        print(f'Port: {args.port}')
+        result = interactive_cli.InteractiveCli(__version__, args.verbose, args.port).run()
+
+    return result
+
+
 def main() -> int:
     """
     Main method to call when the script is executed on the command line
@@ -71,13 +85,30 @@ def main() -> int:
         pass
     args = parser.parse_args()
 
-    if args.command:
-        result = factory.command(args).execute()
-    else:
-        print(f'Port: {args.port}')
-        result = interactive_cli.InteractiveCli(__version__, args.verbose, args.port).run()
+    try:
+        return execute(args)
+    except KeyboardInterrupt:
+        return 0
+    except Exception:
+        print("This is something we haven't foreseen. Please, help us in making the application "
+              "better by reporting this issue.")
+        traceback.print_exc()
+        path = Path(user_log_dir('cryptnoxpro', 'cryptnox'))
+        makedirs(path, exist_ok=True)
+        error_file = path.joinpath("error.log")
+        try:
+            with open(error_file, "w") as log:
+                traceback.print_exc(file=log)
+        except Exception:
+            print("Please, copy this error and send it to us, so that we can make the application "
+                  "better.")
+        else:
+            print(f"Error has been also saved into file {error_file}. "
+                  "Please, send it to us, so that we can make the application better.")
 
-    return result
+        input("Press enter to exit application")
+
+        return -1
 
 
 if __name__ == "__main__":

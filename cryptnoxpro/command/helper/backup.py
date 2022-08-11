@@ -26,6 +26,11 @@ _REGIONS_WITH_ISSUES = [
 ]
 
 
+DEFAULT_REGIONS = {
+    'kms': 'eu-north-1',
+    'secretsmanager': 'ap-northeast-3'
+}
+
 class BackupException(Exception):
     """Base exception for all seed backup exceptions"""
 
@@ -65,6 +70,16 @@ class AWS:
 
         self._check_credentials()
 
+    @property
+    def aliases(self) -> List[str]:
+        client = self._session.client("kms", self._regions["kms"])
+        try:
+            full_result = client.get_paginator('list_aliases').paginate().build_full_result()
+
+            return [page['AliasName'][6:] for page in full_result['Aliases']]
+        except ClientError:
+            return []
+
     def backup(self, name: str, data: bytes) -> None:
         """
         Backup data under name
@@ -84,6 +99,11 @@ class AWS:
         secret_to_store = (length + data_key_encrypted + encrypted_data_b64_decoded)
 
         self._create_secret(secret_to_store, name)
+
+    def delete_access_key(self):
+        self._session.client('iam').delete_access_key(
+            AccessKeyId=self._session.get_credentials().access_key,
+        )
 
     def retrieve(self, name: str) -> bytes:
         """

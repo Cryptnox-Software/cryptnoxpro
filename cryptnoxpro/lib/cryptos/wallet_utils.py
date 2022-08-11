@@ -24,14 +24,11 @@
 # SOFTWARE.
 
 
-import hashlib
-import hmac
 from decimal import Decimal
 
-from .main import *
-from .py2specials import *
-from .py3specials import *
 from . import constants as version
+from .main import *
+from .specials import *
 
 # Version numbers for BIP32 extended keys
 # standard: xprv, xpub
@@ -57,29 +54,36 @@ hfu = binascii.hexlify
 bfh = safe_from_hex
 hmac_sha_512 = lambda x, y: hmac.new(x, y, hashlib.sha512).digest()
 
+
 def rev_hex(s):
     return bh2u(bfh(s)[::-1])
+
 
 def int_to_hex(i, length=1):
     assert isinstance(i, int)
     s = hex(i)[2:].rstrip('L')
-    s = "0"*(2*length - len(s)) + s
+    s = "0" * (2 * length - len(s)) + s
     return rev_hex(s)
+
 
 class InvalidPassword(Exception):
     def __str__(self):
         return "Incorrect password"
+
 
 try:
     from Cryptodome.Cipher import AES
 except:
     AES = None
 
+
 class InvalidPasswordException(Exception):
     pass
 
+
 class InvalidPadding(Exception):
     pass
+
 
 def assert_bytes(*args):
     """
@@ -91,6 +95,7 @@ def assert_bytes(*args):
     except:
         print('assert bytes failed', list(map(type, args)))
         raise
+
 
 def append_PKCS7_padding(data):
     assert_bytes(data)
@@ -109,6 +114,7 @@ def strip_PKCS7_padding(data):
         if i != padlen:
             raise InvalidPadding("invalid padding byte (inconsistent)")
     return data[0:-padlen]
+
 
 def aes_encrypt_with_iv(key, iv, data):
     assert_bytes(key, iv, data)
@@ -136,6 +142,7 @@ def aes_decrypt_with_iv(key, iv, data):
     except InvalidPadding:
         raise InvalidPassword()
 
+
 def EncodeAES(secret, s):
     assert_bytes(s)
     iv = bytes(os.urandom(16))
@@ -143,11 +150,13 @@ def EncodeAES(secret, s):
     e = iv + ct
     return base64.b64encode(e)
 
+
 def DecodeAES(secret, e):
     e = bytes(base64.b64decode(e))
     iv, e = e[:16], e[16:]
     s = aes_decrypt_with_iv(secret, iv, e)
     return s
+
 
 def pw_encode(s, password):
     if password:
@@ -155,6 +164,7 @@ def pw_encode(s, password):
         return EncodeAES(secret, to_bytes(s, "utf8")).decode('utf8')
     else:
         return s
+
 
 def pw_decode(s, password):
     if password is not None:
@@ -167,11 +177,13 @@ def pw_decode(s, password):
     else:
         return s
 
+
 def is_new_seed(x, prefix=version.SEED_PREFIX):
     from . import mnemonic
     x = mnemonic.normalize_text(x)
     s = bh2u(hmac_sha_512(b"Seed version", x.encode('utf8')))
     return s.startswith(prefix)
+
 
 def seed_type(x):
     if is_new_seed(x):
@@ -182,15 +194,16 @@ def seed_type(x):
         return '2fa'
     return ''
 
+
 is_seed = lambda x: bool(seed_type(x))
 
 SCRIPT_TYPES = {
-    'p2pkh':0,
-    'p2wpkh':1,
-    'p2wpkh-p2sh':2,
-    'p2sh':5,
-    'p2wsh':6,
-    'p2wsh-p2sh':7
+    'p2pkh': 0,
+    'p2wpkh': 1,
+    'p2wpkh-p2sh': 2,
+    'p2sh': 5,
+    'p2wsh': 6,
+    'p2wsh-p2sh': 7
 }
 
 __b58chars = b'123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
@@ -199,8 +212,10 @@ assert len(__b58chars) == 58
 __b43chars = b'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ$*+-./:'
 assert len(__b43chars) == 43
 
+
 def inv_dict(d):
     return {v: k for k, v in d.items()}
+
 
 def is_minikey(text):
     # Minikeys are typically 22 or 30 characters, but this routine
@@ -211,6 +226,7 @@ def is_minikey(text):
     return (len(text) >= 20 and text[0] == 'S'
             and all(ord(c) in __b58chars for c in text)
             and sha256(text + '?')[0] == 0x00)
+
 
 def minikey_to_private_key(text):
     return sha256(text)
@@ -225,6 +241,7 @@ def get_pubkeys_from_secret(secret):
     # public key
     pubkey = compress(privtopub(secret))
     return pubkey, True
+
 
 def xprv_header(xtype):
     return bfh("%08x" % XPRV_HEADERS[xtype])

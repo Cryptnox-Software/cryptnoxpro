@@ -1,10 +1,10 @@
 from .base import BaseCoin
-from ..transaction import SIGHASH_ALL, SIGHASH_FORKID
-#from ..explorers import btg_explorer
 from ..main import b58check_to_bin
-from ..py3specials import bin_to_b58check
+from ..specials import bin_to_b58check
+from ..transaction import SIGHASH_ALL, SIGHASH_FORKID
 
 FORKID_BTG = 79
+
 
 class BitcoinGold(BaseCoin):
     coin_symbol = "btg"
@@ -14,7 +14,7 @@ class BitcoinGold(BaseCoin):
     script_magicbyte = 23
     wif_prefix = 0x80
     hd_path = 0
-    #explorer = btg_explorer
+    # explorer = btg_explorer
     hashcode = SIGHASH_ALL | SIGHASH_FORKID | FORKID_BTG << 8
     segwit_hrp = "bc"
     testnet_overrides = {

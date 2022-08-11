@@ -12,13 +12,10 @@ except ImportError:
 
 
 def _add_get_sub_parser(sub_parser):
-    get_parser = sub_parser.add_parser("get", help="Get information from "
-                                                   "the network and "
-                                                   "display it in JSON "
-                                                   "format.")
+    get_parser = sub_parser.add_parser("get", help="Get information from the network and display "
+                                                   "it in JSON format.")
     get_subparsers = get_parser.add_subparsers(dest="get", required=True,
-                                               description="Type of object "
-                                                           "to get")
+                                               description="Type of object to get")
     get_block = get_subparsers.add_parser("block")
     get_block.add_argument("block", type=str, action="store",
                            help="The number or ID of the block to retrieve")
@@ -27,42 +24,32 @@ def _add_get_sub_parser(sub_parser):
                          help="The name of the account to retrieve")
     get_code = get_subparsers.add_parser("code")
     get_code.add_argument("account", type=str, action="store",
-                          help="The name of the account whose code "
-                               "should be retrieved")
+                          help="The name of the account whose code should be retrieved")
 
     get_accs = get_subparsers.add_parser("accounts")
     get_accs.add_argument("public_key", type=str, action="store",
                           help="The public key to retrieve accounts for")
 
     get_currency = get_subparsers.add_parser("currency")
-    get_curr_subparsers = get_currency.add_subparsers(dest="currency",
-                                                      required=True,
-                                                      help="Type of "
-                                                           "currency "
-                                                           "information to "
-                                                           "get")
+    get_curr_subparsers = get_currency.add_subparsers(dest="currency", required=True,
+                                                      help="Type of currency information to get")
     get_currency_balance = get_curr_subparsers.add_parser("balance")
     get_currency_balance.add_argument("contract", type=str, action="store",
-                                      help="The contract that operates the "
-                                           "currency")
+                                      help="The contract that operates the currency")
     get_currency_balance.add_argument("account", type=str, action="store",
                                       help="The account to query balances")
     get_currency_balance.add_argument("symbol", type=str, action="store",
                                       nargs="?", default="EOS",
-                                      help="The symbol for the currency "
-                                           "if the contract operates "
+                                      help="The symbol for the currency if the contract operates "
                                            "multiple currencies.")
 
     get_currency_stats = get_curr_subparsers.add_parser("stats")
     get_currency_stats.add_argument("contract", type=str, action="store",
-                                    help="The contract that operates the "
-                                         "currency")
+                                    help="The contract that operates the currency")
     get_currency_stats.add_argument("symbol", type=str, action="store",
                                     nargs="?", default="EOS",
-                                    help="The symbol for the currency if "
-                                         "the contract operates multiple "
-                                         "currencies"
-                                    )
+                                    help="The symbol for the currency if the contract operates "
+                                         "multiple currencies")
 
     get_subparsers.add_parser("info")
 
@@ -74,25 +61,23 @@ def _add_get_sub_parser(sub_parser):
 
     get_servants = get_subparsers.add_parser("servants")
     get_servants.add_argument("account", type=str, action="store",
-                              help="Reference account to return accounts created by this "
-                                   "account")
+                              help="Reference account to return accounts created by this account")
 
 
 def _add_push_sub_parser(sub_parser):
-    push_parser = sub_parser.add_parser("push", help="Push action or transaction to the "
-                                                     "selected network")
+    push_parser = sub_parser.add_parser("push", help="Push action or transaction to the selected "
+                                                     "network")
     push_subparsers = push_parser.add_subparsers(dest="push", required=True,
                                                  description="Action to push")
-    push_action = push_subparsers.add_parser("action", help="Execute an action on the "
-                                                            "contract.")
+    push_action = push_subparsers.add_parser("action", help="Execute an action on the contract.")
     push_action.add_argument("contract", type=str, action="store",
                              help="Target contract of the action")
     push_action.add_argument("action_name", type=str, action="store",
                              help="The action name to execute on the contract")
     push_action.add_argument("data", type=str, action="store", nargs="+",
                              help="JSON string of the arguments to the contract")
-    push_transaction = push_subparsers.add_parser("transaction", help="Push a transaction to "
-                                                                      "the network.")
+    push_transaction = push_subparsers.add_parser("transaction",
+                                                  help="Push a transaction to the network.")
     push_transaction.add_argument("transaction", type=str, action="store", nargs="+",
                                   help="Transaction to push")
 
@@ -123,8 +108,8 @@ def options(subparsers, pin_option: bool):
 
     action_sub_parser = sub_parser.add_subparsers(dest="action", required=True)
 
-    _add_transfer_sub_parser(action_sub_parser, "send", False, "Simple command to send EOSIO "
-                                                               "system token")
+    _add_transfer_sub_parser(action_sub_parser, "send", False,
+                             "Simple command to send EOSIO system token")
     _add_transfer_sub_parser(action_sub_parser, "transfer", True, "Transfer funds between accounts")
     _add_get_sub_parser(action_sub_parser)
     _add_push_sub_parser(action_sub_parser)
