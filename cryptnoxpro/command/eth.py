@@ -44,7 +44,7 @@ class ApiKeyException(Exception):
 def _abi(config) -> List[Any]:
     try:
         return contract.abi(int(config))
-    except TypeError:
+    except ValueError:
         return json.loads(config)
 
 
@@ -118,8 +118,7 @@ class Event:
 
     def logs(self):
         try:
-            config_contract = get_configuration(self.card)[
-                "hidden"]["eth"]["contract"][self.data.alias]
+            config_contract = get_configuration(self.card)["hidden"]["eth"]["contract"][self.data.alias]
         except KeyError:
             print("There are no contracts with this name")
             return 1
@@ -262,8 +261,11 @@ class Contract(Command):
         try:
             abi_to_config = json.loads(abi)
         except json.decoder.JSONDecodeError as error:
-            print(f"Error in json: {error}")
-            return -1
+            try:
+                abi_to_config = int(abi)
+            except ValueError:
+                print(f"Error in json: {error}")
+                return -1
 
         try:
             abi = _abi(abi)
@@ -343,7 +345,7 @@ class Contract(Command):
         config = get_configuration(card)
         try:
             config = config["hidden"]["eth"]["contract"][self.data.alias]
-        except KeyError as error:
+        except KeyError:
             print(f'Contract with name {self.data.alias} not found.')
             return -1
 
@@ -369,9 +371,7 @@ class Contract(Command):
             return 1
 
         if function.abi["stateMutability"] in ["nonpayable", "payable"]:
-            print(
-                "For this function you should use Transact as it changes the "
-                "state of the network.")
+            print("For this function you should use Transact as it changes the state of the network.")
             return 4
 
         try:
@@ -392,7 +392,7 @@ class Contract(Command):
 
         try:
             contract_config = config["hidden"]["eth"]["contract"][self.data.alias]
-        except KeyError as error:
+        except KeyError:
             print(f'Contract "{self.data.alias}" not found.')
             return 2
 
@@ -494,14 +494,12 @@ class Contract(Command):
             ["MAX TOTAL:", f"{gas + value}"]
         ]
 
-        floating_points = max(
-            cryptos.wallet_utils.number_of_significant_digits(
-                (gas + value)), 8)
+        floating_points = max(cryptos.wallet_utils.number_of_significant_digits((gas + value)), 8)
 
         print("\n\n--- Transaction Ready --- \n")
-        print(tabulate(tabulate_table, tablefmt='plain',
-                       floatfmt=f".{floating_points}f"), "\n")
+        print(tabulate(tabulate_table, tablefmt='plain', floatfmt=f".{floating_points}f"), "\n")
         conf = input("Confirm ? [y/N] > ")
+
         return conf.lower() == "y"
 
 
@@ -632,4 +630,3 @@ class Eth(Command):
         contract.transfer(card, config["endpoint"], config["network"], config["api_key"],
                           self.data.contract, self.data.address, self.data.amount, self.data.price,
                           self.data.limit, derivation)
-

@@ -16,24 +16,24 @@ def _add_get_sub_parser(sub_parser):
                                                    "it in JSON format.")
     get_subparsers = get_parser.add_subparsers(dest="get", required=True,
                                                description="Type of object to get")
-    get_block = get_subparsers.add_parser("block")
+    get_block = get_subparsers.add_parser("block", help="Information about a block")
     get_block.add_argument("block", type=str, action="store",
                            help="The number or ID of the block to retrieve")
-    get_acc = get_subparsers.add_parser("account")
+    get_acc = get_subparsers.add_parser("account", help="Information about the account")
     get_acc.add_argument("account", type=str, action="store",
                          help="The name of the account to retrieve")
-    get_code = get_subparsers.add_parser("code")
+    get_code = get_subparsers.add_parser("code", help="Information about code")
     get_code.add_argument("account", type=str, action="store",
                           help="The name of the account whose code should be retrieved")
 
-    get_accs = get_subparsers.add_parser("accounts")
+    get_accs = get_subparsers.add_parser("accounts", help="Information about the account")
     get_accs.add_argument("public_key", type=str, action="store",
                           help="The public key to retrieve accounts for")
 
-    get_currency = get_subparsers.add_parser("currency")
+    get_currency = get_subparsers.add_parser("currency", help="Information to get about currency")
     get_curr_subparsers = get_currency.add_subparsers(dest="currency", required=True,
                                                       help="Type of currency information to get")
-    get_currency_balance = get_curr_subparsers.add_parser("balance")
+    get_currency_balance = get_curr_subparsers.add_parser("balance", help="Information about balance")
     get_currency_balance.add_argument("contract", type=str, action="store",
                                       help="The contract that operates the currency")
     get_currency_balance.add_argument("account", type=str, action="store",
@@ -43,7 +43,7 @@ def _add_get_sub_parser(sub_parser):
                                       help="The symbol for the currency if the contract operates "
                                            "multiple currencies.")
 
-    get_currency_stats = get_curr_subparsers.add_parser("stats")
+    get_currency_stats = get_curr_subparsers.add_parser("stats", help="Statistics")
     get_currency_stats.add_argument("contract", type=str, action="store",
                                     help="The contract that operates the currency")
     get_currency_stats.add_argument("symbol", type=str, action="store",
@@ -51,15 +51,15 @@ def _add_get_sub_parser(sub_parser):
                                     help="The symbol for the currency if the contract operates "
                                          "multiple currencies")
 
-    get_subparsers.add_parser("info")
+    get_subparsers.add_parser("info", help="Information about the chain")
 
-    get_subparsers.add_parser("pubkey")
+    get_subparsers.add_parser("pubkey", help="Information about public key")
 
-    get_transaction = get_subparsers.add_parser("transaction")
+    get_transaction = get_subparsers.add_parser("transaction", help="Information about a transaction")
     get_transaction.add_argument("txid", type=str, action="store",
                                  help="ID of the transaction to retrieve")
 
-    get_servants = get_subparsers.add_parser("servants")
+    get_servants = get_subparsers.add_parser("servants", help="Information about servants")
     get_servants.add_argument("account", type=str, action="store",
                               help="Reference account to return accounts created by this account")
 

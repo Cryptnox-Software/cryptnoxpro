@@ -10,6 +10,19 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 `Unreleased <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.5.0...HEAD>`_
 --------------------------------------------------------------------------------------
 
+`2.6.0 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.5.0...v2.6.0>`_ - 2022-09-30
+------------------------------------------------------------------------------------------------
+
+Added
+^^^^^
+
+- ERC1155 contract ABI to system for selection for use
+
+Fixed
+^^^^^
+
+- `eosio` command `get` subcommand help not shown
+
 `2.5.0 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.4.0...v2.5.0>`_ - 2022-08-11
 ------------------------------------------------------------------------------------------------
 

@@ -37,7 +37,13 @@ class Initialize:
 
         print("Select type of token to initialize the card with:")
         try:
-            token_type = ui.option_input({"nft": "NFT (ERC721)", "token": "Token (ERC20)"}, "Token Type")
+            token_type = ui.option_input(
+                {
+                    "nft": "NFT (ERC721)",
+                    "token": "Token (ERC20)",
+                    "multi": "Multi token (ERC1155)"
+                },
+                "Token Type")
         except ExitException as error:
             print(error)
             return -1
@@ -54,6 +60,12 @@ class Initialize:
                 slots = Initialize._token_slots()
             except ValueError as error:
                 print(f"Error in getting input for Token: {error}")
+                return -1
+        elif token_type == "multi":
+            try:
+                slots = Initialize._multi_token_slots()
+            except ValueError as error:
+                print(f"Error in getting input for NFT: {error}")
                 return -1
         else:
             return -1
@@ -220,3 +232,25 @@ class Initialize:
             raise ValueError(f"Error in retrieving ABI url response: {data.get('message')}")
 
         return data_request.text
+
+    @staticmethod
+    def _multi_token_slots():
+        print("-------------------------------------------------")
+        print("\n\nMulti token data")
+        print("-------------------------------------------------")
+        endpoint = ui.input_with_exit("Endpoint URL: ").lower()
+        chain_id = ui.input_type("Chain ID: ", type_of_input=int)
+        contract_address = ui.input_with_exit("Contract address: ")
+        token_id = ui.input_with_exit("NFT ID: ")
+        return [
+            json.dumps({
+                "erc": 1155,
+                "endpoint": endpoint,
+                "chain_id": chain_id,
+                "contract_address": contract_address,
+                "token_id": token_id,
+            }),
+            "",
+            Initialize._abi(),
+            ui.input_with_exit("Metadata: ")
+        ]

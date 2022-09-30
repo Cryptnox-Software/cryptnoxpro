@@ -56,6 +56,8 @@ class Info:
                 abi = f.read()
         else:
             abi = slots[2].decode("UTF8")
+        endpoint = slot0['endpoint']
+
         print("----------------------------------------------")
         seed_source = card.seed_source
         print(_SEED_SOURCE_TRANSLATION[seed_source])
@@ -72,7 +74,10 @@ class Info:
         print("----------------------------------------------")
 
         if "erc" not in slot0:
-            Info._owner(slot0['endpoint'], slot0['contract_address'], abi, address, slot0['nft_id'])
+            Info._owner(endpoint, slot0['contract_address'], abi, address, slot0['nft_id'])
+            print("----------------------------------------------\n\n")
+        elif slot0['erc'] == 1155:
+            Info._owner(endpoint, slot0['contract_address'], abi, address, slot0['token_id'])
             print("----------------------------------------------\n\n")
 
         if seed_source == cryptnoxpy.SeedSource.DUAL:
@@ -115,7 +120,7 @@ class Info:
             print("----------------------------------------------")
 
         print("\n\n")
-        Info._balance(slot0['endpoint'], address)
+        Info._balance(endpoint, address)
         print("----------------------------------------------")
         print(f"Endpoint: {slot0['endpoint']}")
         print("----------------------------------------------")
@@ -124,10 +129,15 @@ class Info:
         print(f"Contract address: {slot0['contract_address']}")
         print("----------------------------------------------")
 
-        if "erc" in slot0:
-            Info._token_balance(slot0['endpoint'], slot0['contract_address'], abi, address)
-        else:
-            print(f"NFT ID: {slot0['nft_id']}")
+        try:
+            erc = slot0['erc']
+        except KeyError:
+            erc = 721
+
+        if erc == 20:
+            Info._token_balance(endpoint, slot0['contract_address'], abi, address)
+        elif erc in (721, 1155):
+            print(f"Token ID: {slot0['nft_id' if erc == 721 else 'token_id']}")
             print("----------------------------------------------")
             metadata = slots[3].decode("UTF8").replace("\n", "")
             print(f"metadata: {metadata}")
@@ -186,7 +196,7 @@ class Info:
             print("OK")
 
     @staticmethod
-    def _owner(endpoint: str, contract_address: ChecksumAddress, abi: str, account: str, nft_id: int) -> None:
+    def _owner(endpoint: str, contract_address: ChecksumAddress, abi: str, account: str, token_id: int) -> None:
         print(f"Checking owner on contract: {contract_address}...")
         w3 = Web3(Web3.HTTPProvider(endpoint))
         try:
@@ -197,10 +207,10 @@ class Info:
 
         function = contract.get_function_by_name("balanceOf")
         try:
-            if function(account, int(nft_id)).call() == 1:
+            if function(account, int(token_id)).call() == 1:
                 print("OK")
             else:
-                print(f"FAILED\nThe NFT doesn't belong to address: {account}")
+                print(f"FAILED\nThe Token doesn't belong to address: {account}")
         except Exception:
             print("FAILED!\nIssue with checking ownership")
 
@@ -217,7 +227,7 @@ class Info:
 
         try:
             name = contract.get_function_by_name("name")().call()
-            balance = contract.get_function_by_name("balanceOf")(account).call()
+            balance = contract.get_function_by_name("balanceOf")(account, 1).call()
             symbol = contract.get_function_by_name("symbol")().call()
         except Exception as error:
             print(f"FAILED!\nIssue with checking ownership: {error}")
