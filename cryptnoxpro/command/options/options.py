@@ -180,7 +180,8 @@ def _user_key_options(subparsers, _: bool):
     def _add_key_type_options(sub_parser):
         types = []
 
-        for name in user_keys.get().keys():
+        names = user_keys.get().keys()
+        for name in names:
             types.append(name)
 
         if types:

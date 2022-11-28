@@ -3,7 +3,10 @@ Module for handling user authentication using third party solutions signature.
 """
 import importlib
 from pathlib import Path
-from typing import Dict
+from typing import (
+    Dict,
+    Type
+)
 
 import cryptnoxpy
 
@@ -26,31 +29,47 @@ def add(name: str, card: cryptnoxpy.Card, description: str, puk: str) -> bool:
     :return: Whether the key was added
     :rtype: bool
     """
-    for user_key_cls in user_key_base.UserKey.__subclasses__():
-        if user_key_cls.name != name:
-            continue
 
-        try:
-            user_key = user_key_cls("cryptnox_card" + str(card.serial_number))
-        except user_key_base.NotSupportedException as error:
-            print(error)
-            return False
+    try:
+        user_key_cls = get_user_key_class(name)
+    except ModuleNotFoundError:
+        return False
 
-        if card.user_key_enabled(user_key.slot_index):
-            print("Key already exist. First delete the existing one.")
-            return False
-        description = description or user_key.description
-        try:
-            public_key = user_key.public_key
-        except user_key_base.UserKeyException as error:
-            print(error)
-            return False
+    try:
+        user_key = user_key_cls("cryptnox_card" + str(card.serial_number))
+    except user_key_base.NotSupportedException as error:
+        print(error)
 
-        card.user_key_add(user_key.slot_index, description, public_key, puk)
+        return False
 
-        return True
+    if user_key_cls.enabled(card):
+        print("Key already exist. First delete the existing one.")
 
-    return False
+        return False
+
+    description = description or user_key.description
+    try:
+        public_key = user_key.public_key
+    except user_key_base.UserKeyException as error:
+        print(error)
+
+        return False
+
+    card.user_key_add(user_key.slot_index, description, public_key, puk)
+    print('Checking newly added key')
+    nonce = card.user_key_challenge_response_nonce()
+    try:
+        signature = user_key.sign(nonce)
+    except user_key_base.UserKeyException as error:
+        card.user_key_delete(user_key.slot_index, puk)
+        print('User canceled add key')
+
+        return False
+
+    card.user_key_challenge_response_open(user_key.slot_index, signature)
+    card.custom_bits[user_key_cls.custom_bit] = 1
+
+    return True
 
 
 def authenticate(card: cryptnoxpy.Card, message: bytes = b"") -> bool:
@@ -77,7 +96,7 @@ def authenticate(card: cryptnoxpy.Card, message: bytes = b"") -> bool:
         except user_key_base.NotSupportedException:
             continue
 
-        if not card.user_key_enabled(user_key.slot_index):
+        if not user_key_cls.enabled(card):
             continue
 
         try:
@@ -106,32 +125,32 @@ def delete(name: str, card: cryptnoxpy.Card, puk: str) -> bool:
     :param cryptnoxpy.Card card: Card to use
     :param str puk: PUK code of card
     """
-    for user_key_cls in user_key_base.UserKey.__subclasses__():
-        if user_key_cls.name != name:
-            continue
+    try:
+        user_key_cls = get_user_key_class(name)
+    except ModuleNotFoundError:
+        return False
 
-        try:
-            user_key = user_key_cls("cryptnox_card" + str(card.serial_number))
-        except user_key_base.NotSupportedException as error:
-            print(error)
-            return False
+    try:
+        user_key = user_key_cls("cryptnox_card" + str(card.serial_number))
+    except user_key_base.NotSupportedException as error:
+        print(error)
+        return False
 
-        if not card.user_key_enabled(user_key.slot_index):
-            print("Key not found exist.")
-            break
+    if not user_key_cls.enabled(card):
+        print("Key not found.")
+        return False
 
-        try:
-            user_key.delete()
-        except user_key_base.UserKeyException:
-            pass
+    try:
+        user_key.delete()
+    except user_key_base.UserKeyException:
+        pass
 
-        card.user_key_delete(user_key.slot_index, puk)
-        return True
+    card.user_key_delete(user_key.slot_index, puk)
 
-    return False
+    return True
 
 
-def get() -> Dict[str, cryptnoxpy.SlotIndex]:
+def get(card: cryptnoxpy.Card = None) -> Dict[str, cryptnoxpy.SlotIndex]:
     """
     Get all user key module names and the slot index they are connected to on the card
 
@@ -150,6 +169,17 @@ def get() -> Dict[str, cryptnoxpy.SlotIndex]:
             print(error)
             continue
 
+        if card and not user_key_cls.enabled(card):
+            continue
+
         user_keys[user_key.name] = user_key.slot_index
 
     return user_keys
+
+
+def get_user_key_class(name: str) -> Type[user_key_base.UserKey]:
+    for user_key_cls in user_key_base.UserKey.__subclasses__():
+        if user_key_cls.name == name:
+            return user_key_cls
+
+    raise ModuleNotFoundError

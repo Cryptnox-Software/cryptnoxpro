@@ -7,8 +7,17 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_\ ,
 and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
-`Unreleased <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.5.0...HEAD>`_
+`Unreleased <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.7.0...HEAD>`_
 --------------------------------------------------------------------------------------
+
+`2.7.0 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.6.0...v2.7.0>`_ - 2022-11-28
+------------------------------------------------------------------------------------------------
+
+Added
+^^^^^
+
+- Card can be opened with AWS KMS key instead of PIN code
+- Option to backup to cloud when seed is uploaded or recovered
 
 `2.6.0 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.5.0...v2.6.0>`_ - 2022-09-30
 ------------------------------------------------------------------------------------------------

@@ -65,8 +65,8 @@ class Seed(Command):
         return result
 
     @staticmethod
-    def _backup(card: cryptnoxpy.Card) -> int:
-        pin_code = Seed._get_pin_code(card)
+    def _backup(card: cryptnoxpy.Card, pin_code: str = None, seed: bytes = None) -> int:
+        pin_code = pin_code or Seed._get_pin_code(card)
 
         credentials_file = Path(get_download_folder()).joinpath('rootkey.csv')
         access_key_id, secret_access_key = Seed._credentials(credentials_file)
@@ -96,7 +96,7 @@ class Seed(Command):
                 break
             print("Name of seed can only contain small and large letters, numbers and characters :/_-")
 
-        seed = card.generate_random_number(32)
+        seed = seed or card.generate_random_number(32)
         print("Backing up seed...")
         try:
             service.backup(name, seed)
@@ -130,7 +130,7 @@ class Seed(Command):
         backup_file.write_text(tabulate(data))
         print(f"\nBackup data also saved to: {backup_file}")
 
-        Seed._remove_credentials(credentials_file)
+        Seed._remove_credentials(credentials_file, service)
 
         return 0
 
@@ -293,7 +293,17 @@ class Seed(Command):
         print("\nEnter the mnemonic root to recover (12 or 24 words):")
         mnemonic = ui.input_with_exit("> ")
         try:
-            Seed._load_mnemonic(card, mnemonic, pin_code)
+            seed = cryptos.bip39_mnemonic_to_seed(mnemonic)
+        except Exception as error:
+            print(error)
+            return -1
+
+        do_backup = ui.confirm('Do you wish to backup your seed to AWS KMS?')
+        try:
+            if do_backup:
+                Seed._backup(card, pin_code, seed)
+            else:
+                Seed._load_mnemonic(card, mnemonic, pin_code)
         except Exception as error:
             print(error)
             return -1
@@ -303,7 +313,7 @@ class Seed(Command):
         return 0
 
     @staticmethod
-    def _remove_credentials(credentials_file: Path) -> None:
+    def _remove_credentials(credentials_file: Path, service: backup.AWS) -> None:
         try:
             credentials_file.unlink()
         except FileNotFoundError:
@@ -344,7 +354,7 @@ class Seed(Command):
         Seed._load_mnemonic(card, mnemonic, pin_code)
         print("\nMnemonic loaded from backup service.")
 
-        Seed._remove_credentials(credentials_file)
+        Seed._remove_credentials(credentials_file, service)
 
         return 0
 
@@ -353,7 +363,17 @@ class Seed(Command):
         pin_code = Seed._get_pin_code(card)
         seed = card.generate_random_number(32)
         mnemonic = cryptos.entropy_to_words(seed)
-        Seed._load_mnemonic(card, mnemonic, pin_code)
+        do_backup = ui.confirm('Do you wish to backup your seed to AWS KMS?')
+
+        try:
+            if do_backup:
+                Seed._backup(card, pin_code, seed)
+            else:
+                Seed._load_mnemonic(card, mnemonic, pin_code)
+        except Exception as error:
+            print(error)
+            return -1
+
         print("\nMnemonic root :")
         print(mnemonic)
 

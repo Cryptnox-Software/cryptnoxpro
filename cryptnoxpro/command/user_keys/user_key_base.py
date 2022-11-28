@@ -94,6 +94,21 @@ class UserKey(metaclass=abc.ABCMeta):
         :rtype: cryptnoxpy.SlotIndex
         """
 
+    @property
+    def custom_bit(self) -> int:
+        """
+        :return: Custom bit to use for checking if method is enabled, -1 for not used
+        :rtype: int
+        """
+
+        return -1
+
+    def added(self, card):
+        if self.custom_bit == -1:
+            return
+
+        card.custom_bits[self.custom_bit] = 1
+
     @classmethod
     def __subclasshook__(cls, c):
         if cls is UserKey:
@@ -103,3 +118,14 @@ class UserKey(metaclass=abc.ABCMeta):
                 return True
 
         return NotImplemented
+
+    @classmethod
+    def enabled(cls, card: cryptnoxpy.Card) -> bool:
+        return card.user_key_enabled(cls.slot_index) and cls._custom_bit_enabled(card)
+
+    @classmethod
+    def _custom_bit_enabled(cls, card: cryptnoxpy.Card) -> bool:
+        try:
+            return cls.custom_bit == -1 or card.custom_bits[cls.custom_bit]
+        except IndexError:
+            return True

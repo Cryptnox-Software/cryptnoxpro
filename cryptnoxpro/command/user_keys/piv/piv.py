@@ -19,6 +19,7 @@ class Piv(user_key_base.UserKey):
     name = "piv"
     description = "PIV applet"
     slot_index = cryptnoxpy.SlotIndex.EC256R1
+    custom_bit = 0
 
     def delete(self):
         pass

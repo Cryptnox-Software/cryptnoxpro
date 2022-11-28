@@ -76,7 +76,7 @@ class UserKey(Command):
         return result
 
     def _list(self, card: cryptnoxpy.Card) -> int:
-        slots = user_keys.get()
+        slots = user_keys.get(card)
         data = [[name] for name, slot in slots.items() if card.user_key_enabled(slot)]
 
         if not data:
@@ -86,16 +86,14 @@ class UserKey(Command):
         self._check(card)
 
         large_screen = shutil.get_terminal_size((80, 20)).columns > 200
-        key_length = 128 if large_screen else 32
+        key_length = 130 if large_screen else 32
         headers = ["Type", "Description", "Public Key"]
 
         for row in data:
             slot = slots[row[0]]
-            if card.user_key_enabled(slot):
-                description, public_key = card.user_key_info(slot)
-                row.append(description)
-                row.append("\n".join([public_key[i:i + key_length]
-                                      for i in range(0, len(public_key), key_length)]))
+            description, public_key = card.user_key_info(slot)
+            row.append(description)
+            row.append("\n".join([public_key[i:i + key_length] for i in range(0, len(public_key), key_length)]))
 
         print(tabulate(data, headers=headers))
 
