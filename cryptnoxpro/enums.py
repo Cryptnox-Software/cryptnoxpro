@@ -22,6 +22,7 @@ class Command(Enum):
     INFO = "info"
     INITIALIZE = "init"
     CARD = "list"
+    SERVER = "server"
     RESET = "reset"
     SEED = "seed"
     UNLOCK_PIN = "unlock_pin"

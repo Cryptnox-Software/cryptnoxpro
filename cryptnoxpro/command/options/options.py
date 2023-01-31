@@ -41,6 +41,8 @@ def add(parser, interactive: bool = False):
     _seed_options(subparsers, interactive)
     _reset_options(subparsers, interactive)
 
+    _server_options(subparsers, interactive)
+
     if interactive:
         use_sub_parser = subparsers.add_parser("use", help="Change card to be used by default")
         use_sub_parser.add_argument("serial_index", type=int, nargs="?",
@@ -147,6 +149,14 @@ def _initialize_options(subparsers, _: bool):
 def _list_options(subparsers, _: bool):
     subparsers.add_parser(enums.Command.CARD.value, help="List all cards")
 
+
+def _server_options(subparsers, _: bool):
+    sub_parser = subparsers.add_parser(enums.Command.SERVER.value,
+                                       help="Create a server or establish connection to server")
+    sub_parser.add_argument('--port', nargs='?', type=int, default=5050,
+                            help='Define port to server port, default 5050')
+    sub_parser.add_argument('--host', nargs='?', type=str, default='0.0.0.0',
+                            help='Define port to server host, default 0.0.0.0')
 
 def _reset_options(subparsers, _: bool):
     subparsers.add_parser(enums.Command.RESET.value, help="Reset card")

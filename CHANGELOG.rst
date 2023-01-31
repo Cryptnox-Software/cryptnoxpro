@@ -10,6 +10,14 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 `Unreleased <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.7.0...HEAD>`_
 --------------------------------------------------------------------------------------
 
+`2.8.0 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.7.0...v2.8.0>`_ - 2022-01-31
+------------------------------------------------------------------------------------------------
+
+Added
+^^^^^
+
+- Option to start a server and access the card remotely
+
 `2.7.0 <https://github.com/Cryptnox-Software/cryptnoxpro/compare/v2.6.0...v2.7.0>`_ - 2022-11-28
 ------------------------------------------------------------------------------------------------
 

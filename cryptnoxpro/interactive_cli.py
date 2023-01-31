@@ -337,38 +337,40 @@ class InteractiveCli:
                     pass
                 UsageParser.throw_error = True
         else:
-            if args.command == "exit":
-                raise InteractiveCli.ExitException
-            if args.command == "use":
-                self._card_info = None
-                if args.serial_index is None:
-                    try:
-                        self._card_info = self._cards.select_card().info
-                    except (cryptnoxpy.CryptnoxException, ExitException, TimeoutException) as error:
-                        print(error)
-                        return
-                    else:
-                        print(f"Changing card to: {self._card_info['serial_number']}\n")
-                else:
-                    try:
-                        self._card_info = self._cards[args.serial_index].info
-                    except (cryptnoxpy.CryptnoxException, ExitException, TimeoutException) as error:
-                        print(error)
-                        return
-                    except KeyError:
-                        pass
-                    else:
-                        print(f"Changing card to: {self._card_info['serial_number']}\n")
-                if not self._card_info:
-                    print("Can't change card")
+            self._process(args, to_always_run)
 
-            elif args.command == "back" and self.subcommand:
-                self.subcommand.pop(-1)
-            elif args.command:
-                if self._card_info and args.command in to_always_run:
-                    if self._card_info["serial_number"] not in self._cards:
-                        self._card_info = None
-                self._run_command(args, to_always_run)
+    def _process(self, args, to_always_run: List = None) -> None:
+        to_always_run = [] or to_always_run
+        if args.command == "exit":
+            raise InteractiveCli.ExitException
+
+        if args.command == "use":
+            self._use(args.serial_index)
+
+        elif args.command == "back" and self.subcommand:
+            self.subcommand.pop(-1)
+        elif args.command:
+            if self._card_info and args.command in to_always_run:
+                if self._card_info["serial_number"] not in self._cards:
+                    self._card_info = None
+            self._run_command(args, to_always_run)
+
+    def _use(self, serial_index):
+        self._card_info = None
+
+        try:
+            if serial_index is None:
+                self._card_info = self._cards.select_card().info
+            else:
+                self._card_info = self._cards[serial_index].info
+        except (cryptnoxpy.CryptnoxException, ExitException, TimeoutException) as error:
+            print(error)
+            return
+
+        if self._card_info:
+            print(f"Changing card to: {self._card_info['serial_number']}\n")
+        else:
+            print("Can't change card")
 
     @property
     def _prompt(self) -> str:

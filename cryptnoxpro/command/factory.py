@@ -33,6 +33,7 @@ def command(data: Namespace, cards: Cards = None) -> Command:
     from .initialize import Initialize  # pylint: disable=unused-import
     from .seed import Seed  # pylint: disable=unused-import
     from .cards import Cards  # pylint: disable=unused-import
+    from .server import Server  # pylint: disable=unused-import
     from .reset import Reset  # pylint: disable=unused-import
     from .unlock_pin import UnlockPin  # pylint: disable=unused-import
     from .user_key import UserKey  # pylint: disable=unused-import
