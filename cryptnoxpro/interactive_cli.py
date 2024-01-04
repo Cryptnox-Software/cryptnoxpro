@@ -362,7 +362,7 @@ class InteractiveCli:
             if serial_index is None:
                 self._card_info = self._cards.select_card().info
             else:
-                self._card_info = self._cards[serial_index].info
+                self._card_info = self._cards[serial_index - 1].info
         except (cryptnoxpy.CryptnoxException, ExitException, TimeoutException) as error:
             print(error)
             return
