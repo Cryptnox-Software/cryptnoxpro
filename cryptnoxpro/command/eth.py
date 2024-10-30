@@ -586,7 +586,7 @@ class Eth(Command):
             nonce=endpoint.get_transaction_count(from_address, "pending"),
             gasPrice=price,
             gas=limit,
-            to=web3.Web3.toChecksumAddress(address),
+            to=web3.Web3.to_checksum_address(address),
             value=web3.Web3.toWei(amount, "ether"),
             data=b''
         )
@@ -604,7 +604,7 @@ class Eth(Command):
             ["BALANCE:", f"{web3.Web3.fromWei(balance, 'ether')}", "ETH", "ON", "ACCOUNT:",
              f"{wallet.checksum_address(public_key)}"],
             ["TRANSACTION:", f"{amount}", "ETH", "TO", "ACCOUNT:",
-             f"{web3.Web3.toChecksumAddress(address)}"],
+             f"{web3.Web3.to_checksum_address(address)}"],
             ["MAX GAS:", f"{gas}"],
             ["MAX TOTAL:", f"{gas + amount}"]
         ]

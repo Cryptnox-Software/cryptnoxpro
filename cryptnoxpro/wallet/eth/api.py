@@ -33,7 +33,7 @@ def address(public_key: str) -> str:
 
 
 def checksum_address(public_key: str) -> str:
-    return Web3.toChecksumAddress(address(public_key))
+    return Web3.to_checksum_address(address(public_key))
 
 
 class Api:
@@ -62,10 +62,10 @@ class Api:
         return self._web3.eth.contract(address=address, abi=abi)
 
     def get_transaction_count(self, address: str, blocks: str = None) -> int:
-        return self._web3.eth.get_transaction_count(Web3.toChecksumAddress(address), blocks)
+        return self._web3.eth.get_transaction_count(Web3.to_checksum_address(address), blocks)
 
     def get_balance(self, address: str) -> int:
-        return self._web3.eth.get_balance(Web3.toChecksumAddress(address))
+        return self._web3.eth.get_balance(Web3.to_checksum_address(address))
 
     @property
     def gas_price(self):
