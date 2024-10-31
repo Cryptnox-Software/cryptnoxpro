@@ -482,9 +482,9 @@ class Contract(Command):
 
     @staticmethod
     def _confirm(public_key, address, balance, value, price, limit):
-        gas_price = web3.Web3.fromWei(price, "ether")
+        gas_price = web3.Web3.from_wei(price, "ether")
         gas = Decimal(gas_price * limit)
-        balance = web3.Web3.fromWei(balance, "ether")
+        balance = web3.Web3.from_wei(balance, "ether")
         tabulate_table = [
             ["BALANCE:", f"{balance}", "ETH", "ON", "ACCOUNT:",
              f"{wallet.checksum_address(public_key)}"],
@@ -579,7 +579,7 @@ class Eth(Command):
         from_address = wallet.checksum_address(public_key)
         balance = endpoint.get_balance(from_address)
         max_spendable = balance - price * limit
-        if web3.Web3.toWei(amount, "ether") > max_spendable:
+        if web3.Web3.to_wei(amount, "ether") > max_spendable:
             raise ValueError({"message": "Not enough fund for the tx"})
 
         sanitized_transaction = dict(
@@ -587,7 +587,7 @@ class Eth(Command):
             gasPrice=price,
             gas=limit,
             to=web3.Web3.to_checksum_address(address),
-            value=web3.Web3.toWei(amount, "ether"),
+            value=web3.Web3.to_wei(amount, "ether"),
             data=b''
         )
         print("\nSigning with the Cryptnox")
@@ -599,9 +599,9 @@ class Eth(Command):
             print("Error in getting signature")
             return -1
 
-        gas = Decimal(web3.Web3.fromWei(price, "ether") * limit)
+        gas = Decimal(web3.Web3.from_wei(price, "ether") * limit)
         tabulate_table = [
-            ["BALANCE:", f"{web3.Web3.fromWei(balance, 'ether')}", "ETH", "ON", "ACCOUNT:",
+            ["BALANCE:", f"{web3.Web3.from_wei(balance, 'ether')}", "ETH", "ON", "ACCOUNT:",
              f"{wallet.checksum_address(public_key)}"],
             ["TRANSACTION:", f"{amount}", "ETH", "TO", "ACCOUNT:",
              f"{web3.Web3.to_checksum_address(address)}"],

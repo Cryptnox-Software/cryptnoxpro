@@ -38,8 +38,8 @@ def gas(gas_price: int, set_price: int, set_limit: int,
     if set_price:
         price = set_price
     else:
-        gwei_price = math.ceil(web3.Web3.fromWei(gas_price, "gwei"))
-        price = int(web3.Web3.toWei(gwei_price, "gwei"))
+        gwei_price = math.ceil(web3.Web3.from_wei(gas_price, "gwei"))
+        price = int(web3.Web3.to_wei(gwei_price, "gwei"))
         print(f"\nUsing gas price (override with -p): {gwei_price} Gwei")
 
     if set_limit:
@@ -153,9 +153,9 @@ def transfer(card, endpoint, network, api_key, contract_address: str, to: str, a
 def _confirm_token_sending(contract: str, address: str, to: str,
                            token_balance: float, symbol: str, value: Union[Decimal, int],
                            balance: int, price: int, limit: float):
-    gas_price = web3.Web3.fromWei(price, "ether")
+    gas_price = web3.Web3.from_wei(price, "ether")
     total_gas = Decimal(gas_price * limit)
-    balance = web3.Web3.fromWei(balance, "ether")
+    balance = web3.Web3.from_wei(balance, "ether")
     tabulate_table = [
         ["", "", "", ],
         ["BALANCE:", token_balance, symbol, "CONTRACT: ", contract],

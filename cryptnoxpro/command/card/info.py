@@ -158,7 +158,7 @@ class Info:
         }
 
         try:
-            tabulate_data["balance"] = f"{web3.Web3.fromWei(api.get_balance(address), 'ether')} ETH"
+            tabulate_data["balance"] = f"{web3.Web3.from_wei(api.get_balance(address), 'ether')} ETH"
         except Exception as error:
             print(f"There's an issue in retrieving ETH data: {error}")
             tabulate_data["balance"] = "Network issue"
