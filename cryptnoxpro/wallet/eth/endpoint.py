@@ -101,7 +101,7 @@ class CryptnoxEndpoint(Endpoint):
     """
     name = "cryptnox"
 
-    _NETWORKS = [enums.EthNetwork.MAINNET, enums.EthNetwork.ROPSTEN, enums.EthNetwork.RINKEBY]
+    _NETWORKS = [enums.EthNetwork.MAINNET, enums.EthNetwork.ROPSTEN, enums.EthNetwork.RINKEBY, enums.EthNetwork.SEPOLIA]
 
     available_networks = [x.name for x in _NETWORKS]
 

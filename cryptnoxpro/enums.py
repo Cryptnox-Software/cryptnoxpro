@@ -9,6 +9,8 @@ class EthNetwork(Enum):
     KOVAN = 42
     GOERLI = 5
     RINKEBY = 4
+    SEPOLIA = 11155111
+    # AMOY = 80002
 
 class Command(Enum):
     BTC = "btc"
