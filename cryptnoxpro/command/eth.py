@@ -46,6 +46,8 @@ def _abi(config) -> List[Any]:
         return contract.abi(int(config))
     except ValueError:
         return json.loads(config)
+    except TypeError:
+        return config
 
 
 def _large_screen():
@@ -58,11 +60,10 @@ def _get_processed_json_argument(data: str) -> str:
         result = " ".join(result)
     result = result.strip("'")
     result = re.sub(r"(\w+):", r'"\1":', result)
-    result = re.sub(r"(:\s?)((?!false|true)\d*\.?\d*_?\s?[a-zA-Z\.]+\d*)([,\s\}])",
+    result = re.sub(r'(:\s?)(?!true|false|null)([a-zA-Z_]+[a-zA-Z0-9_]*)([,\s])',
                     r'\1"\2"\3', result)
-    result = re.sub(r'(:.?)(")([,\s])', r'\1\2"\3', result)
-    result = re.sub(r'(:\s?)([,\}\]])', r'\1""\2', result)
-
+    result = re.sub(r'(:\s?)(")("?[,\]])', r'\1\2\3', result)
+    result = re.sub(r'""+"', '""', result)
     return result
 
 
