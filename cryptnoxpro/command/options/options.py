@@ -3,7 +3,6 @@ from decimal import Decimal
 
 import argparse
 
-from . import eosio
 from . import eth
 from .common import (
     add_config_sub_parser,
@@ -23,7 +22,6 @@ def add(parser, interactive: bool = False):
 
     _btc_options(subparsers, interactive)
     eth.options(subparsers, interactive)
-    eosio.options(subparsers, interactive)
     _transfer(subparsers, interactive)
     _info_options(subparsers, interactive)
     _history_options(subparsers, interactive)

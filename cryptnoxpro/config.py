@@ -38,12 +38,6 @@ def get_default_configuration() -> Dict:
             "endpoint": "cryptnox",
             "network": "ropsten",
         },
-        "eosio": {
-            "coin_symbol": "EOS",
-            "derivation": "DERIVE",
-            "endpoint": "https://jungle3.cryptolions.io:443",
-            "key_type": "K1",
-        },
         "hidden": {
             "eth": {
                 "contract": {}

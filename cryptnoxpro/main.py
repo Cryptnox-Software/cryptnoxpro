@@ -78,11 +78,6 @@ def main() -> int:
     """
     parser = get_parser()
 
-    try:
-        if sys.argv[1] == "cleos":
-            sys.argv[1] = "eosio"
-    except LookupError:
-        pass
     args = parser.parse_args()
 
     try:

@@ -17,7 +17,6 @@ class Command(Enum):
     CHANGE_PIN = "change_pin"
     CHANGE_PUK = "change_puk"
     CONFIG = "config"
-    EOSIO = "eosio"
     ETH = "eth"
     HISTORY = "history"
     INFO = "info"

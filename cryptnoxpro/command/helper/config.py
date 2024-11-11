@@ -11,7 +11,6 @@ try:
     from wallet.btc import BlkHubApi, BtcValidator
     from wallet import eth
     from wallet.eth import EthValidator
-    from wallet.eos import EosioValidator
 except ImportError:
     from ...config import (
         get_configuration,
@@ -21,7 +20,6 @@ except ImportError:
     from ...wallet.btc import BlkHubApi, BtcValidator
     from ...wallet import eth
     from ...wallet.eth import EthValidator
-    from ...wallet.eos import EosioValidator
 
 
 def add_config_sub_parser(sub_parser, crypto_currency: str) -> None:

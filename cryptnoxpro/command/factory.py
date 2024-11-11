@@ -26,7 +26,6 @@ def command(data: Namespace, cards: Cards = None) -> Command:
     from .change_pin import ChangePin  # pylint: disable=unused-import
     from .change_puk import ChangePuk  # pylint: disable=unused-import
     from .config import Config  # pylint: disable=unused-import
-    from .eosio import Eosio  # pylint: disable=unused-import
     from .eth import Eth  # pylint: disable=unused-import
     from .history import History  # pylint: disable=unused-import
     from .info import Info  # pylint: disable=unused-import

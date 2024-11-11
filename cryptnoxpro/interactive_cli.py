@@ -301,11 +301,6 @@ class InteractiveCli:
         to_always_run = ["list"]
         command_to_execute = multiline_input(self._prompt)
         execute = command_to_execute.strip().split()
-        try:
-            if execute[0] == "cleos":
-                execute[0] = "eosio"
-        except LookupError:
-            pass
 
         for command in execute:
             if command in ["version", "help"]:
