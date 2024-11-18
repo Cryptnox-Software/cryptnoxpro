@@ -429,31 +429,31 @@ class Contract(Command):
                   "value.")
             return 4
 
-        try:
-            set_data = function(*self.data.arguments).buildTransaction()
-        except TypeError:
-            print("Invalid number of arguments")
-            return -3
-        except web3.exceptions.ContractLogicError as error:
-            print(f"Error occurred with execution: {error}")
-            return -4
-
         price, limit = contract.gas(endpoint.gas_price, self.data.price, self.data.limit,
                                     contract.LIMIT["contract"])
 
         path = b"" if derivation == cryptnoxpy.Derivation.CURRENT_KEY else wallet.Api.PATH
         public_key = card.get_public_key(derivation, path=path, compressed=False)
 
+        nonce = endpoint.get_transaction_count(wallet.checksum_address(public_key))
+
         balance = endpoint.get_balance(wallet.address(public_key))
         if balance - price * limit < 0:
             print("Not enough fund for the transaction")
             return -2
 
-        set_data.update({
-            "nonce": endpoint.get_transaction_count(wallet.checksum_address(public_key)),
-            "gasPrice": price,
-            "gas": limit
-        })
+        try:
+            set_data = function(*self.data.arguments).build_transaction({
+                "nonce": nonce,
+                "gasPrice": price,
+                "gas": limit
+            })
+        except TypeError:
+            print("Invalid number of arguments")
+            return -3
+        except web3.exceptions.ContractLogicError as error:
+            print(f"Error occurred with execution: {error}")
+            return -4
 
         print("\nSigning with the Cryptnox")
         digest = endpoint.transaction_hash(set_data)
