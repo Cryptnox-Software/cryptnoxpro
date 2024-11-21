@@ -174,29 +174,43 @@ class Event:
         min_offset = 0
         max_offset = MONTH_PERIOD_IN_BLOCKS
         offset = _BLOCK_OFFSET
-        current_block = event.web3.eth.block_number
-        event_filter = event.createFilter(fromBlock=current_block - offset,
-                                          toBlock=current_block)
+
+        current_block = event.w3.eth.block_number
+        event_signature = event.w3.keccak(
+            text=event.abi["name"] + "(" + ",".join([i["type"] for i in event.abi["inputs"]]) + ")"
+        )
+
+        decoded_logs = []
+
         while True:
+            filter_params = {
+                "fromBlock": hex(current_block - offset),
+                "toBlock": hex(current_block),
+                "topics": [event_signature],
+                "address": event.address,
+            }
+
             try:
-                entries = event_filter.get_all_entries()
+                logs = event.w3.eth.get_logs(filter_params)  # Stateless retrieval of logs
+                for log in logs:
+                    try:
+                        decoded_logs.append(event.process_log(log))
+                    except Exception as e:
+                        print(f"Error decoding log: {e}")
             except ValueError as error:
-                if error.args[0]["code"] != MORE_THAN_X_RESULTS:
+                if isinstance(error.args[0], dict) and error.args[0].get("code") != MORE_THAN_X_RESULTS:
                     raise
                 max_offset = offset = ((max_offset - min_offset) // 2) + min_offset
             else:
-                if len(entries) > 25 or offset >= MONTH_PERIOD_IN_BLOCKS:
+                if len(decoded_logs) > 25 or offset >= MONTH_PERIOD_IN_BLOCKS:
                     break
                 if max_offset == MONTH_PERIOD_IN_BLOCKS:
                     min_offset = offset
                     offset *= 2
                 else:
-                    min_offset = offset = ((max_offset - min_offset) // 2) + \
-                                          min_offset
-            event_filter = event.createFilter(fromBlock=current_block - offset,
-                                              toBlock=current_block)
+                    min_offset = offset = ((max_offset - min_offset) // 2) + min_offset
 
-        return list(map(dict, entries[-25:][::-1]))
+        return list(map(dict, decoded_logs[-25:][::-1]))
 
     @staticmethod
     def _logs_table(entries):
