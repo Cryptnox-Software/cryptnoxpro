@@ -219,7 +219,7 @@ class Event:
             entry = dict(entry)
             args = "\n".join(f"{name}: {value}" for name, value in
                              entry["args"].items())
-            transaction_hash = str(entry["transactionHash"].hex())
+            transaction_hash = '0x' + entry["transactionHash"].hex()
             if not _large_screen():
                 half_hash_length = int(len(transaction_hash) / 2)
                 transaction_hash = \
