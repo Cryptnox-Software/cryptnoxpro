@@ -167,7 +167,7 @@ class Event:
             print("No events have been found")
         self.config["hidden"]["eth"]["contract"][self.data.alias][self.data.event] = \
             endpoint.block_number
-        save_to_config(self.card.serial_number, self.config)
+        save_to_config(self.card, self.config)
 
     @staticmethod
     def _get_logs(event) -> List[Dict[str, Any]]:
