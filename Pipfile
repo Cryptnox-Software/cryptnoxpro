@@ -17,7 +17,7 @@ base58 = "*"
 boto3 = "*"
 ecdsa = "*"
 colander = "*"
-cryptnoxpy = {path = "C:\\Users\\Nitro\\Desktop\\workspace\\cryptnoxpy"}
+cryptnoxpy = ">=2.0.0"
 lazy-import = "*"
 pytz = "*"
 requests = "*"
