@@ -150,7 +150,7 @@ class Info:
     def _balance(endpoint, address):
         try:
             w3 = Web3(Web3.HTTPProvider(endpoint))
-            print(f"Balance: {Web3.fromWei(w3.eth.get_balance(address), 'ether')} ETH")
+            print(f"Balance: {Web3.from_wei(w3.eth.get_balance(address), 'ether')} ETH")
         except Exception as error:
             print(f"Error getting balance: {error}")
 

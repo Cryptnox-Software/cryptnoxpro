@@ -46,6 +46,8 @@ def _abi(config) -> List[Any]:
         return contract.abi(int(config))
     except ValueError:
         return json.loads(config)
+    except TypeError:
+        return config
 
 
 def _large_screen():
@@ -58,11 +60,10 @@ def _get_processed_json_argument(data: str) -> str:
         result = " ".join(result)
     result = result.strip("'")
     result = re.sub(r"(\w+):", r'"\1":', result)
-    result = re.sub(r"(:\s?)((?!false|true)\d*\.?\d*_?\s?[a-zA-Z\.]+\d*)([,\s\}])",
+    result = re.sub(r'(:\s?)(?!true|false|null)([a-zA-Z_]+[a-zA-Z0-9_]*)([,\s])',
                     r'\1"\2"\3', result)
-    result = re.sub(r'(:.?)(")([,\s])', r'\1\2"\3', result)
-    result = re.sub(r'(:\s?)([,\}\]])', r'\1""\2', result)
-
+    result = re.sub(r'(:\s?)(")("?[,\]])', r'\1\2\3', result)
+    result = re.sub(r'""+"', '""', result)
     return result
 
 
@@ -166,36 +167,50 @@ class Event:
             print("No events have been found")
         self.config["hidden"]["eth"]["contract"][self.data.alias][self.data.event] = \
             endpoint.block_number
-        save_to_config(self.card.serial_number, self.config)
+        save_to_config(self.card, self.config)
 
     @staticmethod
     def _get_logs(event) -> List[Dict[str, Any]]:
         min_offset = 0
         max_offset = MONTH_PERIOD_IN_BLOCKS
         offset = _BLOCK_OFFSET
-        current_block = event.web3.eth.block_number
-        event_filter = event.createFilter(fromBlock=current_block - offset,
-                                          toBlock=current_block)
+
+        current_block = event.w3.eth.block_number
+        event_signature = event.w3.keccak(
+            text=event.abi["name"] + "(" + ",".join([i["type"] for i in event.abi["inputs"]]) + ")"
+        )
+
+        decoded_logs = []
+
         while True:
+            filter_params = {
+                "fromBlock": hex(current_block - offset),
+                "toBlock": hex(current_block),
+                "topics": [event_signature],
+                "address": event.address,
+            }
+
             try:
-                entries = event_filter.get_all_entries()
+                logs = event.w3.eth.get_logs(filter_params)  # Stateless retrieval of logs
+                for log in logs:
+                    try:
+                        decoded_logs.append(event.process_log(log))
+                    except Exception as e:
+                        print(f"Error decoding log: {e}")
             except ValueError as error:
-                if error.args[0]["code"] != MORE_THAN_X_RESULTS:
+                if isinstance(error.args[0], dict) and error.args[0].get("code") != MORE_THAN_X_RESULTS:
                     raise
                 max_offset = offset = ((max_offset - min_offset) // 2) + min_offset
             else:
-                if len(entries) > 25 or offset >= MONTH_PERIOD_IN_BLOCKS:
+                if len(decoded_logs) > 25 or offset >= MONTH_PERIOD_IN_BLOCKS:
                     break
                 if max_offset == MONTH_PERIOD_IN_BLOCKS:
                     min_offset = offset
                     offset *= 2
                 else:
-                    min_offset = offset = ((max_offset - min_offset) // 2) + \
-                                          min_offset
-            event_filter = event.createFilter(fromBlock=current_block - offset,
-                                              toBlock=current_block)
+                    min_offset = offset = ((max_offset - min_offset) // 2) + min_offset
 
-        return list(map(dict, entries[-25:][::-1]))
+        return list(map(dict, decoded_logs[-25:][::-1]))
 
     @staticmethod
     def _logs_table(entries):
@@ -204,7 +219,7 @@ class Event:
             entry = dict(entry)
             args = "\n".join(f"{name}: {value}" for name, value in
                              entry["args"].items())
-            transaction_hash = str(entry["transactionHash"].hex())
+            transaction_hash = '0x' + entry["transactionHash"].hex()
             if not _large_screen():
                 half_hash_length = int(len(transaction_hash) / 2)
                 transaction_hash = \
@@ -428,31 +443,31 @@ class Contract(Command):
                   "value.")
             return 4
 
-        try:
-            set_data = function(*self.data.arguments).buildTransaction()
-        except TypeError:
-            print("Invalid number of arguments")
-            return -3
-        except web3.exceptions.ContractLogicError as error:
-            print(f"Error occurred with execution: {error}")
-            return -4
-
         price, limit = contract.gas(endpoint.gas_price, self.data.price, self.data.limit,
                                     contract.LIMIT["contract"])
 
         path = b"" if derivation == cryptnoxpy.Derivation.CURRENT_KEY else wallet.Api.PATH
         public_key = card.get_public_key(derivation, path=path, compressed=False)
 
+        nonce = endpoint.get_transaction_count(wallet.checksum_address(public_key))
+
         balance = endpoint.get_balance(wallet.address(public_key))
         if balance - price * limit < 0:
             print("Not enough fund for the transaction")
             return -2
 
-        set_data.update({
-            "nonce": endpoint.get_transaction_count(wallet.checksum_address(public_key)),
-            "gasPrice": price,
-            "gas": limit
-        })
+        try:
+            set_data = function(*self.data.arguments).build_transaction({
+                "nonce": nonce,
+                "gasPrice": price,
+                "gas": limit
+            })
+        except TypeError:
+            print("Invalid number of arguments")
+            return -3
+        except web3.exceptions.ContractLogicError as error:
+            print(f"Error occurred with execution: {error}")
+            return -4
 
         print("\nSigning with the Cryptnox")
         digest = endpoint.transaction_hash(set_data)
@@ -482,9 +497,9 @@ class Contract(Command):
 
     @staticmethod
     def _confirm(public_key, address, balance, value, price, limit):
-        gas_price = web3.Web3.fromWei(price, "ether")
+        gas_price = web3.Web3.from_wei(price, "ether")
         gas = Decimal(gas_price * limit)
-        balance = web3.Web3.fromWei(balance, "ether")
+        balance = web3.Web3.from_wei(balance, "ether")
         tabulate_table = [
             ["BALANCE:", f"{balance}", "ETH", "ON", "ACCOUNT:",
              f"{wallet.checksum_address(public_key)}"],
@@ -579,15 +594,15 @@ class Eth(Command):
         from_address = wallet.checksum_address(public_key)
         balance = endpoint.get_balance(from_address)
         max_spendable = balance - price * limit
-        if web3.Web3.toWei(amount, "ether") > max_spendable:
+        if web3.Web3.to_wei(amount, "ether") > max_spendable:
             raise ValueError({"message": "Not enough fund for the tx"})
 
         sanitized_transaction = dict(
             nonce=endpoint.get_transaction_count(from_address, "pending"),
             gasPrice=price,
             gas=limit,
-            to=web3.Web3.toChecksumAddress(address),
-            value=web3.Web3.toWei(amount, "ether"),
+            to=web3.Web3.to_checksum_address(address),
+            value=web3.Web3.to_wei(amount, "ether"),
             data=b''
         )
         print("\nSigning with the Cryptnox")
@@ -599,12 +614,12 @@ class Eth(Command):
             print("Error in getting signature")
             return -1
 
-        gas = Decimal(web3.Web3.fromWei(price, "ether") * limit)
+        gas = Decimal(web3.Web3.from_wei(price, "ether") * limit)
         tabulate_table = [
-            ["BALANCE:", f"{web3.Web3.fromWei(balance, 'ether')}", "ETH", "ON", "ACCOUNT:",
+            ["BALANCE:", f"{web3.Web3.from_wei(balance, 'ether')}", "ETH", "ON", "ACCOUNT:",
              f"{wallet.checksum_address(public_key)}"],
             ["TRANSACTION:", f"{amount}", "ETH", "TO", "ACCOUNT:",
-             f"{web3.Web3.toChecksumAddress(address)}"],
+             f"{web3.Web3.to_checksum_address(address)}"],
             ["MAX GAS:", f"{gas}"],
             ["MAX TOTAL:", f"{gas + amount}"]
         ]

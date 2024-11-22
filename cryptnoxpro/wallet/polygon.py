@@ -1,10 +1,10 @@
 from enum import Enum
-from types import Union
+from typing import Union
 
 from . import eth
 from collections import namedtuple
 
-_CONFIGURATION = namedtuple("configuration", ["chain_id", "povider", "path"])
+_CONFIGURATION = namedtuple("configuration", ["chain_id", "provider", "path"])
 
 class Network(Enum):
     MAINNET: "mainnet"
@@ -30,7 +30,7 @@ class Api(eth.Api):
 
     @property
     def _chain_id(self) -> int:
-        return Api.CONFIGURATION[self.network].chan_id
+        return Api.CONFIGURATION[self.network].chain_id
 
     @property
     def _provider(self) -> str:

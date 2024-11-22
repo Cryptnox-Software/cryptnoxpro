@@ -26,6 +26,7 @@ class Hello(user_key_base.UserKey):
     description = "Windows Hello"
     priority = 100
     slot_index = cryptnoxpy.SlotIndex.RSA
+    custom_bit = 2
 
     def __init__(self, target: str = ""):
         if not sys.platform.startswith("win"):

@@ -2,6 +2,7 @@
 """
 Module containing command for generating keys on the card
 """
+import csv
 import random
 import re
 from pathlib import Path
@@ -174,14 +175,18 @@ class Seed(Command):
         secret_access_key = ''
         credential_file = credential_file or Path(get_download_folder()).joinpath('rootkey.csv')
         try:
-            with open(credential_file, 'r') as file:
-                id_line = file.readline().strip()
-                secret_line = file.readline().strip()
-                if id_line.startswith('AWSAccessKeyId=') and secret_line.startswith('AWSSecretKey='):
-                    access_key_id = id_line[len('AWSAccessKeyId='):]
-                    secret_access_key = secret_line[len('AWSSecretKey='):]
+            with open(credential_file, mode='r', encoding='utf-8-sig') as file:
+                reader = csv.DictReader(file)
+                for row in reader:
+                    access_key_id = row.get('Access key ID', '').strip()
+                    secret_access_key = row.get('Secret access key', '').strip()
+                    break
         except FileNotFoundError:
             print('Credentials file not found.')
+        except KeyError as e:
+            print(f"Missing expected column in the CSV: {e}")
+        except Exception as e:
+            print(f"An error occurred while reading the credentials file: {e}")
 
         return access_key_id, secret_access_key
 

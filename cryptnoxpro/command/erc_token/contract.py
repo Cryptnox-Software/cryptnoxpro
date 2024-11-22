@@ -38,8 +38,8 @@ def gas(gas_price: int, set_price: int, set_limit: int,
     if set_price:
         price = set_price
     else:
-        gwei_price = math.ceil(web3.Web3.fromWei(gas_price, "gwei"))
-        price = int(web3.Web3.toWei(gwei_price, "gwei"))
+        gwei_price = math.ceil(web3.Web3.from_wei(gas_price, "gwei"))
+        price = int(web3.Web3.to_wei(gwei_price, "gwei"))
         print(f"\nUsing gas price (override with -p): {gwei_price} Gwei")
 
     if set_limit:
@@ -103,24 +103,24 @@ def transfer(card, endpoint, network, api_key, contract_address: str, to: str, a
 
     function = contract.get_function_by_name("transfer")
 
-    try:
-        set_data = function(to, int(amount)).buildTransaction()
-    except web3.exceptions.ContractLogicError as error:
-        print(f"Error occurred with execution: {error}")
-        return -4
-
     price, limit = gas(endpoint.gas_price, price, limit, LIMIT["contract"])
+
+    nonce = endpoint.get_transaction_count(address)
 
     balance = endpoint.get_balance(address)
     if balance - price * limit < 0:
         print("Not enough fund for the transaction")
         return -2
 
-    set_data.update({
-        "nonce": endpoint.get_transaction_count(address),
-        "gasPrice": price,
-        "gas": limit
-    })
+    try:
+        set_data = function(to, int(amount)).build_transaction({
+            "nonce": nonce,
+            "gasPrice": price,
+            "gas": limit
+         })
+    except web3.exceptions.ContractLogicError as error:
+        print(f"Error occurred with execution: {error}")
+        return -4
 
     print("\nSigning with the Cryptnox")
     digest = endpoint.transaction_hash(set_data)
@@ -153,9 +153,9 @@ def transfer(card, endpoint, network, api_key, contract_address: str, to: str, a
 def _confirm_token_sending(contract: str, address: str, to: str,
                            token_balance: float, symbol: str, value: Union[Decimal, int],
                            balance: int, price: int, limit: float):
-    gas_price = web3.Web3.fromWei(price, "ether")
+    gas_price = web3.Web3.from_wei(price, "ether")
     total_gas = Decimal(gas_price * limit)
-    balance = web3.Web3.fromWei(balance, "ether")
+    balance = web3.Web3.from_wei(balance, "ether")
     tabulate_table = [
         ["", "", "", ],
         ["BALANCE:", token_balance, symbol, "CONTRACT: ", contract],

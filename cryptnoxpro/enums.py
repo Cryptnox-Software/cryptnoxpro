@@ -9,6 +9,7 @@ class EthNetwork(Enum):
     KOVAN = 42
     GOERLI = 5
     RINKEBY = 4
+    SEPOLIA = 11155111
 
 class Command(Enum):
     BTC = "btc"
@@ -16,7 +17,6 @@ class Command(Enum):
     CHANGE_PIN = "change_pin"
     CHANGE_PUK = "change_puk"
     CONFIG = "config"
-    EOSIO = "eosio"
     ETH = "eth"
     HISTORY = "history"
     INFO = "info"

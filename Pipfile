@@ -27,4 +27,4 @@ web3 = "*"
 winsdk = {version = "*", sys_platform = "== 'win32'"}
 
 [requires]
-python_version = "3.10"
+python_version = "3.12"
