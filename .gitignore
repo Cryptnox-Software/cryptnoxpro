@@ -2,6 +2,7 @@ __pycache__
 *.pem
 build
 dist
+venv
 
 .idea
 
