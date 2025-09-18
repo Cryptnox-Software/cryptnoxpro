@@ -40,6 +40,7 @@ def add(parser, interactive: bool = False):
     _reset_options(subparsers, interactive)
 
     _server_options(subparsers, interactive)
+    _xpub_options(subparsers, interactive)
 
     if interactive:
         use_sub_parser = subparsers.add_parser("use", help="Change card to be used by default")
@@ -244,3 +245,15 @@ def _transfer(subparsers, interactive_mode):
     sub_parser.add_argument("amount", type=Decimal, help="Amount to send")
     sub_parser.add_argument("--price", type=int, help="Gas price")
     sub_parser.add_argument("--limit", type=int, help="Gas limit")
+
+
+def _xpub_options(subparsers, interactive_mode):
+    """
+    Add xpub command options
+    
+    :param subparsers: Argument parser subparsers
+    :param interactive_mode: Whether running in interactive mode
+    """
+    from ..get_xpub import getXpub
+    
+    getXpub.add_options(subparsers)
