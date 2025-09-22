@@ -196,7 +196,8 @@ class Cards:
         if card.valid_key:
             try:
                 flags.append(f"{card.seed_source.name.lower()} seed")
-            except NotImplementedError:
+            except (NotImplementedError, Exception):
+                # Handle cases where seed_source is not accessible (e.g., no PIN auth)
                 flags.append("seed")
         if card.pin_authentication:
             flags.append("pin auth")

@@ -41,6 +41,7 @@ def add(parser, interactive: bool = False):
 
     _server_options(subparsers, interactive)
     _xpub_options(subparsers, interactive)
+    _get_clearpubkey_options(subparsers, interactive)
 
     if interactive:
         use_sub_parser = subparsers.add_parser("use", help="Change card to be used by default")
@@ -257,3 +258,15 @@ def _xpub_options(subparsers, interactive_mode):
     from ..get_xpub import getXpub
     
     getXpub.add_options(subparsers)
+
+def _get_clearpubkey_options(subparsers, interactive_mode):
+    """
+    Add get_clearpubkey command options
+    
+    :param subparsers: Argument parser subparsers
+    :param interactive_mode: Whether running in interactive mode
+    """
+    from ..get_clearpubkey import GetClearpubkey
+    
+    GetClearpubkey.add_options(subparsers)
+    
