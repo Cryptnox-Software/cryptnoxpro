@@ -39,6 +39,7 @@ def command(data: Namespace, cards: Cards = None) -> Command:
     from .transfer import Transfer  # pylint: disable=unused-import
     from .get_xpub import getXpub  # pylint: disable=unused-import
     from .get_clearpubkey import GetClearpubkey  # pylint: disable=unused-import
+    from .decrypt import Decrypt  # pylint: disable=unused-import
 
     for cls in Command.__subclasses__():
         if cls.meets_condition(data):
