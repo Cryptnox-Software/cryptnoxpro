@@ -110,7 +110,7 @@ class Decrypt(Command):
             if len(pubkey) != 65:
                 print("Error: Public key must be 65 bytes (X9.62 uncompressed format)")
                 print(f"Received: {len(pubkey)} bytes")
-                print("Expected format: 0x04 + 32-byte X-coordinate + 32-byte Y-coordinate")
+                print("Expected format: 0x04 followed by two 32-byte coordinates")
                 return -1
             
             if pubkey[0] != 0x04:
@@ -185,7 +185,7 @@ class Decrypt(Command):
                     except UnicodeDecodeError:
                         print("Decrypted data is binary (not text)")
                 
-                print(f"\n🎉 Decrypt command completed successfully!")
+                print(f"\nDecrypt command completed successfully!")
                 return 0
                 
             except cryptnoxpy.exceptions.SeedException as e:
