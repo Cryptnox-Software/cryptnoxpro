@@ -20,6 +20,18 @@ class getXpub(Command):
     """
     _name = "get_xpub"
 
+    def _resolve_key_type(self, key_type_value):
+        try:
+            if isinstance(key_type_value, str):
+                return cryptnoxpy.KeyType[key_type_value.upper()]
+            return key_type_value
+        except Exception as error:
+            raise ValueError(f"Invalid key type: {key_type_value}") from error
+
+    def _print_xpub(self, key_type, xpub_value):
+        print("K1 Extended Public Key" if key_type == cryptnoxpy.KeyType.K1 else "Extended Public Key")
+        print(f"{xpub_value}")
+
     def _execute(self, card) -> int:
         """
         Execute the xpub command to get extended public key from the card
@@ -32,9 +44,7 @@ class getXpub(Command):
         
         try:
             # Get key type from command line arguments, default to K1
-            key_type = getattr(self.data, 'key_type', 'K1')
-            if isinstance(key_type, str):
-                key_type = cryptnoxpy.KeyType[key_type.upper()]
+            key_type = self._resolve_key_type(getattr(self.data, 'key_type', 'K1'))
             
             # Get PUK from command line arguments if provided
             puk = getattr(self.data, 'puk', '')
@@ -42,21 +52,16 @@ class getXpub(Command):
             if key_type == cryptnoxpy.KeyType.R1:
                 print("Cannot get extended public key for R1 key.")
             else:
-                # For K1 keys, use clear pubkey reading for xpub
+                # For K1 keys, use clear export for xpub (if enabled or PUK provided)
                 try:
                     print("Getting extended public key for K1 key...")
-                    
-                    # Enable clear pubkey reading if PUK provided
                     if puk:
-                        print("Enabling clear pubkey reading capability...")
-                    
-                    # Use clear pubkey reading (P1=0x00, P2=0x01)
+                        print("Enabling public key export capability...")
                     xpubkey = card.get_public_key_extended(key_type=key_type, puk=puk)
-                    print(f"\nK1 Extended Public Key")
-                    print(f"{xpubkey}")
-                    
-                except Exception as e:
-                    print(f"Error getting K1 public key: {e}")
+                    print("")
+                    self._print_xpub(key_type, xpubkey)
+                except Exception as error:
+                    print(f"Error getting K1 public key: {error}")
                     return -1
             
             return 0
@@ -67,8 +72,8 @@ class getXpub(Command):
         except cryptnoxpy.exceptions.ReadPublicKeyException as e:
             print(f"Error reading public key: {e}")
             return -1
-        except Exception as e:
-            print(f"Unexpected error: {e}")
+        except Exception as error:
+            print(f"Unexpected error: {error}")
             return -1
 
     @classmethod
