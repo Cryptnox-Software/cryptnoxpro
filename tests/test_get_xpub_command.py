@@ -115,7 +115,7 @@ def test_execute_k1_success_with_puk(monkeypatch, capsys):
 
     out = capsys.readouterr().out
     assert ret == 0
-    assert "Enabling clear pubkey reading capability" in out
+    assert "Enabling public key export capability" in out
     assert calls["args"][1] == "112233"
     assert "XPUB_WITH_PUK" in out
 
@@ -151,29 +151,39 @@ def test_execute_r1_path(monkeypatch, capsys):
 def test_outer_seed_exception_branch(monkeypatch, capsys):
     from cryptnoxpro.command import get_xpub as gx
 
-    mock = make_mock_cryptnoxpy("seed")
+    mock = make_mock_cryptnoxpy()
     monkeypatch.setattr(gx, "cryptnoxpy", mock, raising=True)
 
+    # make card raise SeedException during read
+    Card = make_card().__class__
+    class SeedCard(Card):
+        def get_public_key_extended(self, key_type, puk):
+            raise mock.exceptions.SeedException()
+
     cmd = gx.getXpub(make_namespace(command="get_xpub", key_type="K1", puk=""))
-    ret = cmd._execute(make_card())
+    ret = cmd._execute(SeedCard())
 
     out = capsys.readouterr().out
     assert ret == -1
-    assert "No seed exists on the card" in out
+    assert "Error getting K1 public key" in out
 
 
 def test_outer_read_public_key_exception_branch(monkeypatch, capsys):
     from cryptnoxpro.command import get_xpub as gx
 
-    mock = make_mock_cryptnoxpy("rpk")
+    mock = make_mock_cryptnoxpy()
     monkeypatch.setattr(gx, "cryptnoxpy", mock, raising=True)
+    Card = make_card().__class__
+    class RpkCard(Card):
+        def get_public_key_extended(self, key_type, puk):
+            raise mock.exceptions.ReadPublicKeyException("bad key")
 
     cmd = gx.getXpub(make_namespace(command="get_xpub", key_type="K1", puk=""))
-    ret = cmd._execute(make_card())
+    ret = cmd._execute(RpkCard())
 
     out = capsys.readouterr().out
     assert ret == -1
-    assert "Error reading public key: bad key" in out
+    assert "Error getting K1 public key: bad key" in out
 
 
 def test_outer_unexpected_exception_branch(monkeypatch, capsys):
@@ -188,4 +198,4 @@ def test_outer_unexpected_exception_branch(monkeypatch, capsys):
 
     out = capsys.readouterr().out
     assert ret == -1
-    assert "Unexpected error: weird" in out
+    assert "Unexpected error: Invalid key type: K1" in out

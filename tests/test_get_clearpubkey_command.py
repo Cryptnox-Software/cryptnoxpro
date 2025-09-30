@@ -171,7 +171,7 @@ def test_uncompressed_and_xonly_formats(monkeypatch, capsys):
     )
     out = capsys.readouterr().out
     assert ret == 0
-    assert "Format: X-coordinate only (32 bytes)" in out
+    assert "Format: 32-byte public key data" in out
 
 
 def test_enable_clearpub_puk_exception(monkeypatch, capsys):
@@ -251,21 +251,24 @@ def test_unexpected_in_inner(monkeypatch, capsys):
 
 def test_outer_seed_exception(monkeypatch, capsys):
     from cryptnoxpro.command import get_clearpubkey as mod
-    monkeypatch.setattr(mod, "cryptnoxpy", make_mock_cryptnoxpy("seed"), raising=True)
+    mock = make_mock_cryptnoxpy()
+    monkeypatch.setattr(mod, "cryptnoxpy", mock, raising=True)
+    # simulate seed-not-loaded via status 6985 from read
     ret = mod.GetClearpubkey(ns(command="get_clearpubkey", key_type="K1", puk="", path="", compressed=True, uncompressed=False))._execute(
-        make_card()
+        make_card(get_clear_side_effect=mock.exceptions.ReadPublicKeyException("6985"))
     )
     out = capsys.readouterr().out
     assert ret == -1
-    assert "No seed exists on the card" in out
+    assert "No seed loaded or PIN not verified" in out
 
 
 def test_outer_unexpected(monkeypatch, capsys):
     from cryptnoxpro.command import get_clearpubkey as mod
-    # cause KeyType mapping to raise generic
-    monkeypatch.setattr(mod, "cryptnoxpy", make_mock_cryptnoxpy(mode=RuntimeError("boom")), raising=True)
+    mock = make_mock_cryptnoxpy()
+    monkeypatch.setattr(mod, "cryptnoxpy", mock, raising=True)
+    # unexpected error thrown during read
     ret = mod.GetClearpubkey(ns(command="get_clearpubkey", key_type="K1", puk="", path="", compressed=True, uncompressed=False))._execute(
-        make_card()
+        make_card(get_clear_side_effect=RuntimeError("boom"))
     )
     out = capsys.readouterr().out
     assert ret == -1
