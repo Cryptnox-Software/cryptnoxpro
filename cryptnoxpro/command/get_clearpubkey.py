@@ -20,6 +20,32 @@ class GetClearpubkey(Command):
     """
     _name = "get_clearpubkey"
 
+    def _resolve_key_type(self, key_type_value):
+        try:
+            if isinstance(key_type_value, str):
+                return cryptnoxpy.KeyType[key_type_value.upper()]
+            return key_type_value
+        except Exception as error:
+            raise ValueError(f"Invalid key type: {key_type_value}") from error
+
+    def _print_pubkey_info(self, key_type, compressed, pubkey_bytes):
+        pubkey_hex = pubkey_bytes.hex()
+        print(f"\nClear Public Key Retrieved:")
+        print(f"Key Type: {key_type.name}")
+        print(f"Format: {'Compressed' if compressed else 'Uncompressed'}")
+        print(f"Length: {len(pubkey_bytes)} bytes")
+        print(f"Public Key: {pubkey_hex}")
+
+        if len(pubkey_bytes) == 33:
+            print("Format: Compressed (33 bytes)")
+            prefix = pubkey_bytes[0]
+            parity = 'even' if prefix == 0x02 else 'odd'
+            print(f"Prefix: 0x{prefix:02x} ({parity} Y-coordinate)")
+        elif len(pubkey_bytes) == 65:
+            print("Format: Uncompressed (65 bytes)")
+        elif len(pubkey_bytes) == 32:
+            print("Format: 32-byte public key data")
+
     def _execute(self, card) -> int:
         """
         Execute the get_clearpubkey command to get clear public key from the card
@@ -32,9 +58,7 @@ class GetClearpubkey(Command):
         
         try:
             # Get key type from command line arguments, default to K1
-            key_type = getattr(self.data, 'key_type', 'K1')
-            if isinstance(key_type, str):
-                key_type = cryptnoxpy.KeyType[key_type.upper()]
+            key_type = self._resolve_key_type(getattr(self.data, 'key_type', 'K1'))
             
             # Get PUK from command line arguments if provided
             puk = getattr(self.data, 'puk', '')
@@ -56,14 +80,13 @@ class GetClearpubkey(Command):
             if puk:
                 print("Enabling clear pubkey reading capability...")
                 try:
-                    # Enable clear pubkey reading (P1=1 in SET PUB EXPORT command)
                     card.set_clearpubkey(True, puk)
                     print("Clear pubkey reading capability enabled")
-                except cryptnoxpy.exceptions.PukException as e:
-                    print(f"Error: Invalid PUK code - {e}")
+                except cryptnoxpy.exceptions.PukException as error:
+                    print(f"Error: Invalid PUK code - {error}")
                     return -1
-                except Exception as e:
-                    print(f"Error enabling clear pubkey capability: {e}")
+                except Exception as error:
+                    print(f"Error enabling clear pubkey capability: {error}")
                     return -1
             
             # Calculate derivation parameter
@@ -74,62 +97,36 @@ class GetClearpubkey(Command):
             try:
                 # Get clear public key using get_public_key_clear
                 if hasattr(card, 'get_public_key_clear'):
-                    # Reset card state before getting public key to avoid session corruption
                     try:
-                        # Try to reset the card's derivation state by deriving to a known state
                         if path:
                             card.derive(key_type, path)
                         else:
-                            # For current key, derive to a known path first to reset state
                             card.derive(key_type, "m/44'/0'/0'")
                     except Exception:
-                        # If derivation fails, continue anyway
                         pass
-                    
                     pubkey_bytes = card.get_public_key_clear(derivation, path, compressed)
-                    
-                    # Convert bytes to hex string for display
-                    pubkey_hex = pubkey_bytes.hex()
-                    
-                    print(f"\nClear Public Key Retrieved:")
-                    print(f"Key Type: {key_type.name}")
-                    print(f"Format: {'Compressed' if compressed else 'Uncompressed'}")
-                    print(f"Length: {len(pubkey_bytes)} bytes")
-                    print(f"Public Key: {pubkey_hex}")
-                    
-                    # Additional format information
-                    if len(pubkey_bytes) == 33:
-                        print("Format: Compressed (33 bytes)")
-                        print("Note: Y-coordinate calculated from X-coordinate using elliptic curve math")
-                        print(f"Prefix: 0x{pubkey_bytes[0]:02x} ({'even' if pubkey_bytes[0] == 0x02 else 'odd'} Y-coordinate)")
-                    elif len(pubkey_bytes) == 65:
-                        print("Format: Uncompressed (65 bytes)")
-                        print("Note: Full public key reconstructed from X-coordinate")
-                    elif len(pubkey_bytes) == 32:
-                        print("Format: X-coordinate only (32 bytes)")
-                        print("Note: Card returned only X-coordinate. This is a limitation of the clear channel.")
-                    
+                    self._print_pubkey_info(key_type, compressed, pubkey_bytes)
                 else:
                     print("Error: Card does not support clear pubkey reading")
                     print("This feature requires a compatible card firmware version")
                     return -1
                     
-            except cryptnoxpy.exceptions.ReadPublicKeyException as e:
-                if "6A88" in str(e):
+            except cryptnoxpy.exceptions.ReadPublicKeyException as error:
+                if "6A88" in str(error):
                     print("Error: Clear pubkey reading capability not enabled")
                     print("Please enable it first with: cryptnox get_clearpubkey --puk 'your_puk'")
-                elif "6985" in str(e):
+                elif "6985" in str(error):
                     print("Error: No seed loaded or PIN not verified")
                     print("Please load a seed first: cryptnox seed")
-                elif "X-coordinate" in str(e) and "uncompressed" in str(e):
+                elif "uncompressed" in str(error):
                     print("Error: Cannot get uncompressed public key")
-                    print("The card only returns X-coordinate (32 bytes) in clear channel mode.")
+                    print("The card does not return uncompressed keys in clear channel mode.")
                     print("Use --compressed flag to get a compressed public key instead.")
                 else:
-                    print(f"Error reading clear public key: {e}")
+                    print(f"Error reading clear public key: {error}")
                 return -1
-            except Exception as e:
-                print(f"Unexpected error: {e}")
+            except Exception as error:
+                print(f"Unexpected error: {error}")
                 return -1
             
             return 0
@@ -138,8 +135,8 @@ class GetClearpubkey(Command):
             print("Error: No seed exists on the card. Please initialize the card first.")
             print("Run: cryptnox init")
             return -1
-        except Exception as e:
-            print(f"Unexpected error: {e}")
+        except Exception as error:
+            print(f"Unexpected error: {error}")
             return -1
 
     @classmethod

@@ -621,7 +621,7 @@
             ],
             "index": "pypi",
             "markers": "python_version < '3.13' and python_version >= '3.7'",
-            "version": "==2.5.0"
+            "version": "==2.5.5"
         },
         "cryptography": {
             "hashes": [

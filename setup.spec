@@ -44,7 +44,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='CryptnoxPro-2.9.0-setup',
+    name='CryptnoxPro-2.9.1-setup',
     icon='cryptnox.ico',
     debug=False,
     bootloader_ignore_signals=False,
