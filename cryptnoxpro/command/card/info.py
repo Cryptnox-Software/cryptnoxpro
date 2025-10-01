@@ -44,8 +44,8 @@ class Info:
             print("\nTo use the Ethereum network. Go to https://infura.io. Register and get an "
                   "API key. Set the API key with: eth config api_key")
         if is_easy_mode(card.info) and eth_info["balance"] == "0.0 ETH":
-            print(f"\nTo get some Ethereum do: wget --no-check-certificate "
-                  f"https://faucet.ropsten.be/donate/{eth_info['address']}")
+            print(f"\nTo get some Sepolia testnet ETH, use a faucet like: "
+                  f"https://sepoliafaucet.com or https://www.alchemy.com/faucets/ethereum-sepolia")
 
         return 0
 
@@ -82,7 +82,7 @@ class Info:
     @staticmethod
     def _get_eth_info(card) -> dict:
         config = get_configuration(card)["eth"]
-        network = enums.EthNetwork[config.get("network", "ropsten").upper()]
+        network = enums.EthNetwork[config.get("network", "sepolia").upper()]
         try:
             derivation = cryptnoxpy.Derivation[config["derivation"]].value
         except KeyError:
