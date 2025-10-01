@@ -19,6 +19,9 @@ try:
 except ImportError:
     import config
 
+# Global connection cache to preserve connections across Cards instances
+_GLOBAL_CONNECTIONS: Dict[int, cryptnoxpy.Connection] = {}
+
 
 class ExitException(Exception):
     """
@@ -45,6 +48,8 @@ class Cards:
         self._remove_card(key)
 
     def __getitem__(self, key: int) -> cryptnoxpy.Card:
+        global _GLOBAL_CONNECTIONS
+        
         if key is None:
             self.refresh()
             self.print_card_list(show_warnings=True)
@@ -53,9 +58,14 @@ class Cards:
         if key in self._cards.keys() or key in self._cards_by_index.keys():
             try:
                 card = self._cards[key]
+                index = self._index(card.serial_number)
             except KeyError:
                 card = self._cards_by_index[key]
+                index = key
 
+            if index in _GLOBAL_CONNECTIONS:
+                return card
+            
             if card.alive:
                 return card
 
@@ -167,13 +177,31 @@ class Cards:
         raise ValueError
 
     def _open_card(self, index: int, remote: bool = False) -> cryptnoxpy.Card:
+
+        global _GLOBAL_CONNECTIONS
+        
+        if index in _GLOBAL_CONNECTIONS:
+            connection = _GLOBAL_CONNECTIONS[index]
+            try:
+                test_response = connection._reader.send([0x00, 0xA4, 0x04, 0x00, 0x00])
+                if test_response:
+                    if index in self._cards_by_index:
+                        return self._cards_by_index[index]
+            except:
+                del _GLOBAL_CONNECTIONS[index]
+        
+        # Create new connection only if needed
         connection = cryptnoxpy.Connection(index, self.debug, config.REMOTE_CONNECTIONS, remote)
+        _GLOBAL_CONNECTIONS[index] = connection  # Cache globally
+        
         card = cryptnoxpy.factory.get_card(connection, self.debug)
         self._cards[card.serial_number] = self._cards_by_index[index] = card
 
         return card
 
     def _remove_card(self, key: int) -> None:
+        global _GLOBAL_CONNECTIONS
+        
         serial_number = index = key
         try:
             serial_number = self._cards_by_index[index].serial_number
@@ -186,6 +214,9 @@ class Cards:
         del self._cards[serial_number].connection
         del self._cards[serial_number]
         del self._cards_by_index[index]
+        
+        if index in _GLOBAL_CONNECTIONS:
+            del _GLOBAL_CONNECTIONS[index]
 
     @staticmethod
     def printable_flags(card: cryptnoxpy.Card) -> List[str]:
