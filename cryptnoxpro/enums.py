@@ -5,7 +5,6 @@ class EthNetwork(Enum):
     Class defining possible Ethereum networks
     """
     MAINNET = 1
-    ROPSTEN = 3
     KOVAN = 42
     GOERLI = 5
     RINKEBY = 4

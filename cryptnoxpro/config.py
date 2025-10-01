@@ -36,7 +36,7 @@ def get_default_configuration() -> Dict:
             "api_key": "",
             "derivation": "DERIVE",
             "endpoint": "cryptnox",
-            "network": "ropsten",
+            "network": "sepolia",
         },
         "hidden": {
             "eth": {
