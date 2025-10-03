@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class EthNetwork(Enum):
     """
     Class defining possible Ethereum networks
@@ -9,6 +10,7 @@ class EthNetwork(Enum):
     GOERLI = 5
     RINKEBY = 4
     SEPOLIA = 11155111
+
 
 class Command(Enum):
     BTC = "btc"

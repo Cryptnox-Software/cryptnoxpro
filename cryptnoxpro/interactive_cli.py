@@ -408,7 +408,8 @@ class InteractiveCli:
 
         command = factory.command(args, self._cards)
 
-        execute_result = command.execute(self._card_info["serial_number"] if self._card_info else None)
+        execute_result = command.execute(
+            self._card_info["serial_number"] if self._card_info else None)
         if execute_result == -1:
             return
 
