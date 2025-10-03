@@ -31,6 +31,7 @@ DEFAULT_REGIONS = {
     'secretsmanager': 'ap-northeast-3'
 }
 
+
 class BackupException(Exception):
     """Base exception for all seed backup exceptions"""
 

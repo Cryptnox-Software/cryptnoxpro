@@ -196,7 +196,12 @@ class Info:
             print("OK")
 
     @staticmethod
-    def _owner(endpoint: str, contract_address: ChecksumAddress, abi: str, account: str, token_id: int) -> None:
+    def _owner(
+            endpoint: str,
+            contract_address: ChecksumAddress,
+            abi: str,
+            account: str,
+            token_id: int) -> None:
         print(f"Checking owner on contract: {contract_address}...")
         w3 = Web3(Web3.HTTPProvider(endpoint))
         try:

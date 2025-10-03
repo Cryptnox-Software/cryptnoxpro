@@ -49,7 +49,7 @@ class Cards:
 
     def __getitem__(self, key: int) -> cryptnoxpy.Card:
         global _GLOBAL_CONNECTIONS
-        
+
         if key is None:
             self.refresh()
             self.print_card_list(show_warnings=True)
@@ -65,7 +65,7 @@ class Cards:
 
             if index in _GLOBAL_CONNECTIONS:
                 return card
-            
+
             if card.alive:
                 return card
 
@@ -179,7 +179,7 @@ class Cards:
     def _open_card(self, index: int, remote: bool = False) -> cryptnoxpy.Card:
 
         global _GLOBAL_CONNECTIONS
-        
+
         if index in _GLOBAL_CONNECTIONS:
             connection = _GLOBAL_CONNECTIONS[index]
             try:
@@ -187,13 +187,13 @@ class Cards:
                 if test_response:
                     if index in self._cards_by_index:
                         return self._cards_by_index[index]
-            except:
+            except BaseException:
                 del _GLOBAL_CONNECTIONS[index]
-        
+
         # Create new connection only if needed
         connection = cryptnoxpy.Connection(index, self.debug, config.REMOTE_CONNECTIONS, remote)
         _GLOBAL_CONNECTIONS[index] = connection  # Cache globally
-        
+
         card = cryptnoxpy.factory.get_card(connection, self.debug)
         self._cards[card.serial_number] = self._cards_by_index[index] = card
 
@@ -201,20 +201,21 @@ class Cards:
 
     def _remove_card(self, key: int) -> None:
         global _GLOBAL_CONNECTIONS
-        
+
         serial_number = index = key
         try:
             serial_number = self._cards_by_index[index].serial_number
         except KeyError:
             try:
-                index = next(index for index, card in self._cards_by_index.items() if card.serial_number == key)
+                index = next(index for index, card in self._cards_by_index.items()
+                             if card.serial_number == key)
             except StopIteration:
                 return
 
         del self._cards[serial_number].connection
         del self._cards[serial_number]
         del self._cards_by_index[index]
-        
+
         if index in _GLOBAL_CONNECTIONS:
             del _GLOBAL_CONNECTIONS[index]
 
