@@ -1,5 +1,12 @@
+# -*- coding: utf-8 -*-
+"""
+Module for common argument parsing utilities and validation functions
+used across different command-line options and subcommands.
+"""
+
 import argparse
 import re
+
 
 def add_pin_option(sub_parser):
     sub_parser.add_argument("-p", "--pin", nargs=1, type=pin_validator,
@@ -16,7 +23,7 @@ def add_config_sub_parser(sub_parser, crypto_currency: str) -> None:
     """
     parser = sub_parser.add_parser("config",
                                    help=f"View or edit {crypto_currency} "
-                                        "configuration")
+                                   "configuration")
     parser.add_argument("key", nargs="?", type=str, default=None,
                         help="Define key to use")
     parser.add_argument("value", nargs="?", type=str, default=None,

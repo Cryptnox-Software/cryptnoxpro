@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 """
-Module containing base class for user key
+Module containing base class for user key.
 """
 import abc
 

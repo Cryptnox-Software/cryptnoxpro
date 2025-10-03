@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+"""
+Module for AWS KMS integration providing user key authentication
+using AWS Key Management Service for cryptographic operations.
+"""
+
 from pathlib import Path
 from typing import Tuple
 
@@ -64,8 +70,10 @@ class AwsKms(UserKey):
     @staticmethod
     def _client(access_key_id: str, secret_access_key: str, region_name: str) -> AwsClient:
         try:
-            session = boto3.Session(aws_access_key_id=access_key_id, aws_secret_access_key=secret_access_key,
-                                    region_name=region_name)
+            session = boto3.Session(
+                aws_access_key_id=access_key_id,
+                aws_secret_access_key=secret_access_key,
+                region_name=region_name)
             return session.client('kms')
         except ClientError as error:
             raise ProcessingException(error) from error
@@ -76,7 +84,7 @@ class AwsKms(UserKey):
         try:
             with open(file.absolute(), 'r') as config:
                 data = config.readlines()
-        except FileNotFoundError as error:
+        except FileNotFoundError:
             print(f'AWS configuration not found in expected location: {file}')
             while True:
                 file_path = input_with_exit('Path (exit): ')
