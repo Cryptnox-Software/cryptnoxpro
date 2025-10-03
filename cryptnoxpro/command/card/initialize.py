@@ -32,7 +32,9 @@ class Initialize:
 
         print("Card has been initialized.")
         if self.data.easy_mode:
-            print(f"Card is in {security.EASY_MODE_TEXT}.\n\nPress enter for all pin and puk prompts.\n")
+            print(
+                f"Card is in {
+                    security.EASY_MODE_TEXT}.\n\nPress enter for all pin and puk prompts.\n")
 
         print(tabulate([["RUN seed COMMAND TO GENERATE NEW OR LOAD AN EXISTING SEED."]],
                        tablefmt="rst"))

@@ -33,6 +33,7 @@ def abi(value: int):
     except (FileNotFoundError, PermissionError, json.decoder.JSONDecodeError):
         raise ValueError("ERC not recognized by the application.")
 
+
 def gas(gas_price: int, set_price: int, set_limit: int,
         default_limit: int = LIMIT["transfer"]) -> Tuple[int, int]:
     if set_price:
@@ -117,7 +118,7 @@ def transfer(card, endpoint, network, api_key, contract_address: str, to: str, a
             "nonce": nonce,
             "gasPrice": price,
             "gas": limit
-         })
+        })
     except web3.exceptions.ContractLogicError as error:
         print(f"Error occurred with execution: {error}")
         return -4

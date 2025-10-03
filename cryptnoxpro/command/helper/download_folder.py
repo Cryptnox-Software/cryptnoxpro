@@ -5,7 +5,6 @@ if os.name == 'nt':
     from ctypes import windll, wintypes
     from uuid import UUID
 
-
     class GUID(ctypes.Structure):
         _fields_ = [
             ("Data1", wintypes.DWORD),
@@ -21,13 +20,11 @@ if os.name == 'nt':
             for i in range(2, 8):
                 self.Data4[i] = rest >> (8 - i - 1) * 8 & 0xff
 
-
     SHGetKnownFolderPath = windll.shell32.SHGetKnownFolderPath
     SHGetKnownFolderPath.argtypes = [
         ctypes.POINTER(GUID), wintypes.DWORD,
         wintypes.HANDLE, ctypes.POINTER(ctypes.c_wchar_p)
     ]
-
 
     def _get_known_folder_path(uuidstr):
         pathptr = ctypes.c_wchar_p()
@@ -36,9 +33,7 @@ if os.name == 'nt':
             raise ctypes.WinError()
         return pathptr.value
 
-
     FOLDERID_Download = '{374DE290-123F-4565-9164-39C4925E467B}'
-
 
     def get_download_folder():
         return _get_known_folder_path(FOLDERID_Download)
