@@ -60,7 +60,7 @@ def add(name: str, card: cryptnoxpy.Card, description: str, puk: str) -> bool:
     nonce = card.user_key_challenge_response_nonce()
     try:
         signature = user_key.sign(nonce)
-    except user_key_base.UserKeyException as error:
+    except user_key_base.UserKeyException:
         card.user_key_delete(user_key.slot_index, puk)
         print('User canceled add key')
 
