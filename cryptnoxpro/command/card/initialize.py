@@ -5,11 +5,6 @@ from tabulate import tabulate
 from ..cards import Cards
 from ..helper import ui, security
 
-try:
-    import enums
-except ImportError:
-    from ... import enums
-
 
 class Initialize:
     def __init__(self, data: Namespace, cards: Cards = None):

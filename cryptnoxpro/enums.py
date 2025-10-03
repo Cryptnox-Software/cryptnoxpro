@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+"""
+Module for defining enumerations used throughout the CryptnoxPro application.
+"""
+
 from enum import Enum
 
 

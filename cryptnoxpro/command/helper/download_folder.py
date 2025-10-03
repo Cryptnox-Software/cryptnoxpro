@@ -1,3 +1,10 @@
+"""
+Module for cross-platform download folder detection, providing
+platform-specific functionality to detect the user's download folder
+path on both Windows and Unix-like systems for file operations
+and backup storage.
+"""
+
 import os
 
 if os.name == 'nt':

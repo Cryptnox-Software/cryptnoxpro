@@ -1,3 +1,9 @@
+"""
+Module providing various utility functions including dictionary operations,
+input validation, cryptographic operations, and other common helper methods
+used throughout the application.
+"""
+
 import ast
 from collections.abc import Mapping
 from typing import Any
