@@ -1,3 +1,9 @@
+"""
+Module for secure seed backup and recovery functionality using
+AWS KMS and Secrets Manager services. It handles encryption, storage,
+and retrieval of sensitive seed data with proper key management.
+"""
+
 import base64
 import logging
 import secrets

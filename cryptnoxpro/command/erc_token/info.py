@@ -1,3 +1,9 @@
+"""
+Module for displaying comprehensive information about ERC tokens stored
+on the Cryptnox card, including token balances, ownership verification,
+metadata display, and dual-card validation for enhanced security.
+"""
+
 import gzip
 import json
 import secrets

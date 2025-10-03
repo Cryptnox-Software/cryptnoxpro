@@ -1,3 +1,9 @@
+"""
+Module for managing cryptocurrency-specific configurations including
+network settings, API keys, and validation for Bitcoin and Ethereum
+wallet configurations.
+"""
+
 from typing import Union
 
 import cryptnoxpy
@@ -8,18 +14,14 @@ try:
         save_to_config
     )
     from wallet.validators import ValidationError
-    from wallet.btc import BlkHubApi, BtcValidator
-    from wallet import eth
-    from wallet.eth import EthValidator
+    from wallet.btc import BlkHubApi
 except ImportError:
     from ...config import (
         get_configuration,
         save_to_config
     )
     from ...wallet.validators import ValidationError
-    from ...wallet.btc import BlkHubApi, BtcValidator
-    from ...wallet import eth
-    from ...wallet.eth import EthValidator
+    from ...wallet.btc import BlkHubApi
 
 
 def add_config_sub_parser(sub_parser, crypto_currency: str) -> None:

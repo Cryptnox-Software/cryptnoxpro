@@ -1,3 +1,9 @@
+"""
+Module providing user interface components including input validation,
+confirmation dialogs, data collection forms, and display formatting
+for the command-line interface.
+"""
+
 import secrets
 import sys
 from collections import namedtuple
@@ -74,7 +80,7 @@ def input_type(text, required=True, type_of_input=str):
 
 
 def get_init_data(card: cryptnoxpy.card, easy_mode: bool = False) -> InitData:
-    if easy_mode and not confirm(f"Do you wish to proceed?",
+    if easy_mode and not confirm("Do you wish to proceed?",
                                  f"WARNING: THIS WILL INITIALIZE THE CARD "
                                  f"IN {security.EASY_MODE_TEXT.upper()}"):
         raise ExitException()

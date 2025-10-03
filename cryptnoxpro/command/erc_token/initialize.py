@@ -1,3 +1,9 @@
+"""
+Module for handling the initialization of ERC tokens on Cryptnox cards,
+supporting ERC20, ERC721, and ERC1155 standards. It manages token metadata,
+contract ABIs, and dual-card setup for enhanced security.
+"""
+
 import gzip
 import json
 import urllib
@@ -12,10 +18,8 @@ from ..helper import ui
 from ..helper.cards import ExitException, Cards
 
 try:
-    import enums
     from wallet import eth
 except ImportError:
-    from ... import enums
     from ...wallet import eth
 
 
