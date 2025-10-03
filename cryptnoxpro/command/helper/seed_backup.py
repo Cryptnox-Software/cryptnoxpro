@@ -131,7 +131,8 @@ def get_secret(session, store_secret_name):
             raise e
     else:
         # Decrypts secret using the associated KMS CMK.
-        # Depending on whether the secret is a string or binary, one of these fields will be populated.
+        # Depending on whether the secret is a string or binary, one of these
+        # fields will be populated.
         decoded_binary_secret = get_secret_value_response["SecretBinary"]
         return decoded_binary_secret
 
@@ -159,7 +160,7 @@ if __name__ == "__main__":
 
     # PREPARING SECRET TO STORE = CONCATENATION IN BYTES OF
     secret_to_store = (
-            data_key_encrypted_lengh + data_key_encrypted + encrypted_data_b64_decoded
+        data_key_encrypted_lengh + data_key_encrypted + encrypted_data_b64_decoded
     )
 
     print("CONCATENATED SECRET CREATED")
@@ -173,14 +174,14 @@ if __name__ == "__main__":
 
     # RETRIEVEING ENCRYPTED KEY LENGH PLUS "NUM_BYTES_FOR_LEN"
     from_secret_data_key_encrypted_len = (
-            int.from_bytes(retrieved_encrypted_secret[:NUM_BYTES_FOR_LEN], byteorder="big")
-            + NUM_BYTES_FOR_LEN
+        int.from_bytes(retrieved_encrypted_secret[:NUM_BYTES_FOR_LEN], byteorder="big")
+        + NUM_BYTES_FOR_LEN
     )
 
     # RETRIEVING ENCRYPTED KEY
     from_secret_data_key_encrypted = retrieved_encrypted_secret[
-                                     NUM_BYTES_FOR_LEN:from_secret_data_key_encrypted_len
-                                     ]
+        NUM_BYTES_FOR_LEN:from_secret_data_key_encrypted_len
+    ]
 
     # DECRYPTING ENCRYPTED KEY
     r_data_key_plaintext = base64.b64encode(

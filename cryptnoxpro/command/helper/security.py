@@ -115,7 +115,11 @@ def is_easy_mode(card_info: Dict):
         return False
 
 
-def process_command_with_puk(card: cryptnoxpy.Card, function: typing.Callable, *args, **kwargs) -> bool:
+def process_command_with_puk(
+        card: cryptnoxpy.Card,
+        function: typing.Callable,
+        *args,
+        **kwargs) -> bool:
     easy_mode = is_easy_mode(card.info)
 
     while True:
@@ -177,7 +181,10 @@ def get_puk_code(card: cryptnoxpy.Card, text: str = "", allowed_values: List = N
     return _get_code(card.valid_puk, text, allowed_values)
 
 
-def _get_code(validation_method: typing.Callable, text: str = "", allowed_values: List = None) -> str:
+def _get_code(
+        validation_method: typing.Callable,
+        text: str = "",
+        allowed_values: List = None) -> str:
     allowed_values = allowed_values or []
     code = ui.secret_with_exit(text, required=("" not in allowed_values))
 
