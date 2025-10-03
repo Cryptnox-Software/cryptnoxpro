@@ -1,3 +1,10 @@
+"""
+Module for comprehensive card management functionality including
+card detection, connection handling, timeout management, and user interaction
+for card operations. It manages the global connection cache and provides
+methods for card enumeration and selection.
+"""
+
 from time import (
     sleep,
     time
@@ -48,7 +55,7 @@ class Cards:
         self._remove_card(key)
 
     def __getitem__(self, key: int) -> cryptnoxpy.Card:
-        global _GLOBAL_CONNECTIONS
+        global _GLOBAL_CONNECTIONS  # noqa: F824
 
         if key is None:
             self.refresh()
@@ -178,7 +185,7 @@ class Cards:
 
     def _open_card(self, index: int, remote: bool = False) -> cryptnoxpy.Card:
 
-        global _GLOBAL_CONNECTIONS
+        global _GLOBAL_CONNECTIONS  # noqa: F824
 
         if index in _GLOBAL_CONNECTIONS:
             connection = _GLOBAL_CONNECTIONS[index]
@@ -200,7 +207,7 @@ class Cards:
         return card
 
     def _remove_card(self, key: int) -> None:
-        global _GLOBAL_CONNECTIONS
+        global _GLOBAL_CONNECTIONS  # noqa: F824
 
         serial_number = index = key
         try:

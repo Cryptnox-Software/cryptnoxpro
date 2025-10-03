@@ -1,3 +1,9 @@
+"""
+Module for handling smart contract interactions for ERC tokens including
+token transfers, balance checking, gas estimation, and transaction building
+for ERC20, ERC721, and ERC1155 token standards.
+"""
+
 import json
 import math
 from decimal import Decimal
@@ -12,11 +18,9 @@ from tabulate import tabulate
 from ..helper.helper_methods import sign
 
 try:
-    from config import get_configuration, save_to_config
     from lib import cryptos
     from wallet import eth as wallet
 except ImportError:
-    from ...config import get_configuration
     from ...lib import cryptos
     from ...wallet import eth as wallet
 

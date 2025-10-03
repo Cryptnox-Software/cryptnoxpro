@@ -44,8 +44,8 @@ class Info:
             print("\nTo use the Ethereum network. Go to https://infura.io. Register and get an "
                   "API key. Set the API key with: eth config api_key")
         if is_easy_mode(card.info) and eth_info["balance"] == "0.0 ETH":
-            print(f"\nTo get some Sepolia testnet ETH, use a faucet like: "
-                  f"https://sepoliafaucet.com or https://www.alchemy.com/faucets/ethereum-sepolia")
+            print("\nTo get some Sepolia testnet ETH, use a faucet like: "
+                  "https://sepoliafaucet.com or https://www.alchemy.com/faucets/ethereum-sepolia")
 
         return 0
 
