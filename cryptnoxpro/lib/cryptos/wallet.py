@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 """
 Simple wallet abstractions for addresses, balances, and signing flows.
+
+This module is based on code from pybtctools:
+https://github.com/primal100/pybitcointools/blob/master/cryptos/wallet.py
 """
 from .main import *
 from .keystore import xpubkey_to_address
