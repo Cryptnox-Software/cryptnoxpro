@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Module for displaying comprehensive information about the card
-including wallet addresses, balances, and network status for both
-Bitcoin and Ethereum networks.
+Module containing command for getting information about the card
 """
 from typing import List, Dict
 
@@ -73,7 +71,7 @@ class Info:
             "name": "BTC",
             "address": wallet.address,
             "network": f"{network}"
-            f"\n   -{wallet.api.url.replace('https://', '')}"
+                       f"\n   -{wallet.api.url.replace('https://', '')}"
         }
 
         try:
@@ -109,10 +107,7 @@ class Info:
         }
 
         try:
-            tabulate_data["balance"] = f"{
-                web3.Web3.from_wei(
-                    api.get_balance(address),
-                    'ether')} ETH"
+            tabulate_data["balance"] = f"{web3.Web3.from_wei(api.get_balance(address), 'ether')} ETH"
         except Exception as error:
             print(f"There's an issue in retrieving ETH data: {error}")
             tabulate_data["balance"] = "Network issue"

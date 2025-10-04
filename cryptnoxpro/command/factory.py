@@ -33,9 +33,8 @@ def command(data: Namespace, cards: Cards = None) -> Command:
     for module_name in command_modules:
         try:
             importlib.import_module(f'.{module_name}', package=__package__)
-        except ImportError:
-            # Skip modules that don't exist or can't be imported
-            continue
+        except ImportError as e:
+            raise ImportError(f"Required command module '{module_name}' could not be imported: {e}")
 
     for cls in Command.__subclasses__():
         if cls.meets_condition(data):
