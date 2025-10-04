@@ -1,3 +1,4 @@
+# flake8: noqa
 # -*- coding: utf-8 -*-
 """
 RIPEMD-160 hash function implementation in pure Python.

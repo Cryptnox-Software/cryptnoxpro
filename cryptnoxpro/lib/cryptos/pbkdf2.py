@@ -1,3 +1,4 @@
+# flake8: noqa
 # -*- coding: utf-8 -*-
 """
 PBKDF2 key derivation function implementation and helpers.

@@ -1,3 +1,5 @@
+# flake8: noqa
+# -*- coding: utf-8 -*-
 """
 Bitcoin-specific constants, scripts, and address helpers.
 """
