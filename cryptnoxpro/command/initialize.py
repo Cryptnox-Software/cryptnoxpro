@@ -12,6 +12,7 @@ try:
 except ImportError:
     from .. import enums
 
+
 class Initialize(Command):
     """
     Command to initialize the card

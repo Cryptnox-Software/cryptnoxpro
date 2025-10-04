@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+"""
+Module containing command for starting the server
+"""
 import pickle
 import selectors
 import types
@@ -77,7 +81,7 @@ class Server(Command):
         sock.close()
 
     def _receive(self, sock, address) -> bytes:
-        print(f'Receiving command')
+        print('Receiving command')
         message = sock.recv(Server._HEADER_SIZE)
         if not message:
             self._close(sock, address)
@@ -95,7 +99,7 @@ class Server(Command):
         return self._process_in_card(pickled_data)
 
     def _process_in_card(self, pickled_data: str) -> bytes:
-        print(f'Transmitting APDU command to card')
+        print('Transmitting APDU command to card')
         try:
             command = pickle.loads(pickled_data)
         except pickle.UnpicklingError:
@@ -107,7 +111,7 @@ class Server(Command):
             print(f'Error with card: {error}')
             return b''
 
-        print(f'Responding back to server')
+        print('Responding back to server')
         pickled_response = pickle.dumps(response)
         msg_length = len(pickled_response)
         send_length = str(msg_length).encode(Server._ENCODING)

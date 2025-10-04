@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+"""
+Module containing command for getting history of the card
+"""
 from tabulate import tabulate
 
 from .command import Command

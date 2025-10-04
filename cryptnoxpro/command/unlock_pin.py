@@ -3,8 +3,6 @@
 Module containing command for unlocking the pin
 """
 
-import cryptnoxpy
-
 from .command import Command
 from .helper import security
 
