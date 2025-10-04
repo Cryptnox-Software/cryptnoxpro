@@ -1,3 +1,9 @@
+"""
+Module providing various utility functions including dictionary operations,
+input validation, cryptographic operations, and other common helper methods
+used throughout the application.
+"""
+
 import ast
 from collections.abc import Mapping
 from typing import Any
@@ -58,7 +64,7 @@ def sign(card: cryptnoxpy.Card, message: bytes,
          filter_eos: bool = False, pin_code: str = "") -> bytes:
     """
     Open the card with a user key or PIN code and sign the given message in the given card
-    
+
     :param crypnoxpy.Card card: Card to use for signature
     :param bytes message: Message to sign with the card
     :param cryptnoxpy.Derivation derivation: Derivation to use when signing

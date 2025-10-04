@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 """
-Module for signing messages with Windows Hello
+Module for signing messages with Windows Hello.
 """
 
 import asyncio

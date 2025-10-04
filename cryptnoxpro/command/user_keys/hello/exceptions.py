@@ -1,6 +1,9 @@
+# -*- coding: utf-8 -*-
 """
-Exceptions Windows Hello can raise
+Exceptions Windows Hello can raise.
 """
+
+
 class WindowsHelloExceptions(Exception):
     """Base exception for the class exceptions."""
 

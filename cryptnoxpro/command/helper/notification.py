@@ -1,3 +1,9 @@
+"""
+Module for monitoring and notifying users about ERC token activities,
+transaction events, and other blockchain-related notifications using
+multiprocessing for efficient parallel processing.
+"""
+
 import json
 from multiprocessing import Pool
 from pathlib import Path
@@ -9,15 +15,13 @@ import web3
 try:
     from config import (
         get_cached_serials,
-        get_configuration,
-        save_to_config
+        get_configuration
     )
     from wallet import eth as wallet
 except ImportError:
     from ...config import (
         get_cached_serials,
-        get_configuration,
-        save_to_config
+        get_configuration
     )
     from ...wallet import eth as wallet
 

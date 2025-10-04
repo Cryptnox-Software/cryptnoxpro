@@ -1,3 +1,10 @@
+"""
+Module for comprehensive card management functionality including
+card detection, connection handling, timeout management, and user interaction
+for card operations. It manages the global connection cache and provides
+methods for card enumeration and selection.
+"""
+
 from time import (
     sleep,
     time
@@ -48,8 +55,8 @@ class Cards:
         self._remove_card(key)
 
     def __getitem__(self, key: int) -> cryptnoxpy.Card:
-        global _GLOBAL_CONNECTIONS
-        
+        global _GLOBAL_CONNECTIONS  # noqa: F824
+
         if key is None:
             self.refresh()
             self.print_card_list(show_warnings=True)
@@ -65,7 +72,7 @@ class Cards:
 
             if index in _GLOBAL_CONNECTIONS:
                 return card
-            
+
             if card.alive:
                 return card
 
@@ -178,8 +185,8 @@ class Cards:
 
     def _open_card(self, index: int, remote: bool = False) -> cryptnoxpy.Card:
 
-        global _GLOBAL_CONNECTIONS
-        
+        global _GLOBAL_CONNECTIONS  # noqa: F824
+
         if index in _GLOBAL_CONNECTIONS:
             connection = _GLOBAL_CONNECTIONS[index]
             try:
@@ -187,34 +194,35 @@ class Cards:
                 if test_response:
                     if index in self._cards_by_index:
                         return self._cards_by_index[index]
-            except:
+            except BaseException:
                 del _GLOBAL_CONNECTIONS[index]
-        
+
         # Create new connection only if needed
         connection = cryptnoxpy.Connection(index, self.debug, config.REMOTE_CONNECTIONS, remote)
         _GLOBAL_CONNECTIONS[index] = connection  # Cache globally
-        
+
         card = cryptnoxpy.factory.get_card(connection, self.debug)
         self._cards[card.serial_number] = self._cards_by_index[index] = card
 
         return card
 
     def _remove_card(self, key: int) -> None:
-        global _GLOBAL_CONNECTIONS
-        
+        global _GLOBAL_CONNECTIONS  # noqa: F824
+
         serial_number = index = key
         try:
             serial_number = self._cards_by_index[index].serial_number
         except KeyError:
             try:
-                index = next(index for index, card in self._cards_by_index.items() if card.serial_number == key)
+                index = next(index for index, card in self._cards_by_index.items()
+                             if card.serial_number == key)
             except StopIteration:
                 return
 
         del self._cards[serial_number].connection
         del self._cards[serial_number]
         del self._cards_by_index[index]
-        
+
         if index in _GLOBAL_CONNECTIONS:
             del _GLOBAL_CONNECTIONS[index]
 

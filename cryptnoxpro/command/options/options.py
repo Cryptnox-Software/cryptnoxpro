@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Module for defining command-line argument parsers and subcommands
+for various CryptnoxPro operations including Bitcoin, Ethereum,
+and card management commands.
+"""
+
 import re
 from decimal import Decimal
 
@@ -159,6 +166,7 @@ def _server_options(subparsers, _: bool):
     sub_parser.add_argument('--host', nargs='?', type=str, default='0.0.0.0',
                             help='Define port to server host, default 0.0.0.0')
 
+
 def _reset_options(subparsers, _: bool):
     subparsers.add_parser(enums.Command.RESET.value, help="Reset card")
 
@@ -252,29 +260,30 @@ def _transfer(subparsers, interactive_mode):
 def _xpub_options(subparsers, interactive_mode):
     """
     Add xpub command options
-    
+
     :param subparsers: Argument parser subparsers
     :param interactive_mode: Whether running in interactive mode
     """
-    from ..get_xpub import getXpub
-    
-    getXpub.add_options(subparsers)
+    from ..get_xpub import GetXpub
+
+    GetXpub.add_options(subparsers)
 
 def _get_clearpubkey_options(subparsers, interactive_mode):
     """
     Add get_clearpubkey command options
-    
+
     :param subparsers: Argument parser subparsers
     :param interactive_mode: Whether running in interactive mode
     """
     from ..get_clearpubkey import GetClearpubkey
-    
+
     GetClearpubkey.add_options(subparsers)
-    
+
+
 def _decrypt_options(subparsers, interactive_mode):
     """
     Add decrypt command options
-    
+
     :param subparsers: Argument parser subparsers
     :param interactive_mode: Whether running in interactive mode
     """
