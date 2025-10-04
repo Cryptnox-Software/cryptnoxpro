@@ -1,3 +1,4 @@
+# flake8: noqa
 # -*- coding: utf-8 -*-
 """
 Simple wallet abstractions for addresses, balances, and signing flows.

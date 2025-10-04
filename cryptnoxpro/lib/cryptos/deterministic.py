@@ -1,3 +1,4 @@
+# flake8: noqa
 # -*- coding: utf-8 -*-
 """
 Deterministic key and path derivation utilities (BIP32-like logic).

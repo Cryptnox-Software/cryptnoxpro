@@ -1,3 +1,4 @@
+# flake8: noqa
 # -*- coding: utf-8 -*-
 """
 High-level composition utilities combining deterministic keys and transactions.

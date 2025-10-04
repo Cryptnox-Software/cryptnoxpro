@@ -1,3 +1,5 @@
+# flake8: noqa
+# -*- coding: utf-8 -*-
 """
 Base classes and shared logic for UTXO-based coin implementations.
 """

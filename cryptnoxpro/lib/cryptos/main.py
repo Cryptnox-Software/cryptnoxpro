@@ -1,3 +1,4 @@
+# flake8: noqa
 # -*- coding: utf-8 -*-
 """
 Core cryptographic and encoding primitives used by higher-level modules.

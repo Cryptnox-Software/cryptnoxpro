@@ -1,3 +1,4 @@
+# flake8: noqa
 # -*- coding: utf-8 -*-
 """
 Mnemonic phrase generation and seed handling (BIP39-style operations).

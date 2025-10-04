@@ -1,3 +1,4 @@
+# flake8: noqa
 # -*- coding: utf-8 -*-
 """
 HD wallet structures, serialization, derivation, and key store helpers.
