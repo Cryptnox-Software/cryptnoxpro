@@ -12,6 +12,7 @@ try:
 except ImportError:
     from .. import enums
 
+
 class Info(Command):
     """
     Command to get detailed information about the accounts on the card

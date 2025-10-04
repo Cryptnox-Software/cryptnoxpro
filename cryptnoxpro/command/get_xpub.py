@@ -8,11 +8,6 @@ from argparse import Namespace
 from .command import Command
 from .helper.security import check
 
-try:
-    import enums
-except ImportError:
-    from .. import enums
-
 
 class GetXpub(Command):
     """

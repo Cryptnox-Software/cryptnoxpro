@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+"""
+Module containing command for transferring tokens
+"""
 import gzip
 import json
 
@@ -6,10 +10,10 @@ from .erc_token.contract import transfer
 
 try:
     import enums
-    from wallet import eth as wallet
+    from wallet import eth as wallet  # noqa: F401
 except ImportError:
     from .. import enums
-    from ..wallet import eth as wallet
+    from ..wallet import eth as wallet  # noqa: F401
 
 
 class Transfer(Command):
