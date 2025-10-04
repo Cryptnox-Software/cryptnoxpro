@@ -1,9 +1,8 @@
-# flake8: noqa
 # -*- coding: utf-8 -*-
 """
 Bitcoin-specific constants, scripts, and address helpers.
 """
-#from ..explorers import blockchain
+# from ..explorers import blockchain
 from .base import BaseCoin
 
 
@@ -11,7 +10,7 @@ class Bitcoin(BaseCoin):
     coin_symbol = "BTC"
     display_name = "Bitcoin"
     segwit_supported = True
-    #explorer = blockchain
+    # explorer = blockchain
     magicbyte = 0
     script_magicbyte = 5
     segwit_hrp = "bc"
