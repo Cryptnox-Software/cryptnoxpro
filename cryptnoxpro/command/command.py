@@ -22,11 +22,6 @@ from .helper.security import (
     Unauthorized
 )
 
-try:
-    from config import get_configuration, save_to_config
-except ImportError:
-    from ..config import get_configuration, save_to_config
-
 
 class Command(metaclass=abc.ABCMeta):
     """
