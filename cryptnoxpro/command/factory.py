@@ -21,25 +21,25 @@ def command(data: Namespace, cards: Cards = None) -> Command:
     :return: Command that can execute the given user input
     :rtype: Command
     """
-    from .btc import Btc  # pylint: disable=unused-import
-    from .card_configuration import CardConfiguration  # pylint: disable=unused-import
-    from .change_pin import ChangePin  # pylint: disable=unused-import
-    from .change_puk import ChangePuk  # pylint: disable=unused-import
-    from .config import Config  # pylint: disable=unused-import
-    from .eth import Eth  # pylint: disable=unused-import
-    from .history import History  # pylint: disable=unused-import
-    from .info import Info  # pylint: disable=unused-import
-    from .initialize import Initialize  # pylint: disable=unused-import
-    from .seed import Seed  # pylint: disable=unused-import
-    from .cards import Cards  # pylint: disable=unused-import
-    from .server import Server  # pylint: disable=unused-import
-    from .reset import Reset  # pylint: disable=unused-import
-    from .unlock_pin import UnlockPin  # pylint: disable=unused-import
-    from .user_key import UserKey  # pylint: disable=unused-import
-    from .transfer import Transfer  # pylint: disable=unused-import
-    from .get_xpub import getXpub  # pylint: disable=unused-import
-    from .get_clearpubkey import GetClearpubkey  # pylint: disable=unused-import
-    from .decrypt import Decrypt  # pylint: disable=unused-import
+    from .btc import Btc  # noqa: F401
+    from .card_configuration import CardConfiguration  # noqa: F401
+    from .change_pin import ChangePin  # noqa: F401
+    from .change_puk import ChangePuk  # noqa: F401
+    from .config import Config  # noqa: F401
+    from .eth import Eth  # noqa: F401
+    from .history import History  # noqa: F401
+    from .info import Info  # noqa: F401
+    from .initialize import Initialize  # noqa: F401
+    from .seed import Seed  # noqa: F401
+    from .cards import Cards  # noqa: F401
+    from .server import Server  # noqa: F401
+    from .reset import Reset  # noqa: F401
+    from .unlock_pin import UnlockPin  # noqa: F401
+    from .user_key import UserKey  # noqa: F401
+    from .transfer import Transfer  # noqa: F401
+    from .get_xpub import getXpub  # noqa: F401
+    from .get_clearpubkey import GetClearpubkey  # noqa: F401
+    from .decrypt import Decrypt  # noqa: F401
 
     for cls in Command.__subclasses__():
         if cls.meets_condition(data):

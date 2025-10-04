@@ -10,6 +10,7 @@ try:
 except ImportError:
     from .. import enums
 
+
 class Cards(Command):
     """
     Command to show a table of cards to the user
