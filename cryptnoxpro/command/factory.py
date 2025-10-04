@@ -2,6 +2,7 @@
 """
 Module for creating Factory class.
 """
+import importlib
 from argparse import Namespace
 
 from .command import Command
@@ -21,25 +22,20 @@ def command(data: Namespace, cards: Cards = None) -> Command:
     :return: Command that can execute the given user input
     :rtype: Command
     """
-    from .btc import Btc  # noqa: F401
-    from .card_configuration import CardConfiguration  # noqa: F401
-    from .change_pin import ChangePin  # noqa: F401
-    from .change_puk import ChangePuk  # noqa: F401
-    from .config import Config  # noqa: F401
-    from .eth import Eth  # noqa: F401
-    from .history import History  # noqa: F401
-    from .info import Info  # noqa: F401
-    from .initialize import Initialize  # noqa: F401
-    from .seed import Seed  # noqa: F401
-    from .cards import Cards  # noqa: F401
-    from .server import Server  # noqa: F401
-    from .reset import Reset  # noqa: F401
-    from .unlock_pin import UnlockPin  # noqa: F401
-    from .user_key import UserKey  # noqa: F401
-    from .transfer import Transfer  # noqa: F401
-    from .get_xpub import getXpub  # noqa: F401
-    from .get_clearpubkey import GetClearpubkey  # noqa: F401
-    from .decrypt import Decrypt  # noqa: F401
+    # Dynamically import all command modules to register them with Command.__subclasses__()
+    command_modules = [
+        'btc', 'card_configuration', 'change_pin', 'change_puk', 'config',
+        'eth', 'history', 'info', 'initialize', 'seed', 'cards', 'server',
+        'reset', 'unlock_pin', 'user_key', 'transfer', 'get_xpub',
+        'get_clearpubkey', 'decrypt'
+    ]
+
+    for module_name in command_modules:
+        try:
+            importlib.import_module(f'.{module_name}', package=__package__)
+        except ImportError:
+            # Skip modules that don't exist or can't be imported
+            continue
 
     for cls in Command.__subclasses__():
         if cls.meets_condition(data):

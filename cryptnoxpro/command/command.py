@@ -68,31 +68,6 @@ class Command(metaclass=abc.ABCMeta):
 
         self.run_execute(card)
 
-    def print_notifications(self):
-        return
-        notifications = self.notification.get()
-        for card_serial, contracts_events in notifications.items():
-            title = "\n\nLIST OF NEW EVENTS"
-            display_title = True
-            tabulate_table = []
-            contract_name = None
-            for contract, events in contracts_events.items():
-                for event, new_events_num in events.items():
-                    if contract_name != contract:
-                        table_contract = contract
-                        contract_name = contract
-                    else:
-                        table_contract = ""
-                    tabulate_table.append(
-                        [table_contract, event, new_events_num])
-            if tabulate_table and display_title:
-                print(title)
-            if tabulate_table:
-                print(f"\nCARD: {card_serial}")
-                print(tabulate(tabulate_table,
-                               headers=["CONTRACT", "EVENT", "NEW EVENTS"]),
-                      "\n")
-
     def run_execute(self, card) -> int:
         print(f"Using card with serial number {card.serial_number}")
         origin = card.origin

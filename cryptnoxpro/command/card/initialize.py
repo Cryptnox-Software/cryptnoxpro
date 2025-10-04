@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+"""
+Module for handling the initialization process of cards, including
+setting up user credentials, PIN/PUK codes, and preparing the card for use
+with cryptocurrency operations.
+"""
 from argparse import Namespace
 from tabulate import tabulate
 

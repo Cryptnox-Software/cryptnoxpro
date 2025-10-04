@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Module for handling smart contract interactions for ERC tokens including
 token transfers, balance checking, gas estimation, and transaction building

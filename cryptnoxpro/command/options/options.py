@@ -264,10 +264,9 @@ def _xpub_options(subparsers, interactive_mode):
     :param subparsers: Argument parser subparsers
     :param interactive_mode: Whether running in interactive mode
     """
-    from ..get_xpub import getXpub
+    from ..get_xpub import GetXpub
 
-    getXpub.add_options(subparsers)
-
+    GetXpub.add_options(subparsers)
 
 def _get_clearpubkey_options(subparsers, interactive_mode):
     """

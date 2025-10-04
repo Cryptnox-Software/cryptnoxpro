@@ -15,7 +15,7 @@ except ImportError:
 
 class Reset(Command):
     """
-    Command to reset the card to it's factory settings.
+    Command to reset the card to its factory settings.
 
     Warning: This command will delete the keys from the card, which may result
              in loss of access to the funds.

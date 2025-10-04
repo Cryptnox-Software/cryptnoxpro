@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Module for displaying comprehensive information about ERC tokens stored
 on the Cryptnox card, including token balances, ownership verification,
