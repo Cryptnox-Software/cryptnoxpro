@@ -1,4 +1,7 @@
-
+# -*- coding: utf-8 -*-
+"""
+PBKDF2 key derivation function implementation and helpers.
+"""
 from struct import pack
 from random import randint
 import string

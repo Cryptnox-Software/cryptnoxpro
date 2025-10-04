@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+"""
+Core constants and magic values used across cryptocurrency modules.
+"""
 ELECTRUM_VERSION = '3.0.5'   # version of the client package
 PROTOCOL_VERSION = '1.1'     # protocol version requested
 

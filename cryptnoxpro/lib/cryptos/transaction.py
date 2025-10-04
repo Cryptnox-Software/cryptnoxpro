@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+"""
+Transaction building, serialization, signing, and parsing utilities.
+"""
 #!/usr/bin/python
 import binascii, re, copy
 from .main import *

@@ -1,3 +1,6 @@
+"""
+Dogecoin-specific parameters and address formatting.
+"""
 from .bitcoin import BaseCoin
 #from ..explorers import sochain
 

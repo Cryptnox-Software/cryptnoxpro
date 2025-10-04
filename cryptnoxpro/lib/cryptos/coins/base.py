@@ -1,3 +1,6 @@
+"""
+Base classes and shared logic for UTXO-based coin implementations.
+"""
 from .. import segwit_addr
 from ..blocks import mk_merkle_proof
 # from ..explorers import blockchain

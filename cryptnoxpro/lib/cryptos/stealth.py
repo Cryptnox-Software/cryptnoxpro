@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+"""
+Stealth address generation and parsing utilities.
+"""
 from . import main
 
 # Shared secrets and uncovering pay keys

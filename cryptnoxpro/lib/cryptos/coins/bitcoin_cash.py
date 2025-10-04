@@ -1,3 +1,6 @@
+"""
+Bitcoin Cash-specific rules, prefixes, and transaction variations.
+"""
 from .base import BaseCoin
 from ..transaction import SIGHASH_ALL, SIGHASH_FORKID
 #from ..explorers import blockdozer

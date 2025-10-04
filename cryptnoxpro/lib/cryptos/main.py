@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+"""
+Core cryptographic and encoding primitives used by higher-level modules.
+"""
 #!/usr/bin/python
 import base64
 import binascii

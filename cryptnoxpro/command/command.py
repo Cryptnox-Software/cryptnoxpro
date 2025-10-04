@@ -34,7 +34,6 @@ class Command(metaclass=abc.ABCMeta):
         self.data = data
         self._cards = cards or Cards(self.data.verbose if "verbose" in self.data else False)
         self.serial_number = None
-        # self.notification = Notification()
 
     def execute(self, serial_number: int = None) -> int:
         """
@@ -47,7 +46,6 @@ class Command(metaclass=abc.ABCMeta):
         :rtype: int
         """
         result = self._handle_execution(serial_number)
-        # self.print_notifications()
 
         return result
 
@@ -149,6 +147,3 @@ class Command(metaclass=abc.ABCMeta):
         :return:
         """
         return check(card, check_seed)
-
-        # get_configuration(serial_number)
-        # self.notification.run()
