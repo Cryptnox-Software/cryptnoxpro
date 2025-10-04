@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+"""
+Module for Ethereum-specific command-line argument parsing and validation,
+including transaction parameters, gas settings, and network configuration.
+"""
+
 from decimal import Decimal
 
 import argparse

@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+"""
+Module for displaying comprehensive information about the card
+including wallet addresses, balances, and network status for both
+Bitcoin and Ethereum networks.
+"""
 from typing import List, Dict
 
 import cryptnoxpy
@@ -44,8 +49,8 @@ class Info:
             print("\nTo use the Ethereum network. Go to https://infura.io. Register and get an "
                   "API key. Set the API key with: eth config api_key")
         if is_easy_mode(card.info) and eth_info["balance"] == "0.0 ETH":
-            print(f"\nTo get some Sepolia testnet ETH, use a faucet like: "
-                  f"https://sepoliafaucet.com or https://www.alchemy.com/faucets/ethereum-sepolia")
+            print("\nTo get some Sepolia testnet ETH, use a faucet like: "
+                  "https://sepoliafaucet.com or https://www.alchemy.com/faucets/ethereum-sepolia")
 
         return 0
 
@@ -68,7 +73,7 @@ class Info:
             "name": "BTC",
             "address": wallet.address,
             "network": f"{network}"
-                       f"\n   -{wallet.api.url.replace('https://', '')}"
+            f"\n   -{wallet.api.url.replace('https://', '')}"
         }
 
         try:
@@ -104,7 +109,10 @@ class Info:
         }
 
         try:
-            tabulate_data["balance"] = f"{web3.Web3.from_wei(api.get_balance(address), 'ether')} ETH"
+            tabulate_data["balance"] = f"{
+                web3.Web3.from_wei(
+                    api.get_balance(address),
+                    'ether')} ETH"
         except Exception as error:
             print(f"There's an issue in retrieving ETH data: {error}")
             tabulate_data["balance"] = "Network issue"

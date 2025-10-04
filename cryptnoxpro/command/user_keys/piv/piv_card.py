@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 """
-Module for handling operations related to PIV
+Module for handling operations related to PIV.
 """
 import time
 from contextlib import ContextDecorator

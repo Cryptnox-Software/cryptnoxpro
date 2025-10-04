@@ -2,6 +2,7 @@
 """
 Module for creating Factory class.
 """
+import importlib
 from argparse import Namespace
 
 from .command import Command
@@ -21,25 +22,20 @@ def command(data: Namespace, cards: Cards = None) -> Command:
     :return: Command that can execute the given user input
     :rtype: Command
     """
-    from .btc import Btc  # pylint: disable=unused-import
-    from .card_configuration import CardConfiguration  # pylint: disable=unused-import
-    from .change_pin import ChangePin  # pylint: disable=unused-import
-    from .change_puk import ChangePuk  # pylint: disable=unused-import
-    from .config import Config  # pylint: disable=unused-import
-    from .eth import Eth  # pylint: disable=unused-import
-    from .history import History  # pylint: disable=unused-import
-    from .info import Info  # pylint: disable=unused-import
-    from .initialize import Initialize  # pylint: disable=unused-import
-    from .seed import Seed  # pylint: disable=unused-import
-    from .cards import Cards  # pylint: disable=unused-import
-    from .server import Server  # pylint: disable=unused-import
-    from .reset import Reset  # pylint: disable=unused-import
-    from .unlock_pin import UnlockPin  # pylint: disable=unused-import
-    from .user_key import UserKey  # pylint: disable=unused-import
-    from .transfer import Transfer  # pylint: disable=unused-import
-    from .get_xpub import getXpub  # pylint: disable=unused-import
-    from .get_clearpubkey import GetClearpubkey  # pylint: disable=unused-import
-    from .decrypt import Decrypt  # pylint: disable=unused-import
+    # Dynamically import all command modules to register them with Command.__subclasses__()
+    command_modules = [
+        'btc', 'card_configuration', 'change_pin', 'change_puk', 'config',
+        'eth', 'history', 'info', 'initialize', 'seed', 'cards', 'server',
+        'reset', 'unlock_pin', 'user_key', 'transfer', 'get_xpub',
+        'get_clearpubkey', 'decrypt'
+    ]
+
+    for module_name in command_modules:
+        try:
+            importlib.import_module(f'.{module_name}', package=__package__)
+        except ImportError:
+            # Skip modules that don't exist or can't be imported
+            continue
 
     for cls in Command.__subclasses__():
         if cls.meets_condition(data):

@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Module for displaying comprehensive information about ERC tokens stored
+on the Cryptnox card, including token balances, ownership verification,
+metadata display, and dual-card validation for enhanced security.
+"""
+
 import gzip
 import json
 import secrets
@@ -196,7 +203,12 @@ class Info:
             print("OK")
 
     @staticmethod
-    def _owner(endpoint: str, contract_address: ChecksumAddress, abi: str, account: str, token_id: int) -> None:
+    def _owner(
+            endpoint: str,
+            contract_address: ChecksumAddress,
+            abi: str,
+            account: str,
+            token_id: int) -> None:
         print(f"Checking owner on contract: {contract_address}...")
         w3 = Web3(Web3.HTTPProvider(endpoint))
         try:
