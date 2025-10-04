@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Module containing the class for printing card configuration
 """
