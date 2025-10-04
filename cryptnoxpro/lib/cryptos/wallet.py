@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+"""
+Simple wallet abstractions for addresses, balances, and signing flows.
+"""
 from .main import *
 from .keystore import xpubkey_to_address
 

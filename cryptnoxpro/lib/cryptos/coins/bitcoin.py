@@ -1,3 +1,6 @@
+"""
+Bitcoin-specific constants, scripts, and address helpers.
+"""
 #from ..explorers import blockchain
 from .base import BaseCoin
 

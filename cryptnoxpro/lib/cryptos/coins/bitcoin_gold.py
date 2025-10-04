@@ -1,3 +1,6 @@
+"""
+Bitcoin Gold-specific parameters and address/script handling.
+"""
 from .base import BaseCoin
 from ..main import b58check_to_bin
 from ..specials import bin_to_b58check

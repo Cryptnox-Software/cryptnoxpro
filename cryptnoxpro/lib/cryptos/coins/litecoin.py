@@ -1,3 +1,6 @@
+"""
+Litecoin-specific constants, prefixes, and transaction helpers.
+"""
 from .base import BaseCoin
 #from ..explorers import sochain
 

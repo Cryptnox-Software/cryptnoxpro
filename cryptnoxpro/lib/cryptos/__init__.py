@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+"""
+Cryptocurrency utilities package - aggregates and re-exports submodules for easier imports.
+"""
 from .blocks import *
 from .composite import *
 from .deterministic import *

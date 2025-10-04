@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+"""
+Low-level helpers, type adapters, and encoding utilities shared across modules.
+"""
 import binascii
 import hashlib
 import os

@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+"""
+General wallet helper functions (formatting, hashing, conversions).
+"""
+# -*- coding: utf-8 -*-
 #
 # Electrum - lightweight Bitcoin client
 # Copyright (C) 2011 thomasv@gitorious with changes by pycryptools developers

@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+"""
+Mnemonic phrase generation and seed handling (BIP39-style operations).
+"""
 import hmac
 import random
 from bisect import bisect_left

@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+"""
+Deterministic key and path derivation utilities (BIP32-like logic).
+"""
 from .main import *
 import hmac
 import hashlib

@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+"""
+HD wallet structures, serialization, derivation, and key store helpers.
+"""
 #!/usr/bin/env python2
 # -*- mode: python -*-
 #

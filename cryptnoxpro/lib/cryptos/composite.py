@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+"""
+High-level composition utilities combining deterministic keys and transactions.
+"""
 from .deterministic import *
 from .transaction import *
 from .main import *
