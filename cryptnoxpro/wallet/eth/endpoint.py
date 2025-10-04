@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Module for endpoints that can be used for working with the Ethereum network
 """
@@ -124,6 +125,7 @@ class DirectEndpoint:
     @property
     def provider(self) -> str:
         return self.url
+
 
 def factory(endpoint: str, network: enums.EthNetwork, api_key: str = "") -> Endpoint:
     """
