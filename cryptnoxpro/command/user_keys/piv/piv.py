@@ -74,6 +74,4 @@ class Piv(user_key_base.UserKey):
                 if error.retries_left == 0:
                     raise
                 try_str = "tries" if error.retries_left > 1 else "try"
-                print(
-                    f"Wrong pin code. You have {
-                        error.retries_left} {try_str} before the card is locked.")
+                print(f"Wrong pin code. You have {error.retries_left} {try_str} before the card is locked.")
