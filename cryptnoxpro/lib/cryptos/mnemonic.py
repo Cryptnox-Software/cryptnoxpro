@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 """
 Mnemonic phrase generation and seed handling (BIP39-style operations).
+
+This module is based on code from pybtctools:
+https://github.com/danvergara/pybtctools/blob/32b50d324d1c9432719ba08059886458fa6b42eb/bitcoin/mnemonic.py
 """
 import hmac
 import random
