@@ -268,6 +268,7 @@ def _xpub_options(subparsers, interactive_mode):
 
     GetXpub.add_options(subparsers)
 
+
 def _get_clearpubkey_options(subparsers, interactive_mode):
     """
     Add get_clearpubkey command options
