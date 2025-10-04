@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+"""
+Module for displaying comprehensive information about the card
+including wallet addresses, balances, and network status for both
+Bitcoin and Ethereum networks.
+"""
 from typing import List, Dict
 
 import cryptnoxpy

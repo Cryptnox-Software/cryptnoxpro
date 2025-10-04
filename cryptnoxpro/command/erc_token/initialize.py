@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Module for handling the initialization of ERC tokens on Cryptnox cards,
 supporting ERC20, ERC721, and ERC1155 standards. It manages token metadata,
