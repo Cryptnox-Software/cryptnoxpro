@@ -4,7 +4,7 @@
 Core cryptographic and encoding primitives used by higher-level modules.
 
 This module is based on code from pybitcointools:
-https://github.com/primal100/pybitcointools/blob/3223f9bc6c94372e74f04c76f411ed1a680d8e44/cryptos/main.py
+https://github.com/primal100/pybitcointools/blob/master/cryptos/main.py
 """
 #!/usr/bin/python
 import base64
