@@ -39,7 +39,7 @@ def check(card, check_seed: bool = True) -> bool:
     card.check_init()
 
     if not card.valid_key and check_seed:
-        raise cryptnoxpy.SeedException("The key is not generated")
+        raise cryptnoxpy.exceptions.SeedException("The key is not generated")
 
     result = False
     try:
@@ -83,7 +83,7 @@ def check_pin_code(card, text: str = "Cryptnox PIN code: ") -> str:
 
         try:
             authorized = _check_pin_code(card, pin_code, not easy_mode)
-        except cryptnoxpy.PinException:
+        except cryptnoxpy.exceptions.PinException:
             if easy_mode:
                 print(f"{EASY_MODE_TEXT} PIN doesn't work. Try other PIN code.\n")
                 easy_mode = False
@@ -133,7 +133,7 @@ def process_command_with_puk(
 
         try:
             result = function(*args, **kwargs, puk=puk_code)
-        except cryptnoxpy.PukException as error:
+        except cryptnoxpy.exceptions.PukException as error:
             if easy_mode:
                 print(f"{EASY_MODE_TEXT} PUK doesn't work. Try other PUK code.\n")
                 easy_mode = False
@@ -152,7 +152,7 @@ def process_command_with_puk(
 def _check_pin_code(card, pin_code, handle_exception: bool = True) -> bool:
     try:
         card.verify_pin(str(pin_code))
-    except cryptnoxpy.PinException as error:
+    except cryptnoxpy.exceptions.PinException as error:
         if not handle_exception:
             raise error
         number_of_retries = error.number_of_retries
@@ -194,7 +194,7 @@ def _get_code(
     while True:
         try:
             validation_method(code)
-        except cryptnoxpy.DataValidationException as error:
+        except cryptnoxpy.exceptions.DataValidationException as error:
             print(error, "\n")
             code = ui.secret_with_exit(text, required=("" not in allowed_values))
 
