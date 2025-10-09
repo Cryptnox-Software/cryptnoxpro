@@ -358,7 +358,7 @@ class InteractiveCli:
                 self._card_info = self._cards.select_card().info
             else:
                 self._card_info = self._cards[serial_index - 1].info
-        except (cryptnoxpy.CryptnoxException, ExitException, TimeoutException) as error:
+        except (cryptnoxpy.exceptions.CryptnoxException, ExitException, TimeoutException) as error:
             print(error)
             return
 
@@ -417,7 +417,7 @@ class InteractiveCli:
             self._card_info = self._cards[command.serial_number].info
         except KeyError:
             pass
-        except (cryptnoxpy.CryptnoxException, ExitException, TimeoutException) as error:
+        except (cryptnoxpy.exceptions.CryptnoxException, ExitException, TimeoutException) as error:
             print(error)
 
         print("\n")

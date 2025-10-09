@@ -196,7 +196,7 @@ class Seed(Command):
         except NotImplementedError as error:
             print(error)
             return -1
-        except cryptnoxpy.DataValidationException:
+        except cryptnoxpy.exceptions.DataValidationException:
             pass
 
         pin_code = Seed._get_pin_code(card)
@@ -277,7 +277,7 @@ class Seed(Command):
                     print(f"Second card, {card.serial_number} doesn't have this functionality. "
                           f"Insert another card")
                     input("Press ENTER to continue.")
-                except cryptnoxpy.DataValidationException:
+                except cryptnoxpy.exceptions.DataValidationException:
                     break
                 else:
                     break

@@ -107,7 +107,7 @@ class Server(Command):
 
         try:
             response = self.card.connection._reader.send(command)
-        except cryptnoxpy.CryptnoxException as error:
+        except cryptnoxpy.exceptions.CryptnoxException as error:
             print(f'Error with card: {error}')
             return b''
 

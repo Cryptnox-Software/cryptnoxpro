@@ -57,7 +57,7 @@ class Command(metaclass=abc.ABCMeta):
             pass
         try:
             card = self._cards[self.serial_number]
-        except (ExitException, TimeoutException, cryptnoxpy.CryptnoxException) as error:
+        except (ExitException, TimeoutException, cryptnoxpy.exceptions.CryptnoxException) as error:
             print(error)
             return -1
         except requests.exceptions.RequestException as error:
@@ -76,19 +76,19 @@ class Command(metaclass=abc.ABCMeta):
 
         try:
             result = self._execute(card)
-        except cryptnoxpy.InitializationException as error:
+        except cryptnoxpy.exceptions.InitializationException as error:
             print("\n" + tabulate([[str(error).upper()]],
                                   tablefmt="rst"))
             print(f"To initialize card run : init\n"
                   f"To initialize card in {security.EASY_MODE_TEXT} run : init -e")
             result = -1
-        except cryptnoxpy.SeedException:
+        except cryptnoxpy.exceptions.SeedException:
             print("The seed is not generated\nRun seed command to generate seed")
             result = -1
-        except cryptnoxpy.GenericException as error:
+        except cryptnoxpy.exceptions.GenericException as error:
             print(f"Generic exception with status code: 0x{error.status.hex().upper()}")
             return -2
-        except (cryptnoxpy.CryptnoxException, NotImplementedError) as error:
+        except (cryptnoxpy.exceptions.CryptnoxException, NotImplementedError) as error:
             print(error)
             result = -1
         except ui.ExitException:

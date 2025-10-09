@@ -110,9 +110,9 @@ class Cards:
 
             try:
                 self._open_card(index, remote)
-            except cryptnoxpy.ReaderException:
+            except cryptnoxpy.exceptions.ReaderException:
                 break
-            except cryptnoxpy.CryptnoxException:
+            except cryptnoxpy.exceptions.CryptnoxException:
                 pass
 
             index += 1
@@ -260,7 +260,7 @@ class Cards:
     @property
     def _select_card(self) -> cryptnoxpy.Card:
         if not self._cards:
-            raise cryptnoxpy.CardException("No Cryptnox cards have been found")
+            raise cryptnoxpy.exceptions.CardException("No Cryptnox cards have been found")
 
         if len(self._cards) == 1:
             return list(self._cards_by_index.values())[0]
