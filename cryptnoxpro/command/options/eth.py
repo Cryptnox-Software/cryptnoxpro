@@ -4,7 +4,7 @@ Module for Ethereum-specific command-line argument parsing and validation,
 including transaction parameters, gas settings, and network configuration.
 """
 
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 import argparse
 
@@ -18,6 +18,16 @@ try:
     import enums
 except ImportError:
     from ... import enums
+
+
+def _validate_decimal(value: str) -> Decimal:
+
+    try:
+        return Decimal(value)
+    except InvalidOperation:
+        raise argparse.ArgumentTypeError(
+            f"Invalid amount: '{value}'. Please provide a valid number"
+        )
 
 
 def _argument_parser(arguments):
@@ -113,7 +123,7 @@ def _add_contract_options(subparsers):
 def _add_send(subparsers):
     sub_parser = subparsers.add_parser("send", help="Simple command to send Ethereum system token")
     sub_parser.add_argument("address", type=_validate, help="Address where to send funds")
-    sub_parser.add_argument("amount", type=Decimal, help="Amount to send")
+    sub_parser.add_argument("amount", type=_validate_decimal, help="Amount to send")
     sub_parser.add_argument("-c", "--contract", type=_validate,
                             help="Contract address of the contract")
 

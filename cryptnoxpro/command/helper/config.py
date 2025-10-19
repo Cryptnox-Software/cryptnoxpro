@@ -14,14 +14,18 @@ try:
         save_to_config
     )
     from wallet.validators import ValidationError
-    from wallet.btc import BlkHubApi
+    from wallet.btc import BlkHubApi, BtcValidator
+    from wallet.eth import EthValidator
 except ImportError:
     from ...config import (
         get_configuration,
         save_to_config
     )
     from ...wallet.validators import ValidationError
-    from ...wallet.btc import BlkHubApi
+    from ...wallet.btc import BlkHubApi, BtcValidator
+    from ...wallet.eth import EthValidator
+
+    __all__ = ["BtcValidator", "EthValidator"]
 
 
 def add_config_sub_parser(sub_parser, crypto_currency: str) -> None:

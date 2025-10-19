@@ -205,6 +205,8 @@ class Seed(Command):
         index = card.connection.index
         first_card_data = card.dual_seed_public_key(pin_code)
 
+        del self._cards[serial_number]
+
         print(f"Remove card with serial number {serial_number} (first card) and insert the second "
               f"card into same reader with index {index}.")
         input("Insert card and press ENTER to continue")

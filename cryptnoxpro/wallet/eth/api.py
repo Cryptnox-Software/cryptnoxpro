@@ -147,7 +147,7 @@ class EthValidator:
     api_key = validators.AnyValidator()
     endpoint = ep.EndpointValidator()
 
-    def __init__(self, endpoint: str = "cryptnox", network: str = "sepolia", price: int = 8,
+    def __init__(self, endpoint: str = "publicnode", network: str = "sepolia", price: int = 8,
                  limit: int = 2500, derivation: str = "DERIVE", api_key=""):
         self.endpoint = endpoint
         self.network = network
