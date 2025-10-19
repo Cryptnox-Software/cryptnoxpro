@@ -6,7 +6,7 @@ and card management commands.
 """
 
 import re
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 import argparse
 
@@ -22,6 +22,16 @@ try:
     import enums
 except ImportError:
     from ... import enums
+
+
+def _validate_decimal(value: str) -> Decimal:
+
+    try:
+        return Decimal(value)
+    except InvalidOperation:
+        raise argparse.ArgumentTypeError(
+            f"Invalid amount: '{value}'. Please provide a valid number"
+        )
 
 
 def add(parser, interactive: bool = False):
@@ -72,7 +82,7 @@ def _btc_options(subparsers, interactive_mode):
                                                              "system token")
         send_sub_parser.add_argument("address", type=_validate,
                                      help="Address where to send funds")
-        send_sub_parser.add_argument("amount", type=Decimal, help="Amount to send")
+        send_sub_parser.add_argument("amount", type=_validate_decimal, help="Amount to send")
         send_sub_parser.add_argument("-n", "--network", choices=["mainnet", "testnet"],
                                      help="Network to use for transaction")
         send_sub_parser.add_argument("-f", "--fees", type=int,

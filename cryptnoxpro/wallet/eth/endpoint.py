@@ -102,15 +102,40 @@ class CryptnoxEndpoint(Endpoint):
     """
     name = "cryptnox"
 
-    _NETWORKS = [enums.EthNetwork.MAINNET, enums.EthNetwork.RINKEBY, enums.EthNetwork.SEPOLIA]
+    _NETWORK_MAPPING = {
+        enums.EthNetwork.MAINNET: "ethereum",
+        enums.EthNetwork.SEPOLIA: "sepolia",
+    }
 
-    available_networks = [x.name for x in _NETWORKS]
+    available_networks = [x.name for x in _NETWORK_MAPPING.keys()]
 
     @property
     def domain(self) -> str:
-        domain = self.network.name.lower()
-        domain = domain if domain != "mainnet" else "ethereum"
-        return f"{domain}.nodes.cryptnox.tech"
+        network_name = self._NETWORK_MAPPING.get(self.network, self.network.name.lower())
+        return f"{network_name}.nodes.cryptnox.tech"
+
+    @property
+    def provider(self) -> str:
+        return f"https://{self.domain}"
+
+
+class PublicNodeEndpoint(Endpoint):
+    """
+    Implementation of the PublicNode public RPC endpoint (free, no API key required)
+    """
+    name = "publicnode"
+
+    _NETWORK_MAPPING = {
+        enums.EthNetwork.MAINNET: "ethereum",
+        enums.EthNetwork.SEPOLIA: "ethereum-sepolia",
+    }
+
+    available_networks = [x.name for x in _NETWORK_MAPPING.keys()]
+
+    @property
+    def domain(self) -> str:
+        network_name = self._NETWORK_MAPPING.get(self.network, self.network.name.lower())
+        return f"{network_name}.publicnode.com"
 
     @property
     def provider(self) -> str:

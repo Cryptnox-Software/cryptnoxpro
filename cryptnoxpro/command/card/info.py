@@ -43,10 +43,10 @@ class Info:
         Info._print_info_table([Info._get_btc_info(card), eth_info])
 
         config = get_configuration(card)
-        if not config["eth"]["api_key"]:
-            print("\nTo use the Ethereum network. Go to https://infura.io. Register and get an "
-                  "API key. Set the API key with: eth config api_key")
-        if is_easy_mode(card.info) and eth_info["balance"] == "0.0 ETH":
+        if not config["eth"]["api_key"] and config["eth"]["endpoint"] == "infura":
+            print("\nTo use the Ethereum network with Infura. Go to https://infura.io. "
+                  "Register (free) and get an API key. Set the API key with: eth config api_key")
+        if is_easy_mode(card.info) and eth_info.get("balance") == "0.0 ETH":
             print("\nTo get some Sepolia testnet ETH, use a faucet like: "
                   "https://sepoliafaucet.com or https://www.alchemy.com/faucets/ethereum-sepolia")
 
@@ -85,7 +85,7 @@ class Info:
     @staticmethod
     def _get_eth_info(card) -> dict:
         config = get_configuration(card)["eth"]
-        network = enums.EthNetwork[config.get("network", "sepolia").upper()]
+        network = enums.EthNetwork[config.get("network", "infura").upper()]
         try:
             derivation = cryptnoxpy.Derivation[config["derivation"]].value
         except KeyError:
