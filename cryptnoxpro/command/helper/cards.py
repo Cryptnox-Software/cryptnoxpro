@@ -70,7 +70,7 @@ class Cards:
                 card = self._cards_by_index[key]
                 index = key
 
-            if index in _GLOBAL_CONNECTIONS:
+            if index in _GLOBAL_CONNECTIONS and card.alive:
                 return card
 
             if card.alive:
@@ -194,8 +194,11 @@ class Cards:
                 if test_response:
                     if index in self._cards_by_index:
                         return self._cards_by_index[index]
-            except BaseException:
+            except (BaseException, cryptnoxpy.exceptions.ConnectionException):
+                # Connection is stale, remove it and create new one
                 del _GLOBAL_CONNECTIONS[index]
+                if index in self._cards_by_index:
+                    self._remove_card(self._cards_by_index[index].serial_number)
 
         # Create new connection only if needed
         connection = cryptnoxpy.Connection(index, self.debug, config.REMOTE_CONNECTIONS, remote)

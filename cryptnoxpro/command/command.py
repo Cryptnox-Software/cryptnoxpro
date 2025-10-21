@@ -68,7 +68,12 @@ class Command(metaclass=abc.ABCMeta):
 
     def run_execute(self, card) -> int:
         print(f"Using card with serial number {card.serial_number}")
-        origin = card.origin
+        try:
+            origin = card.origin
+        except cryptnoxpy.exceptions.ConnectionException:
+            print("Card connection lost. Please run 'list' to reconnect.")
+            return -1
+
         if origin == cryptnoxpy.enums.Origin.UNKNOWN:
             ui.print_warning("Origin of card can't be checked. Check your internet connection.")
         elif origin == cryptnoxpy.enums.Origin.FAKE:
