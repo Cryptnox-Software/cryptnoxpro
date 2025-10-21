@@ -16,7 +16,7 @@ import cryptnoxpy
 import requests
 
 from ..helper import ui
-from ..helper.cards import ExitException, Cards
+from ..helper.cards import ExitException, CardManager
 
 try:
     from wallet import eth
@@ -25,9 +25,9 @@ except ImportError:
 
 
 class Initialize:
-    def __init__(self, data: Namespace, cards: Cards = None):
+    def __init__(self, data: Namespace, cards: CardManager = None):
         self.data = data
-        self._cards = cards or Cards(self.data.verbose if "verbose" in self.data else False)
+        self._cards = cards or CardManager(self.data.verbose if "verbose" in self.data else False)
         self.serial_number = None
 
     def execute(self, card: cryptnoxpy.Card) -> int:

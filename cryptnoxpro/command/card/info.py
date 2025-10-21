@@ -10,6 +10,7 @@ from argparse import Namespace
 from tabulate import tabulate
 
 from ..cards import Cards
+from ..helper.cards import CardManager
 from ..helper.security import (
     check,
     is_easy_mode
@@ -26,11 +27,13 @@ except ImportError:
     from ...wallet import eth
     from ...wallet.btc import BTCwallet, BlkHubApi
 
+__all__ = ['Cards']
+
 
 class Info:
-    def __init__(self, data: Namespace, cards: Cards = None):
+    def __init__(self, data: Namespace, cards: CardManager = None):
         self.data = data
-        self._cards = cards or Cards(self.data.verbose if "verbose" in self.data else False)
+        self._cards = cards or CardManager(self.data.verbose if "verbose" in self.data else False)
         self.serial_number = None
 
     @staticmethod

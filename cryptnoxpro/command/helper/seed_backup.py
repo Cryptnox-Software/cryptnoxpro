@@ -35,14 +35,15 @@ def create_data_key(session, cmk_id, key_spec="AES_256"):
     """Generate a data key to use when encrypting and decrypting data
 
     :param cmk_id: KMS CMK ID or ARN under which to generate and encrypt the
-    data key.
+        data key.
     :param key_spec: Length of the data encryption key. Supported values:
         'AES_128': Generate a 128-bit symmetric key
         'AES_256': Generate a 256-bit symmetric key
-    :return Tuple(EncryptedDataKey, PlaintextDataKey) where:
+    :return: Tuple(EncryptedDataKey, PlaintextDataKey) where:
         EncryptedDataKey: Encrypted CiphertextBlob data key as binary string
         PlaintextDataKey: Plaintext base64-encoded data key as binary string
-    :return Tuple(None, None) if error"""
+    :return: Tuple(None, None) if error
+    """
     # Create data key
     kms_client = session.client("kms")
 

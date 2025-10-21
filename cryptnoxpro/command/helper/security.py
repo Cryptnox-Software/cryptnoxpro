@@ -173,7 +173,7 @@ def get_puk_code(card: cryptnoxpy.Card, text: str = "", allowed_values: List = N
     :param Card card: Card for use to check PUK code validity
     :param str text: Text displayed to user for value input.
     :param List allowed_values: Values other than 15 digits long strings
-    that can be accepted.
+        that can be accepted.
     :return: Entered puk code.
     :rtype: str
     """

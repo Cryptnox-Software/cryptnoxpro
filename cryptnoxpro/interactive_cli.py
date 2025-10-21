@@ -17,7 +17,7 @@ try:
     from command.options import options
     from command.helper import security
     from command.helper.cards import (
-        Cards,
+        CardManager,
         ExitException,
         TimeoutException
     )
@@ -27,7 +27,7 @@ except ImportError:
     from .command.options import options
     from .command.helper import security
     from .command.helper.cards import (
-        Cards,
+        CardManager,
         ExitException,
         TimeoutException
     )
@@ -223,7 +223,7 @@ class InteractiveCli:
 
         self._reconnect = False
         self._card_info = None
-        self._cards = Cards()
+        self._cards = CardManager()
 
         self.subcommand = []
         self.parser = None

@@ -21,6 +21,7 @@ class Unknown(Command):
         Main execution method of the command.
 
         Finds card and establishes connection to it. Executes _execute method.
+
         :param serial_number: Serial number of the wanted card
         :return: 0 if the command executed without issues. Other number
                  indicating and issue

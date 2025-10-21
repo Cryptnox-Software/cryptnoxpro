@@ -20,6 +20,9 @@ from tabulate import tabulate
 from web3 import Web3
 
 from ..cards import Cards
+from ..helper.cards import CardManager
+
+__all__ = ['Cards']
 
 try:
     import enums
@@ -47,9 +50,9 @@ class Info:
     """
     _name = enums.Command.INFO.value
 
-    def __init__(self, data: Namespace, cards: Cards = None):
+    def __init__(self, data: Namespace, cards: CardManager = None):
         self.data = data
-        self._cards = cards or Cards(self.data.verbose if "verbose" in self.data else False)
+        self._cards = cards or CardManager(self.data.verbose if "verbose" in self.data else False)
         self.serial_number = None
 
     def execute(self, card: cryptnoxpy.Card) -> int:

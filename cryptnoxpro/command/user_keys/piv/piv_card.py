@@ -215,7 +215,7 @@ class PIVcard(ContextDecorator):
 
         :param int pin_bank: The PIN bank to check
         :return: Whether the PIV is locked for pin_bank
-        :rtype; bool
+        :rtype: bool
         """
         try:
             self.verify_pin(pin_bank, "")

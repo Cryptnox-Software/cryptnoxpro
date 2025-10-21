@@ -26,7 +26,7 @@ try:
 except ImportError:
     import config
 
-# Global connection cache to preserve connections across Cards instances
+# Global connection cache to preserve connections across CardManager instances
 _GLOBAL_CONNECTIONS: Dict[int, cryptnoxpy.Connection] = {}
 
 
@@ -42,7 +42,7 @@ class TimeoutException(Exception):
     """
 
 
-class Cards:
+class CardManager:
     def __init__(self, debug: bool = False):
         self._cards: Dict[int, cryptnoxpy.Card] = {}
         self._cards_by_index: Dict[int, cryptnoxpy.Card] = {}
@@ -70,7 +70,7 @@ class Cards:
                 card = self._cards_by_index[key]
                 index = key
 
-            if index in _GLOBAL_CONNECTIONS:
+            if index in _GLOBAL_CONNECTIONS and card.alive:
                 return card
 
             if card.alive:
@@ -150,7 +150,7 @@ class Cards:
                 info["applet_version"],
                 info["name"] + ((" <" + info["email"] + ">") if info["email"]
                                 else ""),
-                ", ".join(Cards.printable_flags(card))
+                ", ".join(CardManager.printable_flags(card))
             ]
 
             uninitialized |= not info["initialized"]
@@ -194,8 +194,11 @@ class Cards:
                 if test_response:
                     if index in self._cards_by_index:
                         return self._cards_by_index[index]
-            except BaseException:
+            except (BaseException, cryptnoxpy.exceptions.ConnectionException):
+                # Connection is stale, remove it and create new one
                 del _GLOBAL_CONNECTIONS[index]
+                if index in self._cards_by_index:
+                    self._remove_card(self._cards_by_index[index].serial_number)
 
         # Create new connection only if needed
         connection = cryptnoxpy.Connection(index, self.debug, config.REMOTE_CONNECTIONS, remote)
