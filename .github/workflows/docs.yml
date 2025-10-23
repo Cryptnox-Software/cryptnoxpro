@@ -8,6 +8,11 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -37,7 +42,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: cryptnox-software/cryptnox-software.github.io
-          token: ${{ secrets.DOCS_DEPLOY_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           path: docs-repo
 
       - name: Update documentation
