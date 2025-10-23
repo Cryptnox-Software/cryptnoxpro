@@ -70,13 +70,6 @@ suppress_warnings = [
 html_theme = "sphinx_rtd_theme"
 html_static_path = ['_static']
 
-# GitHub Pages configuration
-html_baseurl = 'https://cryptnox-software.github.io/cryptnoxpro/'
-
-# Force relative paths for GitHub Pages
-html_use_opensearch = False
-html_show_sourcelink = False
-
 # Custom CSS and JS
 html_css_files = [
     'custom.css',
