@@ -42,7 +42,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: cryptnox-software/cryptnox-software.github.io
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.DOCS_DEPLOY_TOKEN }}
           path: docs-repo
 
       - name: Update documentation
