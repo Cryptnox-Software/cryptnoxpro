@@ -17,15 +17,15 @@ from ..helper.security import (
 )
 
 try:
-    import enums
-    from config import get_configuration
-    from wallet import eth
-    from wallet.btc import BTCwallet, BlkHubApi
-except ImportError:
     from ... import enums
     from ...config import get_configuration
     from ...wallet import eth
     from ...wallet.btc import BTCwallet, BlkHubApi
+except ImportError:
+    import enums
+    from config import get_configuration
+    from wallet import eth
+    from wallet.btc import BTCwallet, BlkHubApi
 
 __all__ = ['Cards']
 

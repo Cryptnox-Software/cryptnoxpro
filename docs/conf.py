@@ -38,7 +38,18 @@ autodoc_mock_imports = [
     'tabulate',
     'requests',
     'web3',
-    'eth_typing'
+    'eth_typing',
+    'eth_account',
+    'eth_account.transactions',
+    'eth_account.account',
+    'eth_account._utils',
+    'eth_account.datastructures',
+    'pydantic',
+    'pydantic_core',
+    'eth_utils',
+    'hexbytes',
+    'enums',
+    'config'
 ]
 
 # Handle ambiguous cross-references

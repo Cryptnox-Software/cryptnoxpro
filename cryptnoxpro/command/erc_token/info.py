@@ -25,11 +25,11 @@ from ..helper.cards import CardManager
 __all__ = ['Cards']
 
 try:
-    import enums
-    from wallet import eth
-except ImportError:
     from ... import enums
     from ...wallet import eth
+except ImportError:
+    import enums
+    from wallet import eth
 
 _SEED_SOURCE_TRANSLATION = {
     cryptnoxpy.SeedSource.NO_SEED: "No seed",
