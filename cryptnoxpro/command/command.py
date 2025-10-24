@@ -13,7 +13,7 @@ from .helper import (
     ui, security
 )
 from .helper.cards import (
-    Cards,
+    CardManager,
     ExitException,
     TimeoutException,
 )
@@ -30,9 +30,9 @@ class Command(metaclass=abc.ABCMeta):
     :param Namespace data: Command line arguments
     """
 
-    def __init__(self, data: Namespace, cards: Cards = None):
+    def __init__(self, data: Namespace, cards: CardManager = None):
         self.data = data
-        self._cards = cards or Cards(self.data.verbose if "verbose" in self.data else False)
+        self._cards = cards or CardManager(self.data.verbose if "verbose" in self.data else False)
         self.serial_number = None
 
     def execute(self, serial_number: int = None) -> int:
@@ -40,6 +40,7 @@ class Command(metaclass=abc.ABCMeta):
         Main execution method of the command.
 
         Finds card and establishes connection to it. Executes _execute method.
+
         :param serial_number: Serial number of the wanted card
         :return: 0 if the command executed without issues. Other number
                  indicating and issue

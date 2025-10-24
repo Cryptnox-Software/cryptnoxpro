@@ -7,8 +7,30 @@ from typing import List, Dict
 
 import cryptnoxpy
 
-from . import ui
 from .. import user_keys
+
+
+class ExitException(Exception):
+    """Raised when user has indicated he want's to exit the command"""
+
+
+def _secret_with_exit(text, required=True):
+    """
+    Local implementation of secret_with_exit to avoid circular import.
+    Replicates the functionality of ui.secret_with_exit.
+    """
+    from stdiomask import getpass
+
+    while True:
+        value = getpass(text).strip()
+        if value.lower() == "exit":
+            raise ExitException
+        if required and not value:
+            print("This entry is required")
+        else:
+            break
+
+    return value
 
 
 class Unauthorized(Exception):
@@ -173,7 +195,7 @@ def get_puk_code(card: cryptnoxpy.Card, text: str = "", allowed_values: List = N
     :param Card card: Card for use to check PUK code validity
     :param str text: Text displayed to user for value input.
     :param List allowed_values: Values other than 15 digits long strings
-    that can be accepted.
+        that can be accepted.
     :return: Entered puk code.
     :rtype: str
     """
@@ -186,7 +208,7 @@ def _get_code(
         text: str = "",
         allowed_values: List = None) -> str:
     allowed_values = allowed_values or []
-    code = ui.secret_with_exit(text, required=("" not in allowed_values))
+    code = _secret_with_exit(text, required=("" not in allowed_values))
 
     if not {code, ""}.isdisjoint(allowed_values):
         return code
@@ -196,7 +218,7 @@ def _get_code(
             validation_method(code)
         except cryptnoxpy.exceptions.DataValidationException as error:
             print(error, "\n")
-            code = ui.secret_with_exit(text, required=("" not in allowed_values))
+            code = _secret_with_exit(text, required=("" not in allowed_values))
 
             if code in allowed_values:
                 break

@@ -6,11 +6,11 @@ import importlib
 from argparse import Namespace
 
 from .command import Command
-from .helper.cards import Cards
+from .helper.cards import CardManager
 from .unknown import Unknown
 
 
-def command(data: Namespace, cards: Cards = None) -> Command:
+def command(data: Namespace, cards: CardManager = None) -> Command:
     """
     Gives back the command that took responsibility for executing the
     command
