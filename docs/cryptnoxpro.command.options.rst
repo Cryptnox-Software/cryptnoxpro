@@ -36,3 +36,12 @@ Module contents
    :undoc-members:
    :show-inheritance:
 
+The ``cryptnoxpro.command.options`` package provides command-line argument parsing and exports:
+
+.. py:currentmodule:: cryptnoxpro.command.options
+
+.. py:function:: add(subparsers, command_class)
+   :no-index:
+
+   Add command-line options for a command class. See :func:`cryptnoxpro.command.options.options.add` for details.
+

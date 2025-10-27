@@ -28,3 +28,12 @@ Module contents
    :undoc-members:
    :show-inheritance:
 
+The ``cryptnoxpro.lib.cryptos.coins`` package provides cryptocurrency coin implementations and exports:
+
+.. py:currentmodule:: cryptnoxpro.lib.cryptos.coins
+
+.. py:class:: Bitcoin
+   :no-index:
+
+   Bitcoin cryptocurrency implementation. See :class:`cryptnoxpro.lib.cryptos.coins.bitcoin.Bitcoin` for details.
+

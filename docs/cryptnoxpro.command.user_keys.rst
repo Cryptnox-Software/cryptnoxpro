@@ -38,3 +38,27 @@ Module contents
    :undoc-members:
    :show-inheritance:
 
+The ``cryptnoxpro.command.user_keys`` package provides authentication functionality and exports:
+
+.. py:currentmodule:: cryptnoxpro.command.user_keys
+
+.. py:function:: add(data)
+   :no-index:
+
+   Add a new authentication method. See :func:`cryptnoxpro.command.user_keys.authentication.add` for details.
+
+.. py:function:: authenticate(data)
+   :no-index:
+
+   Authenticate using a configured method. See :func:`cryptnoxpro.command.user_keys.authentication.authenticate` for details.
+
+.. py:function:: delete(data)
+   :no-index:
+
+   Delete an authentication method. See :func:`cryptnoxpro.command.user_keys.authentication.delete` for details.
+
+.. py:function:: get(data)
+   :no-index:
+
+   Get information about authentication methods. See :func:`cryptnoxpro.command.user_keys.authentication.get` for details.
+

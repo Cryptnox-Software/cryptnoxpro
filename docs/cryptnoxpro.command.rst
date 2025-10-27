@@ -200,3 +200,6 @@ Module contents
    :undoc-members:
    :show-inheritance:
 
+The ``cryptnoxpro.command`` package provides command-line interface commands for interacting with Cryptnox cards.
+This package contains all command implementations that can be executed from the CLI.
+
