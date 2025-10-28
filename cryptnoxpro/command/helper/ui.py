@@ -201,3 +201,96 @@ def _verify_input(card: cryptnoxpy.Card, method, text, verify_text,
         print(error)
 
     return value
+
+
+def get_bip39_passphrase(confirm_required: bool = True) -> str:
+    print()
+    print_warning("BIP39 PASSPHRASE FEATURE")
+    print("A BIP39 passphrase is an optional extra password that provides additional security.")
+    print("Different passphrases create completely different wallets from the same mnemonic.")
+    print()
+    print("IMPORTANT WARNINGS:")
+    print("  • If you forget your passphrase, your funds are PERMANENTLY LOST")
+    print("  • Passphrases are case-sensitive and spaces matter")
+    print("  • There is NO way to recover funds without the exact passphrase")
+    print("  • Press ENTER to skip passphrase (standard BIP39 with empty passphrase)")
+    print()
+
+    use_passphrase = confirm("Do you want to use a BIP39 passphrase?")
+
+    if not use_passphrase:
+        return ""
+
+    print()
+    print("Enter your BIP39 passphrase:")
+    print("(Any UTF-8 characters are valid, but avoid unusual characters you might forget)")
+
+    if confirm_required:
+        passphrase = _verify_passphrase_input()
+    else:
+        passphrase = getpass("Passphrase: ")
+
+    _validate_and_warn_passphrase(passphrase)
+
+    return passphrase
+
+
+def _verify_passphrase_input() -> str:
+    while True:
+        passphrase = getpass("Passphrase: ")
+        verify_passphrase = getpass("Confirm passphrase: ")
+
+        if passphrase == verify_passphrase:
+            return passphrase
+
+        print("ERROR: Passphrases do not match. Please try again.")
+        print()
+
+
+def _validate_and_warn_passphrase(passphrase: str) -> None:
+    if not passphrase:
+        return
+
+    warnings = []
+
+    # Check for weak passphrases
+    if len(passphrase) < 8:
+        warnings.append("Your passphrase is quite short. Consider using a longer passphrase.")
+
+    if passphrase.isdigit():
+        warnings.append("Your passphrase contains only numbers. Consider adding letters or symbols.")
+
+    # Check for common weak passphrases
+    weak_passphrases = ["password", "123456", "12345678", "test", "passphrase"]
+    if passphrase.lower() in weak_passphrases:
+        warnings.append("WARNING: This is a commonly used passphrase and is not secure!")
+
+    # Check for leading/trailing spaces
+    if passphrase != passphrase.strip():
+        print_warning("Your passphrase contains leading or trailing spaces. "
+                      "Make sure you can remember this exactly!")
+
+    # Check for multiple consecutive spaces
+    if "  " in passphrase:
+        print_warning("Your passphrase contains multiple consecutive spaces. "
+                      "Make sure you can remember this exactly!")
+
+    # Display general warnings
+    if warnings:
+        print()
+        for warning in warnings:
+            print(f"⚠ {warning}")
+        print()
+
+        if not confirm("Do you want to continue with this passphrase?"):
+            raise ExitException("User chose to re-enter passphrase")
+
+    # Final confirmation
+    print()
+    print_warning("FINAL CONFIRMATION")
+    print("Please write down your passphrase and store it securely.")
+    print("Without this exact passphrase, you CANNOT access your wallet.")
+    print()
+
+    if not confirm("Have you securely stored your passphrase?"):
+        raise ExitException("User needs to store passphrase securely")
