@@ -96,11 +96,6 @@ autodoc_default_options = {
     'exclude-members': '__weakref__'
 }
 
-# Allow autodoc to import modules with errors
-autodoc_inherit_docstrings = True
-autodoc_typehints = 'description'
-autodoc_typehints_description_target = 'documented'
-
 # Set autodoc to not fail on import errors
 autoclass_content = 'both'
 

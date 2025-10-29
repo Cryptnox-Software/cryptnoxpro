@@ -6,10 +6,6 @@ Cryptnox Pro
     :target: https://pypi.org/project/cryptnoxpro
 
 
-**Warning: This is a beta release of the software.
-It is released for development purposes.
-Use at your own risk.**
-
 A command line user interface to manage and use of `Cryptnox Smart cards <https://www.cryptnox.com/>`_.
 
 This provides basic wallets for `Bitcoin <https://bitcoin.org>`_ and
