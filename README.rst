@@ -5,7 +5,6 @@ Cryptnox Pro
 .. image:: https://img.shields.io/pypi/v/cryptnoxpro
     :target: https://pypi.org/project/cryptnoxpro
 
-
 A command line user interface to manage and use of `Cryptnox Smart cards <https://www.cryptnox.com/>`_.
 
 This provides basic wallets for `Bitcoin <https://bitcoin.org>`_ and
