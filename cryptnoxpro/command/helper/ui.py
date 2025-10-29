@@ -230,55 +230,9 @@ def get_bip39_passphrase(confirm_required: bool = True) -> str:
     else:
         passphrase = getpass("Passphrase: ")
 
-    _validate_and_warn_passphrase(passphrase)
-
-    return passphrase
-
-
-def _verify_passphrase_input() -> str:
-    while True:
-        passphrase = getpass("Passphrase: ")
-        verify_passphrase = getpass("Confirm passphrase: ")
-
-        if passphrase == verify_passphrase:
-            return passphrase
-
-        print("ERROR: Passphrases do not match. Please try again.")
-        print()
-
-
-def _validate_and_warn_passphrase(passphrase: str) -> None:
-    if not passphrase:
-        return
-
-    warnings = []
-
-    if len(passphrase) < 8:
-        warnings.append("Your passphrase is quite short. Consider using a longer passphrase.")
-
-    if passphrase.isdigit():
-        warnings.append("Your passphrase contains only numbers. Consider adding letters or symbols.")
-
-    weak_passphrases = ["password", "123456", "12345678", "test", "passphrase"]
-    if passphrase.lower() in weak_passphrases:
-        warnings.append("WARNING: This is a commonly used passphrase and is not secure!")
-
-    if passphrase != passphrase.strip():
-        print_warning("Your passphrase contains leading or trailing spaces. "
-                      "Make sure you can remember this exactly!")
-
-    if "  " in passphrase:
-        print_warning("Your passphrase contains multiple consecutive spaces. "
-                      "Make sure you can remember this exactly!")
-
-    if warnings:
-        print()
-        for warning in warnings:
-            print(f"⚠ {warning}")
-        print()
-
-        if not confirm("Do you want to continue with this passphrase?"):
-            raise ExitException("User chose to re-enter passphrase")
+    if len(passphrase) > 100:
+        print("ERROR: Passphrase must be at most 100 characters. Please try again.")
+        raise ExitException("Passphrase exceeds 100 characters")
 
     print()
     print("Please write down your passphrase and store it securely.")
@@ -287,3 +241,21 @@ def _validate_and_warn_passphrase(passphrase: str) -> None:
 
     if not confirm("Have you securely stored your passphrase?"):
         raise ExitException("User needs to store passphrase securely")
+
+    return passphrase
+
+
+def _verify_passphrase_input() -> str:
+    while True:
+        passphrase = getpass("Passphrase: ")
+        if len(passphrase) > 100:
+            print("ERROR: Passphrase must be at most 100 characters. Please try again.")
+            print()
+            continue
+        verify_passphrase = getpass("Confirm passphrase: ")
+
+        if passphrase == verify_passphrase:
+            return passphrase
+
+        print("ERROR: Passphrases do not match. Please try again.")
+        print()
