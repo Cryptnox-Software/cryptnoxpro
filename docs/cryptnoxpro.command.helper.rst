@@ -84,3 +84,7 @@ Module contents
    :undoc-members:
    :show-inheritance:
 
+The ``cryptnoxpro.command.helper`` package provides utility functions and helper modules for command implementations.
+This package contains shared functionality used across multiple commands, including user interface components,
+security helpers, configuration management, and backup utilities.
+

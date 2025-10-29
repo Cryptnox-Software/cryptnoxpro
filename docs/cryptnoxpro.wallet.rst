@@ -36,3 +36,6 @@ Module contents
    :undoc-members:
    :show-inheritance:
 
+The ``cryptnoxpro.wallet`` package provides wallet functionality for various cryptocurrencies.
+It includes Bitcoin wallet operations, Ethereum wallet utilities, and validation functions.
+

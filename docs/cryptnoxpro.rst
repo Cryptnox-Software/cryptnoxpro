@@ -54,3 +54,11 @@ Module contents
    :undoc-members:
    :show-inheritance:
 
+The main ``cryptnoxpro`` package exports:
+
+.. py:data:: __version__
+   :type: str
+   :value: "2.9.1"
+
+   Current version of the CryptnoxPro package.
+

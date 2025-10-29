@@ -36,3 +36,17 @@ Module contents
    :undoc-members:
    :show-inheritance:
 
+The ``cryptnoxpro.command.erc_token`` package provides ERC token management and exports:
+
+.. py:currentmodule:: cryptnoxpro.command.erc_token
+
+.. py:class:: Info
+   :no-index:
+
+   Command class for displaying ERC token information. See :class:`cryptnoxpro.command.erc_token.info.Info` for details.
+
+.. py:class:: Initialize
+   :no-index:
+
+   Command class for initializing ERC tokens. See :class:`cryptnoxpro.command.erc_token.initialize.Initialize` for details.
+

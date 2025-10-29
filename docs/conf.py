@@ -8,6 +8,7 @@
 
 import os
 import sys
+
 sys.path.insert(0, os.path.abspath(".."))
 
 project = 'cryptnoxpro'
@@ -25,32 +26,78 @@ extensions = [
     "sphinx.ext.viewcode",
 ]
 
+# Disable autosummary generation to prevent hangs
+autosummary_generate = False
+
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
+# autodoc_mock_imports - Sphinx will create mock imports for these modules
+# This is safer than manual sys.modules mocking and prevents hangs
 autodoc_mock_imports = [
-    'winsdk',
+    # Cryptnox
     'cryptnoxpy',
-    'boto3',
-    'botocore',
-    'cryptography',
+    # Input/Output
     'stdiomask',
     'tabulate',
-    'requests',
+    # AWS
+    'boto3',
+    'botocore',
+    'botocore.exceptions',
+    'botocore.client',
+    'botocore.config',
+    # Web3 and Ethereum
     'web3',
-    'eth_typing',
+    'web3.eth',
+    'web3.contract',
+    'web3.middleware',
     'eth_account',
+    'eth_account._utils',
+    'eth_account._utils.legacy_transactions',
     'eth_account.transactions',
     'eth_account.account',
-    'eth_account._utils',
     'eth_account.datastructures',
+    'eth_utils',
+    'eth_utils.curried',
+    'eth_typing',
+    'eth_keys',
+    'eth_rlp',
+    'eth_abi',
+    'eth_hash',
+    'hexbytes',
+    'ecdsa',
+    'rlp',
+    # Validation
     'pydantic',
     'pydantic_core',
-    'eth_utils',
-    'hexbytes',
-    'enums',
-    'config'
+    # Smart card
+    'pyscard',
+    'smartcard',
+    'smartcard.CardConnection',
+    'smartcard.System',
+    'smartcard.Exceptions',
+    'smartcard.CardType',
+    'smartcard.CardRequest',
+    'smartcard.util',
+    'smartcard.scard',
+    # Utilities
+    'cytoolz',
+    'toolz',
+    'winsdk',
+    'base58',
 ]
+
+# Autodoc configuration
+autodoc_default_options = {
+    'members': True,
+    'member-order': 'bysource',
+    'special-members': '__init__',
+    'undoc-members': True,
+    'exclude-members': '__weakref__'
+}
+
+# Set autodoc to not fail on import errors
+autoclass_content = 'both'
 
 # Handle ambiguous cross-references
 nitpicky = False

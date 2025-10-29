@@ -140,3 +140,19 @@ Module contents
    :undoc-members:
    :show-inheritance:
 
+The ``cryptnoxpro.lib.cryptos`` package provides cryptocurrency utilities and re-exports functionality from:
+
+* :mod:`cryptnoxpro.lib.cryptos.blocks` - Block-related utilities
+* :mod:`cryptnoxpro.lib.cryptos.composite` - Composite key handling
+* :mod:`cryptnoxpro.lib.cryptos.deterministic` - Deterministic wallet functions
+* :mod:`cryptnoxpro.lib.cryptos.main` - Main crypto operations
+* :mod:`cryptnoxpro.lib.cryptos.mnemonic` - Mnemonic phrase handling
+* :mod:`cryptnoxpro.lib.cryptos.specials` - Special cryptocurrency operations
+* :mod:`cryptnoxpro.lib.cryptos.stealth` - Stealth address support
+* :mod:`cryptnoxpro.lib.cryptos.transaction` - Transaction handling
+* :mod:`cryptnoxpro.lib.cryptos.coins` - Coin implementations
+* :mod:`cryptnoxpro.lib.cryptos.keystore` - Key storage utilities
+* :mod:`cryptnoxpro.lib.cryptos.wallet` - Wallet functionality
+
+All public members from these modules are available directly from ``cryptnoxpro.lib.cryptos``.
+
