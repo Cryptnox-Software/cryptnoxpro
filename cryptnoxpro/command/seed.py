@@ -367,7 +367,6 @@ class Seed(Command):
         print("\nEnter the mnemonic root to recover (12 or 24 words):")
         mnemonic = ui.input_with_exit("> ")
 
-        # Get optional BIP39 passphrase
         try:
             passphrase = ui.get_bip39_passphrase(confirm_required=True)
         except ui.ExitException as error:
@@ -392,7 +391,7 @@ class Seed(Command):
 
         print("Mnemonic loaded, please keep it safe for backup.")
         if passphrase:
-            print("Remember: You MUST use the same passphrase when restoring this wallet!")
+            print("You MUST use the same passphrase when restoring this wallet.")
 
         return 0
 
@@ -474,7 +473,6 @@ class Seed(Command):
         seed = card.generate_random_number(32)
         mnemonic = cryptos.entropy_to_words(seed)
 
-        # Get optional BIP39 passphrase
         try:
             passphrase = ui.get_bip39_passphrase(confirm_required=True)
         except ui.ExitException as error:
@@ -485,8 +483,6 @@ class Seed(Command):
 
         try:
             if do_backup:
-                # Note: Backup stores the raw seed (entropy), not the passphrase
-                # The passphrase must be remembered separately by the user
                 Seed._backup(card, pin_code, seed, passphrase=passphrase)
             else:
                 Seed._load_mnemonic(card, mnemonic, pin_code, passphrase=passphrase)
