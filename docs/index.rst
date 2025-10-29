@@ -8,6 +8,7 @@ Welcome to the technical documentation of Cryptnoxpro.
    :caption: Contents:
 
    overview
+   cli
    modules
    license
 
