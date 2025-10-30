@@ -18,7 +18,7 @@ except ImportError:
 
 _CONFIGURATION = {}
 REMOTE_CONNECTIONS = []
-
+MAX_PASSPHRASE_LENGTH = 100
 
 def get_default_configuration() -> Dict:
     """

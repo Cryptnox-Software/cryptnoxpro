@@ -10,9 +10,6 @@ A command line user interface to manage and use of `Cryptnox Smart cards <https:
 This provides basic wallets for `Bitcoin <https://bitcoin.org>`_ and
 `Ethereum <https://ethereum.org>`_.
 
-It is able to execute `cleos <https://eos.io/for-developers/build/cleos/>`_ commands and use
-the keys on the card for signing.
-
 To buy NFC enabled cards that are supported by this application go to:
 `https://www.cryptnox.com/ <https://www.cryptnox.com/>`_
 

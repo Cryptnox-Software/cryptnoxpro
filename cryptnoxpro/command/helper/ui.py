@@ -14,6 +14,7 @@ from stdiomask import getpass
 from tabulate import tabulate
 
 from . import security
+from cryptnoxpro.config import MAX_PASSPHRASE_LENGTH
 
 InitData = namedtuple("InitData", ["name", "email", "pin", "puk"])
 
@@ -230,7 +231,7 @@ def get_bip39_passphrase(confirm_required: bool = True) -> str:
     else:
         passphrase = getpass("Passphrase: ")
 
-    if len(passphrase) > 100:
+    if len(passphrase) > MAX_PASSPHRASE_LENGTH:
         print("ERROR: Passphrase must be at most 100 characters. Please try again.")
         raise ExitException("Passphrase exceeds 100 characters")
 
@@ -248,7 +249,7 @@ def get_bip39_passphrase(confirm_required: bool = True) -> str:
 def _verify_passphrase_input() -> str:
     while True:
         passphrase = getpass("Passphrase: ")
-        if len(passphrase) > 100:
+        if len(passphrase) > MAX_PASSPHRASE_LENGTH:
             print("ERROR: Passphrase must be at most 100 characters. Please try again.")
             print()
             continue
