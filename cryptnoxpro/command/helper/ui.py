@@ -14,6 +14,7 @@ from stdiomask import getpass
 from tabulate import tabulate
 
 from . import security
+from cryptnoxpro.config import MAX_PASSPHRASE_LENGTH
 
 InitData = namedtuple("InitData", ["name", "email", "pin", "puk"])
 
@@ -201,3 +202,61 @@ def _verify_input(card: cryptnoxpy.Card, method, text, verify_text,
         print(error)
 
     return value
+
+
+def get_bip39_passphrase(confirm_required: bool = True) -> str:
+    print()
+    print_warning("BIP39 PASSPHRASE FEATURE")
+    print("A BIP39 passphrase is an optional extra password that provides additional security.")
+    print("Different passphrases create completely different wallets from the same mnemonic.")
+    print()
+    print("IMPORTANT WARNINGS:")
+    print("  • If you forget your passphrase, your funds are PERMANENTLY LOST")
+    print("  • Passphrases are case-sensitive and spaces matter")
+    print("  • There is NO way to recover funds without the exact passphrase")
+    print("  • Press ENTER to skip passphrase (standard BIP39 with empty passphrase)")
+    print()
+
+    use_passphrase = confirm("Do you want to use a BIP39 passphrase?")
+
+    if not use_passphrase:
+        return ""
+
+    print()
+    print("Enter your BIP39 passphrase:")
+    print("(Any UTF-8 characters are valid, but avoid unusual characters you might forget)")
+
+    if confirm_required:
+        passphrase = _verify_passphrase_input()
+    else:
+        passphrase = getpass("Passphrase: ")
+
+    if len(passphrase) > MAX_PASSPHRASE_LENGTH:
+        print("ERROR: Passphrase must be at most 100 characters. Please try again.")
+        raise ExitException("Passphrase exceeds 100 characters")
+
+    print()
+    print("Please write down your passphrase and store it securely.")
+    print("Without this exact passphrase, you CANNOT access your wallet.")
+    print()
+
+    if not confirm("Have you securely stored your passphrase?"):
+        raise ExitException("User needs to store passphrase securely")
+
+    return passphrase
+
+
+def _verify_passphrase_input() -> str:
+    while True:
+        passphrase = getpass("Passphrase: ")
+        if len(passphrase) > MAX_PASSPHRASE_LENGTH:
+            print("ERROR: Passphrase must be at most 100 characters. Please try again.")
+            print()
+            continue
+        verify_passphrase = getpass("Confirm passphrase: ")
+
+        if passphrase == verify_passphrase:
+            return passphrase
+
+        print("ERROR: Passphrases do not match. Please try again.")
+        print()

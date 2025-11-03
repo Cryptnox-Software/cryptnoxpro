@@ -66,7 +66,21 @@ class Seed(Command):
         return result
 
     @staticmethod
-    def _backup(card: cryptnoxpy.Card, pin_code: str = None, seed: bytes = None) -> int:
+    def _backup(card: cryptnoxpy.Card, pin_code: str = None, seed: bytes = None,
+                passphrase: str = '') -> int:
+        """
+        Backup seed to AWS KMS and load onto card with optional BIP39 passphrase.
+
+        Note: The backup service stores only the raw seed entropy, not the passphrase.
+        The passphrase is used only when loading the mnemonic onto the card.
+        Users must remember their passphrase separately.
+
+        :param card: The Cryptnox card
+        :param pin_code: The card PIN code
+        :param seed: Optional pre-generated seed bytes
+        :param passphrase: Optional BIP39 passphrase
+        :return: 0 on success, -1 on error
+        """
         pin_code = pin_code or Seed._get_pin_code(card)
 
         credentials_file = Path(get_download_folder()).joinpath('rootkey.csv')
@@ -121,7 +135,7 @@ class Seed(Command):
 
         print("Seed successfully saved. Writing card.")
         mnemonic = cryptos.entropy_to_words(seed)
-        Seed._load_mnemonic(card, mnemonic, pin_code)
+        Seed._load_mnemonic(card, mnemonic, pin_code, passphrase=passphrase)
 
         data = list(service.region.items())
         data.append(("name", name))
@@ -130,6 +144,13 @@ class Seed(Command):
         backup_file = Path.home().joinpath(f"{name}.txt")
         backup_file.write_text(tabulate(data))
         print(f"\nBackup data also saved to: {backup_file}")
+
+        if passphrase:
+            print()
+            ui.print_warning("IMPORTANT: BIP39 PASSPHRASE IN USE")
+            print("The backup service stores only the seed entropy, NOT your passphrase.")
+            print("You must remember and store your BIP39 passphrase separately!")
+            print("To restore this wallet, you will need BOTH the backup AND your passphrase.")
 
         Seed._remove_credentials(credentials_file, service)
 
@@ -162,7 +183,22 @@ class Seed(Command):
 
     @staticmethod
     def _chip(card: cryptnoxpy.Card) -> int:
+        """
+        Generate seed directly in the card's secure chip.
+
+        Note: This method generates the seed entirely on the card's hardware and does not
+        use BIP39 mnemonics. Therefore, BIP39 passphrases do not apply to this seed
+        generation method. The seed cannot be exported or backed up as a mnemonic phrase.
+
+        :param card: The Cryptnox card
+        :return: 0 on success
+        """
         pin_code = Seed._get_pin_code(card)
+
+        print("Generating seed directly in card's secure chip...")
+        print("Note: This seed is generated on-chip and does not use BIP39 mnemonics.")
+        print("BIP39 passphrases do not apply to this generation method.")
+        print()
 
         card.generate_seed(pin_code)
         print("New key generated in card.")
@@ -191,6 +227,17 @@ class Seed(Command):
         return access_key_id, secret_access_key
 
     def _dual_seed(self, card: cryptnoxpy.Card) -> int:
+        """
+        Generate the same seed on two cards using secure dual-card generation.
+
+        Note: This method generates seeds using a secure two-card protocol and does not
+        use BIP39 mnemonics. Therefore, BIP39 passphrases do not apply to this seed
+        generation method. The seed is generated securely on both cards and never leaves
+        the hardware.
+
+        :param card: The first Cryptnox card
+        :return: 0 on success, -1 or -2 on error
+        """
         try:
             card.dual_seed_public_key()
         except NotImplementedError as error:
@@ -198,6 +245,11 @@ class Seed(Command):
             return -1
         except cryptnoxpy.exceptions.DataValidationException:
             pass
+
+        print("Dual seed generation process starting...")
+        print("Note: This method uses secure on-chip generation and does not use BIP39 mnemonics.")
+        print("BIP39 passphrases do not apply to this generation method.")
+        print()
 
         pin_code = Seed._get_pin_code(card)
 
@@ -287,20 +339,42 @@ class Seed(Command):
         return card
 
     @staticmethod
-    def _load_mnemonic(card: cryptnoxpy.Card, mnemonic: str, pin_code: str) -> None:
+    def _load_mnemonic(card: cryptnoxpy.Card, mnemonic: str, pin_code: str,
+                       passphrase: str = '') -> None:
+        """
+        Load mnemonic onto card with optional BIP39 passphrase.
+
+        :param card: The Cryptnox card
+        :param mnemonic: The BIP39 mnemonic phrase (12 or 24 words)
+        :param pin_code: The card PIN code
+        :param passphrase: Optional BIP39 passphrase (13th/25th word)
+        """
         if len(mnemonic.split(' ')) not in (12, 24):
             raise ValueError('Only mnemonic passphrases of length 12 and 24 are supported')
-        seed = cryptos.bip39_mnemonic_to_seed(mnemonic)
+        seed = cryptos.bip39_mnemonic_to_seed(mnemonic, passphrase=passphrase)
         card.load_seed(seed, pin_code)
 
     @staticmethod
     def _recover(card: cryptnoxpy.Card) -> int:
+        """
+        Recover wallet from BIP39 mnemonic phrase with optional passphrase.
+
+        :param card: The Cryptnox card
+        :return: 0 on success, -1 on error
+        """
         pin_code = Seed._get_pin_code(card)
 
         print("\nEnter the mnemonic root to recover (12 or 24 words):")
         mnemonic = ui.input_with_exit("> ")
+
         try:
-            seed = cryptos.bip39_mnemonic_to_seed(mnemonic)
+            passphrase = ui.get_bip39_passphrase(confirm_required=True)
+        except ui.ExitException as error:
+            print(error)
+            return -1
+
+        try:
+            seed = cryptos.bip39_mnemonic_to_seed(mnemonic, passphrase=passphrase)
         except Exception as error:
             print(error)
             return -1
@@ -308,14 +382,16 @@ class Seed(Command):
         do_backup = ui.confirm('Do you wish to backup your seed to AWS KMS?')
         try:
             if do_backup:
-                Seed._backup(card, pin_code, seed)
+                Seed._backup(card, pin_code, seed, passphrase=passphrase)
             else:
-                Seed._load_mnemonic(card, mnemonic, pin_code)
+                Seed._load_mnemonic(card, mnemonic, pin_code, passphrase=passphrase)
         except Exception as error:
             print(error)
             return -1
 
         print("Mnemonic loaded, please keep it safe for backup.")
+        if passphrase:
+            print("You MUST use the same passphrase when restoring this wallet.")
 
         return 0
 
@@ -331,6 +407,15 @@ class Seed(Command):
 
     @staticmethod
     def _restore(card: cryptnoxpy.Card) -> int:
+        """
+        Restore seed from AWS KMS backup with optional BIP39 passphrase.
+
+        Note: The backup service stores only the seed entropy. If a BIP39 passphrase
+        was used when creating the wallet, it must be provided again during restore.
+
+        :param card: The Cryptnox card
+        :return: 0 on success, -1 on error
+        """
         pin_code = Seed._get_pin_code(card)
         credentials_file = Path(get_download_folder()).joinpath('rootkey.csv')
         access_key_id, secret_access_key = Seed._credentials(credentials_file)
@@ -357,8 +442,19 @@ class Seed(Command):
             print("There was an issue with the retrieved backup in converting it to a mnemonic.")
             return -1
 
-        print("Seed successfully retrieved. Writing card.")
-        Seed._load_mnemonic(card, mnemonic, pin_code)
+        print("Seed successfully retrieved.")
+        print()
+        print("If you used a BIP39 passphrase when creating this wallet,")
+        print("you must provide the same passphrase now.")
+
+        try:
+            passphrase = ui.get_bip39_passphrase(confirm_required=False)
+        except ui.ExitException as error:
+            print(error)
+            return -1
+
+        print("Writing card.")
+        Seed._load_mnemonic(card, mnemonic, pin_code, passphrase=passphrase)
         print("\nMnemonic loaded from backup service.")
 
         Seed._remove_credentials(credentials_file, service)
@@ -367,16 +463,29 @@ class Seed(Command):
 
     @staticmethod
     def _upload(card: cryptnoxpy.Card) -> int:
+        """
+        Generate new seed, optionally with BIP39 passphrase, and upload to card.
+
+        :param card: The Cryptnox card
+        :return: 0 on success, -1 on error
+        """
         pin_code = Seed._get_pin_code(card)
         seed = card.generate_random_number(32)
         mnemonic = cryptos.entropy_to_words(seed)
+
+        try:
+            passphrase = ui.get_bip39_passphrase(confirm_required=True)
+        except ui.ExitException as error:
+            print(error)
+            return -1
+
         do_backup = ui.confirm('Do you wish to backup your seed to AWS KMS?')
 
         try:
             if do_backup:
-                Seed._backup(card, pin_code, seed)
+                Seed._backup(card, pin_code, seed, passphrase=passphrase)
             else:
-                Seed._load_mnemonic(card, mnemonic, pin_code)
+                Seed._load_mnemonic(card, mnemonic, pin_code, passphrase=passphrase)
         except Exception as error:
             print(error)
             return -1
@@ -385,5 +494,16 @@ class Seed(Command):
         print(mnemonic)
 
         print("\nMnemonic loaded, please save this root mnemonic for backup.")
+
+        if passphrase:
+            print()
+            ui.print_warning("IMPORTANT: BIP39 PASSPHRASE IN USE")
+            print("You are using a BIP39 passphrase with this wallet.")
+            print("To restore this wallet, you will need BOTH:")
+            print("  1. The mnemonic phrase shown above")
+            print("  2. Your BIP39 passphrase")
+            print()
+            print("Store your passphrase separately and securely!")
+            print("Without the exact passphrase, you CANNOT access your funds.")
 
         return 0
