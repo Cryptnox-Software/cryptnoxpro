@@ -1,0 +1,90 @@
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/7613b715-90f3-4855-890e-9bba08add646" alt="cryptnox-icon" height="200" width="200" />
+</p>
+
+<h3 align="center">Cryptnox Pro — Smartcard CLI</h3>
+
+<br/>
+
+[![PyPI](https://img.shields.io/pypi/v/cryptnoxpro.svg)](https://pypi.org/project/cryptnoxpro/)
+[![Python versions](https://img.shields.io/pypi/pyversions/cryptnoxpro.svg)](https://pypi.org/project/cryptnoxpro/)
+[![Documentation status](https://img.shields.io/badge/docs-latest-blue)](https://cryptnox-software.github.io/cryptnoxpro)
+[![License: GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
+## About
+
+
+`cryptnoxpro` is a command-line interface for managing **Cryptnox Smartcards**, enabling secure seed initialization and cryptographic signing for **Bitcoin** and **Ethereum**.
+
+## Supported hardware
+
+- **Cryptnox Smartcards** 💳
+- **Standard PC/SC Smartcard Readers**: either USB NFC reader or a USB smartcard reader
+  → Readers are also available in the Cryptnox shop.
+
+Get your card and readers here: [shop.cryptnox.com](https://shop.cryptnox.com)
+
+
+## Installation
+> 💡 This is only a minimal setup. Additional packages may be required depending on your operating system. See [Installation and Requirements](https://cryptnox-software.github.io/cryptnoxpro/overview.html#installation-and-requirements).
+
+### From PyPI
+
+```bash
+pip install cryptnoxpro
+```
+
+### From source
+
+```bash
+git clone https://github.com/cryptnox-software/cryptnoxpro.git
+cd cryptnoxpro
+pip install .
+```
+This installs the package and makes the `cryptnox` command available (if your Python installation is in your system `PATH`).
+## Quick usage examples
+> 💡 The examples below are only a subset of available commands. The complete list of commands and detailed usage instructions is described in the [official documentation](https://cryptnox-software.github.io/cryptnoxpro).
+### 1. Dual initialization
+
+1. Factory reset each card:  
+   `cryptnox reset` → enter PUK → verify reset.
+
+2. Initialize each card:  
+   `cryptnox init` → (optional) set name/email → set **PIN** (4–9 digits) → set or generate **PUK** → verify init.
+
+3. Run dual seed procedure:  
+   `cryptnox seed dual` — follow prompts: insert Card A (enter PIN), swap to Card B (enter PIN), swap back as requested.
+
+### 2. Sign and send a Bitcoin transaction
+
+1. Create or obtain a raw unsigned transaction externally.
+2. Run the signing & send command:  
+   `cryptnox btc send <recipient_address> <amount> [-f <fees>]`
+
+### 3. Change PIN code
+
+1. Run command: `cryptnox change_pin`
+2. Enter current PIN → enter new PIN → verify change.  
+3. Check with `cryptnox info` using new PIN (BTC & ETH accounts displayed).
+
+### 3. Change PIN code
+
+1. Run command: `cryptnox change_pin`
+2. Enter current PIN → enter new PIN → verify change.  
+3. Check with `cryptnox info` using new PIN (BTC & ETH accounts displayed).
+
+### 4. Get extended public key (xpub)
+
+1. Run command: `cryptnox get_xpub`
+2. Enter **PIN** → enter **PUK**
+3. The card returns the **xpub**
+
+
+## Documentation
+
+The full **User & Developer documentation** is available at the [CryptnoxPro Documentation](https://cryptnox-software.github.io/cryptnoxpro). It covers installation and setup, usage guides and examples, CLI command reference, and developer notes with API details.
+
+## License
+
+Licensed under **GPLv3**: [GNU GPLv3 License](https://www.gnu.org/licenses/gpl-3.0.en.html).  
+Commercial licensing options are available — email **contact@cryptnox.ch** for inquiries.
