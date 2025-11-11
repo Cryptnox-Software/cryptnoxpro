@@ -30,6 +30,14 @@ cryptnoxpro.enums module
    :undoc-members:
    :show-inheritance:
 
+cryptnoxpro.constants module
+----------------------------
+
+.. automodule:: cryptnoxpro.constants
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 cryptnoxpro.interactive\_cli module
 -----------------------------------
 
