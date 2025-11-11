@@ -14,7 +14,7 @@ from stdiomask import getpass
 from tabulate import tabulate
 
 from . import security
-from cryptnoxpro.config import MAX_PASSPHRASE_LENGTH
+from cryptnoxpro.constants import MAX_PASSPHRASE_LENGTH
 
 InitData = namedtuple("InitData", ["name", "email", "pin", "puk"])
 
