@@ -54,8 +54,8 @@ jobs:
       - name: Commit and push changes
         run: |
           cd docs-repo
-          git config --local user.email "yannw.dev@gmail.com"
-          git config --local user.name "YanNaingWinDev"
+          git config --local user.email "yann@oinsm.ch"
+          git config --local user.name "YanNaingWinn"
           git add .
           git commit -m "Update cryptnoxpro documentation from cryptnoxpro@${{ github.sha }}" || exit 0
           git push

@@ -11,5 +11,5 @@ def read(file):
 
 
 setup(
-    long_description="\n\n".join((read("README.rst"), read("CHANGELOG.rst"))),
+    long_description="\n\n".join((read("README.md"), read("CHANGELOG.rst"))),
 )
