@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/7613b715-90f3-4855-890e-9bba08add646" alt="cryptnox-icon" height="200" width="200" />
+  <img src="https://github.com/user-attachments/assets/6ce54a27-8fb6-48e6-9d1f-da144f43425a"/>
 </p>
 
 <h3 align="center">Cryptnox Pro — Smartcard CLI</h3>
