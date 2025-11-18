@@ -1,5 +1,5 @@
-Cryptnoxpro Overview
-====================
+Cryptnox CLI Overview
+=====================
 
 .. include:: ../README.rst
 

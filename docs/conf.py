@@ -11,10 +11,10 @@ import sys
 
 sys.path.insert(0, os.path.abspath(".."))
 
-project = 'cryptnoxpro'
+project = 'cryptnox-cli'
 copyright = '2025, Cryptnox'
 author = 'Cryptnox'
-release = '2.9.1'
+release = '1.0.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -35,8 +35,8 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # autodoc_mock_imports - Sphinx will create mock imports for these modules
 # This is safer than manual sys.modules mocking and prevents hangs
 autodoc_mock_imports = [
-    # Cryptnox
-    'cryptnoxpy',
+    # Cryptnox SDK (PyPI package: cryptnox-sdk-py)
+    'cryptnox_sdk_py',
     # Input/Output
     'stdiomask',
     'tabulate',

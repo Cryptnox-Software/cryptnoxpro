@@ -2,19 +2,19 @@
   <img src="https://github.com/user-attachments/assets/6ce54a27-8fb6-48e6-9d1f-da144f43425a"/>
 </p>
 
-<h3 align="center">Cryptnox Pro — Smartcard CLI</h3>
+<h3 align="center">Cryptnox CLI — Smartcard CLI</h3>
 
 <br/>
 
-[![PyPI](https://img.shields.io/pypi/v/cryptnoxpro.svg)](https://pypi.org/project/cryptnoxpro/)
-[![Python versions](https://img.shields.io/pypi/pyversions/cryptnoxpro.svg)](https://pypi.org/project/cryptnoxpro/)
-[![Documentation status](https://img.shields.io/badge/docs-latest-blue)](https://cryptnox-software.github.io/cryptnoxpro)
+[![PyPI](https://img.shields.io/pypi/v/cryptnox-cli.svg)](https://pypi.org/project/cryptnox-cli/)
+[![Python versions](https://img.shields.io/pypi/pyversions/cryptnox-cli.svg)](https://pypi.org/project/cryptnox-cli/)
+[![Documentation status](https://img.shields.io/badge/docs-latest-blue)](https://cryptnox-software.github.io/cryptnox-cli)
 [![License: GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 ## About
 
 
-`cryptnoxpro` is a command-line interface for managing **Cryptnox Smartcards**, enabling secure seed initialization and cryptographic signing for **Bitcoin** and **Ethereum**.
+`cryptnox-cli` is a command-line interface for managing **Cryptnox Smartcards**, enabling secure seed initialization and cryptographic signing for **Bitcoin** and **Ethereum**.
 
 ## Supported hardware
 
@@ -26,24 +26,24 @@ Get your card and readers here: [shop.cryptnox.com](https://shop.cryptnox.com)
 
 
 ## Installation
-> 💡 This is only a minimal setup. Additional packages may be required depending on your operating system. See [Installation and Requirements](https://cryptnox-software.github.io/cryptnoxpro/overview.html#installation-and-requirements).
+> 💡 This is only a minimal setup. Additional packages may be required depending on your operating system. See [Installation and Requirements](https://cryptnox-software.github.io/cryptnox-cli/overview.html#installation-and-requirements).
 
 ### From PyPI
 
 ```bash
-pip install cryptnoxpro
+pip install cryptnox-cli
 ```
 
 ### From source
 
 ```bash
-git clone https://github.com/cryptnox-software/cryptnoxpro.git
-cd cryptnoxpro
+git clone https://github.com/cryptnox-software/cryptnox-cli.git
+cd cryptnox-cli
 pip install .
 ```
 This installs the package and makes the `cryptnox` command available (if your Python installation is in your system `PATH`).
 ## Quick usage examples
-> 💡 The examples below are only a subset of available commands. The complete list of commands and detailed usage instructions is described in the [official documentation](https://cryptnox-software.github.io/cryptnoxpro).
+> 💡 The examples below are only a subset of available commands. The complete list of commands and detailed usage instructions is described in the [official documentation](https://cryptnox-software.github.io/cryptnox-cli).
 ### 1. Dual initialization
 
 1. Factory reset each card:  
@@ -82,7 +82,7 @@ This installs the package and makes the `cryptnox` command available (if your Py
 
 ## Documentation
 
-The full **User & Developer documentation** is available at the [CryptnoxPro Documentation](https://cryptnox-software.github.io/cryptnoxpro). It covers installation and setup, usage guides and examples, CLI command reference, and developer notes with API details.
+The full **User & Developer documentation** is available at the [Cryptnox CLI Documentation](https://cryptnox-software.github.io/cryptnox-cli). It covers installation and setup, usage guides and examples, CLI command reference, and developer notes with API details.
 
 ## License
 

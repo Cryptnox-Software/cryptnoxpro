@@ -1,7 +1,7 @@
-Cryptnoxpro Documentation
-=========================
+Cryptnox CLI Documentation
+==========================
 
-Welcome to the technical documentation of Cryptnoxpro.
+Welcome to the technical documentation of Cryptnox CLI.
 
 .. toctree::
    :maxdepth: 2
