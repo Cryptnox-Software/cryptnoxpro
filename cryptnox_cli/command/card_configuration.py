@@ -69,10 +69,14 @@ class CardConfiguration(Command):
         ]
         try:
             data += [
-                ["RSA 2048 user key", CardConfiguration._bool_to_str(card.user_key_enabled(cryptnox_sdk_py.SlotIndex.RSA))],
+                ["RSA 2048 user key",
+                 CardConfiguration._bool_to_str(
+                     card.user_key_enabled(cryptnox_sdk_py.SlotIndex.RSA))],
                 ["ECC 256 user key",
                  CardConfiguration._bool_to_str(card.user_key_enabled(cryptnox_sdk_py.SlotIndex.EC256R1))],
-                ["FIDO2 user key", CardConfiguration._bool_to_str(card.user_key_enabled(cryptnox_sdk_py.SlotIndex.FIDO))]
+                ["FIDO2 user key",
+                 CardConfiguration._bool_to_str(
+                     card.user_key_enabled(cryptnox_sdk_py.SlotIndex.FIDO))]
             ]
         except NotImplementedError:
             data += [["User keys", "Not available"]]
