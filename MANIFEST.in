@@ -1,5 +1,5 @@
 include LICENSE
 include CHANGELOG.rst
-include README.rst
-include cryptnoxpro/contract_abi/*.json
-include cryptnoxpro/lib/cryptos/english.txt
+include README.md
+include cryptnox_cli/contract_abi/*.json
+include cryptnox_cli/lib/cryptos/english.txt
