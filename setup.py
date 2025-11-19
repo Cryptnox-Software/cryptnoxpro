@@ -1,5 +1,5 @@
 """
-Configuration for setting up CryptnoxPro CLI application
+Configuration for setting up Cryptnox CLI application
 """
 import pathlib
 

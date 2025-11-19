@@ -2,12 +2,11 @@
 
 
 a = Analysis(
-    ['cryptnoxpro\\main.py'],
+    ['cryptnox_cli\\main.py'],
     pathex=[],
     binaries=[],
     datas=[
-        ('cryptnoxpro', 'cryptnoxpro'),
-        ('venv/lib/site-packages/lazy_import/VERSION', 'lazy_import/')
+        ('cryptnox_cli', 'cryptnox_cli')
     ],
     hiddenimports=[
         'lazy_import',
@@ -44,12 +43,12 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='CryptnoxPro-2.9.1-setup',
+    name='CryptnoxCLI-1.0.0-setup',
     icon='cryptnox.ico',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
-    upx=True,
+    upx=False,
     upx_exclude=[],
     runtime_tmpdir=None,
     console=True,
@@ -58,4 +57,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    onefile=False,
 )

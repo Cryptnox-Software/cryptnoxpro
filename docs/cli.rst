@@ -6,11 +6,11 @@ The ``cryptnox`` command provides a comprehensive CLI for managing Cryptnox card
 Installation
 ------------
 
-After installing the cryptnoxpro package, the ``cryptnox`` command becomes available in your system:
+After installing the cryptnox-cli package, the ``cryptnox`` command becomes available in your system:
 
 .. code-block:: bash
 
-   pip install cryptnoxpro
+   pip install cryptnox-cli
 
 Basic Usage
 -----------
@@ -547,7 +547,7 @@ In interactive mode, you can:
 .. code-block:: text
 
    $ cryptnox
-   Cryptnox Pro 2.9.1
+   Cryptnox CLI 1.0.0
    
    > list
    [Shows available cards]
@@ -619,7 +619,7 @@ Error Handling
 
 When errors occur:
   - Detailed error messages are displayed
-  - Errors are logged to: ``~/.local/share/cryptnoxpro/error.log`` (Linux/macOS) or ``%LOCALAPPDATA%\\cryptnox\\cryptnoxpro\\error.log`` (Windows)
+  - Errors are logged to: ``~/.local/share/cryptnox-cli/error.log`` (Linux/macOS) or ``%LOCALAPPDATA%\\cryptnox\\cryptnox-cli\\error.log`` (Windows)
   - You can report errors to help improve the application
 
 Examples
@@ -670,8 +670,8 @@ Examples
 See Also
 --------
 
-- :doc:`overview` - Overview of CryptnoxPro
-- :mod:`cryptnoxpro.command.seed` - Seed command implementation details
-- :doc:`cryptnoxpro.command` - All command implementations
+- :doc:`overview` - Overview of Cryptnox CLI
+- :mod:`cryptnox_cli.command.seed` - Seed command implementation details
+- :doc:`cryptnox_cli.command` - All command implementations
 - :doc:`modules` - Complete API Reference
 
