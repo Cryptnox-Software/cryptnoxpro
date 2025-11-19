@@ -66,7 +66,7 @@ The main ``cryptnox_cli`` package (Cryptnox CLI) exports:
 
 .. py:data:: __version__
    :type: str
-   :value: "2.9.1"
+   :value: "1.0.0"
 
    Current version of the Cryptnox CLI package.
 
