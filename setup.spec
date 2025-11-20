@@ -1,12 +1,20 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+import os
+import sys
+
+# Find lazy_import VERSION file
+import lazy_import
+lazy_import_version = os.path.join(os.path.dirname(lazy_import.__file__), 'VERSION')
 
 a = Analysis(
     ['cryptnox_cli\\main.py'],
     pathex=[],
     binaries=[],
     datas=[
-        ('cryptnox_cli', 'cryptnox_cli')
+        # Only include non-Python data files
+        ('cryptnox_cli\\contract_abi\\*.json', 'cryptnox_cli\\contract_abi'),
+        (lazy_import_version, 'lazy_import')
     ],
     hiddenimports=[
         'lazy_import',
@@ -26,7 +34,11 @@ a = Analysis(
         'websockets',
         'aiohttp',
         'botocore',
-        'awscrt'
+        'awscrt',
+        # Dynamically imported user_keys submodules
+        'cryptnox_cli.command.user_keys.aws_kms',
+        'cryptnox_cli.command.user_keys.hello',
+        'cryptnox_cli.command.user_keys.piv'
     ],
     hookspath=[],
     hooksconfig={},
@@ -35,6 +47,7 @@ a = Analysis(
     noarchive=False,
     optimize=0,
 )
+
 pyz = PYZ(a.pure)
 
 exe = EXE(

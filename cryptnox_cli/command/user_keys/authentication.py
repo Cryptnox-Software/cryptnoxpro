@@ -2,6 +2,7 @@
 Module for handling user authentication using third party solutions signature.
 """
 import importlib
+import sys
 from pathlib import Path
 from typing import (
     Dict,
@@ -12,9 +13,20 @@ import cryptnox_sdk_py
 
 from . import user_key_base
 
-for path in Path(__file__).parent.iterdir():
-    if path.is_dir():
-        importlib.import_module("." + path.name, package=__package__)
+# Handle dynamic module imports for both regular and PyInstaller frozen environments
+if getattr(sys, 'frozen', False):
+    # When frozen by PyInstaller, explicitly import known submodules
+    _submodules = ['aws_kms', 'hello', 'piv']
+    for submodule in _submodules:
+        try:
+            importlib.import_module("." + submodule, package=__package__)
+        except Exception:
+            pass
+else:
+    # When running normally, dynamically discover submodules
+    for path in Path(__file__).parent.iterdir():
+        if path.is_dir():
+            importlib.import_module("." + path.name, package=__package__)
 
 
 def add(name: str, card: cryptnox_sdk_py.Card, description: str, puk: str) -> bool:

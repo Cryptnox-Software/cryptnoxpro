@@ -20,12 +20,21 @@ try:
         options
     )
 except ImportError:
-    from . import __version__
-    from . import interactive_cli
-    from .command import (
-        factory,
-        options
-    )
+    try:
+        from . import __version__
+        from . import interactive_cli
+        from .command import (
+            factory,
+            options
+        )
+    except ImportError:
+        # When frozen by PyInstaller, use absolute imports
+        from cryptnox_cli import __version__
+        from cryptnox_cli import interactive_cli
+        from cryptnox_cli.command import (
+            factory,
+            options
+        )
 
 cryptnox_sdk_py = lazy_import.lazy_module("cryptnox_sdk_py")
 json = lazy_import.lazy_module("json")
