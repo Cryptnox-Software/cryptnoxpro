@@ -2,7 +2,7 @@
 Changelog
 =========
 
-`1.0.0 <https://github.com/Cryptnox-Software/cryptnox-cli/compare/v2.9.1...ver1.0.0>`_
+`1.0.1 <https://github.com/Cryptnox-Software/cryptnox-cli/compare/v2.9.1...ver1.0.1>`_
 ------------------------------------------------------------------------------------------------
 
 Added

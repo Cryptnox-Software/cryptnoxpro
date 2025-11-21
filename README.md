@@ -2,7 +2,7 @@
   <img src="https://github.com/user-attachments/assets/6ce54a27-8fb6-48e6-9d1f-da144f43425a"/>
 </p>
 
-<h3 align="center">Cryptnox CLI — Smartcard CLI</h3>
+<h3 align="center">CLI for managing Cryptnox smart card wallets.</h3>
 
 <br/>
 
@@ -11,10 +11,9 @@
 [![Documentation status](https://img.shields.io/badge/docs-latest-blue)](https://cryptnox-software.github.io/cryptnox-cli)
 [![License: GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-## About
-
-
 `cryptnox-cli` is a command-line interface for managing **Cryptnox Smartcards**, enabling secure seed initialization and cryptographic signing for **Bitcoin** and **Ethereum**.
+
+---
 
 ## Supported hardware
 
@@ -24,6 +23,7 @@
 
 Get your card and readers here: [shop.cryptnox.com](https://shop.cryptnox.com)
 
+---
 
 ## Installation
 > 💡 This is only a minimal setup. Additional packages may be required depending on your operating system. See [Installation and Requirements](https://cryptnox-software.github.io/cryptnox-cli/overview.html#installation-and-requirements).
@@ -42,6 +42,9 @@ cd cryptnox-cli
 pip install .
 ```
 This installs the package and makes the `cryptnox` command available (if your Python installation is in your system `PATH`).
+
+---
+
 ## Quick usage examples
 > 💡 The examples below are only a subset of available commands. The complete list of commands and detailed usage instructions is described in the [official documentation](https://cryptnox-software.github.io/cryptnox-cli).
 ### 1. Dual initialization
@@ -79,10 +82,13 @@ This installs the package and makes the `cryptnox` command available (if your Py
 2. Enter **PIN** → enter **PUK**
 3. The card returns the **xpub**
 
+---
 
 ## Documentation
 
 The full **User & Developer documentation** is available at the [Cryptnox CLI Documentation](https://cryptnox-software.github.io/cryptnox-cli). It covers installation and setup, usage guides and examples, CLI command reference, and developer notes with API details.
+
+---
 
 ## License
 
